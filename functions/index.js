@@ -10,7 +10,7 @@ Date.prototype.format = function() {
 };
 
 exports.ping = functions.https.onRequest((request, response) => {
-  response.send('SHE slash commands up and running! v0.1');
+  response.send('SHE slash commands up and running! v0.1.1');
 });
 
 exports.addMessage = functions.https.onRequest((req, res) => {
@@ -26,12 +26,12 @@ exports.addMessage = functions.https.onRequest((req, res) => {
 
 exports.addAttendancePost = functions.https.onRequest((req, res) => {
   const attendancePostContent =
-    ':dancing_banana: Rehearsal day! :dancing_banana: <!channel> \n';
-  ('Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup:');
-  ('(present) or :thumbsdown: (absent).\n');
-  ('Facilitator please respond with :raised_hands:!\n');
-  ('To volunteer for Physical warm up, respond with :muscle: ');
-  ('For Musical warm up, respond with :musical_note:.');
+    ':dancing_banana: Rehearsal day! :dancing_banana: <!channel> \n' +
+    'Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup:' +
+    '(present) or :thumbsdown: (absent).\n' +
+    'Facilitator please respond with :raised_hands:!\n' +
+    'To volunteer for Physical warm up, respond with :muscle: ' +
+    'For Musical warm up, respond with :musical_note:.';
 
   fetch('https://slack.com/api/chat.postMessage', {
     method: 'POST',
@@ -54,15 +54,17 @@ exports.addAttendancePost = functions.https.onRequest((req, res) => {
         .firestore()
         .collection('attendance')
         .add({
-          rehearsal_date: new Date(ts).format(),
+          rehearsal_date: new Date().format(),
           ts: ts,
           attending: [],
           notAttending: [],
           notResponded: []
         });
     })
+    .then(result =>
+      res.send(`Message posted! Saved to datastore with ID ${writeResult.id}.`)
+    )
     .catch(err => {
       throw new Error(err);
     });
-  return res.send('Posting a message now!');
 });
