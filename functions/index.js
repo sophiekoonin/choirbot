@@ -55,9 +55,7 @@ exports.addAttendancePost = functions
           });
       })
       .then(result =>
-        res.send(
-          `Message posted! Saved to datastore with ID ${writeResult.id}.`
-        )
+        res.send(`Message posted! Saved to datastore with ID ${result.id}.`)
       )
       .catch(err => {
         throw new Error(err);
