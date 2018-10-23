@@ -12,7 +12,7 @@ Date.prototype.format = function() {
 exports.ping = functions
   .region('europe-west1')
   .https.onRequest((request, response) => {
-    response.send('SHE slash commands up and running! v0.1.1');
+    response.send('SHE slash commands up and running! v0.1.2');
   });
 
 exports.addAttendancePost = functions
@@ -29,7 +29,7 @@ exports.addAttendancePost = functions
     fetch('https://slack.com/api/chat.postMessage', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json; charset=utf-8',
+        'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
         Authorization: `Bearer ${functions.config().shebot.token}`
       },
       body: JSON.stringify({
@@ -37,7 +37,44 @@ exports.addAttendancePost = functions
         channel: 'C2Z635VUJ',
         icon_emoji: ':ballot_box_with_check:',
         as_user: false,
-        username: 'Attendance Bot'
+        username: 'Attendance Bot',
+        attachments: [
+          {
+            callback_id: 'attendance_reply',
+            actions: [
+              {
+                name: 'attending',
+                text: ':+1:',
+                type: 'button',
+                value: 'pressed'
+              },
+              {
+                name: 'notAttending',
+                text: ':-1:',
+                type: 'button',
+                value: 'pressed'
+              },
+              {
+                name: 'physical',
+                text: ':muscle:',
+                type: 'button',
+                value: 'pressed'
+              },
+              {
+                name: 'musical',
+                text: ':musical_note:',
+                type: 'button',
+                value: 'pressed'
+              },
+              {
+                name: 'facilitator',
+                text: ':raised_hands:',
+                type: 'button',
+                value: 'pressed'
+              }
+            ]
+          }
+        ]
       })
     })
       .then(res => res.json())
