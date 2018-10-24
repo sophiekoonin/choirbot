@@ -16,15 +16,14 @@ exports.oauth_redirect = functions
     if (!request.query && !request.query.code) {
       return response.status(401).send("Missing query attribute 'code'");
     }
-
-    const queryParams = [
-      `code=${request.query.code}`,
-      `client_id=${functions.config().shebot.id}`,
-      `client_secret=${functions.config().shebot.secret}`,
-      `redirect_uri=https://europe-west1-${
+    const queryParams = {
+      code: request.query.code,
+      client_id: functions.config().shebot.id,
+      client_secret: functions.config().shebot.secret,
+      redirect_uri: `https://europe-west1-${
         process.env.GCLOUD_PROJECT
       }.cloudfunctions.net/oauth_redirect`
-    ];
+    };
     const encodedQueryString = querystring.stringify(queryParams);
     const options = {
       method: 'GET',
@@ -48,15 +47,14 @@ exports.oauth_redirect = functions
             )
             .send(302);
         }
-
-        return null;
-        //return  admin
-        //   .firestore()
-        //   .collection('installations')
-        //   .add({
-        //     token: result.access_token,
-        //     team: result.team_id
-        //   })
+        return admin
+          .firestore()
+          .collection('tokens')
+          .doc('token')
+          .set({
+            token: result.access_token,
+            team: result.team_id
+          });
       })
       .then(() =>
         response

@@ -18,11 +18,25 @@ exports.addAttendancePost = functions
       'To volunteer for Physical warm up, respond with :muscle: ' +
       'For Musical warm up, respond with :musical_note:.';
 
+    const token = admin
+      .firestore()
+      .collection('tokens')
+      .doc('token')
+      .get()
+      .then(doc => {
+        if (!doc.exists) {
+          console.log('Token not found!');
+          return null;
+        } else {
+          return doc.data()['token'];
+        }
+      })
+      .catch(err => console.error(err));
     fetch('https://slack.com/api/chat.postMessage', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
-        Authorization: `Bearer ${functions.config().shebot.token}`
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({
         text: attendancePostContent,
@@ -70,8 +84,9 @@ exports.addAttendancePost = functions
       })
     })
       .then(res => res.json())
-      .then(({ message }) => {
-        const { ts, channel } = message;
+      .then(json => {
+        console.log(json);
+        const { ts, channel } = json.message;
         return admin
           .firestore()
           .collection('attendance')

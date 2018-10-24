@@ -6,7 +6,7 @@ const auth = require('./auth');
 const attendance = require('./attendance');
 
 admin.initializeApp();
-
+admin.firestore().settings({ timestampsInSnapshots: true });
 exports.ping = functions
   .region('europe-west1')
   .https.onRequest((request, response) => {
