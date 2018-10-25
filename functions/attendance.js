@@ -11,6 +11,7 @@ Date.prototype.format = function() {
 exports.addAttendancePost = functions
   .region('europe-west1')
   .https.onRequest((req, res) => {
+    const env = functions.config().shebot.env;
     const attendancePostContent =
       ':dancing_banana: Rehearsal day! :dancing_banana: <!channel> \n' +
       'Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup:' +
@@ -19,64 +20,68 @@ exports.addAttendancePost = functions
       'To volunteer for Physical warm up, respond with :muscle: ' +
       'For Musical warm up, respond with :musical_note:.';
 
-    const token = admin
-      .firestore()
-      .collection('tokens')
-      .doc('token')
-      .get()
-      .then(doc => {
-        if (!doc.exists) {
-          console.log('Token not found!');
-          return null;
-        } else {
-          return doc.data()['access_token'];
-        }
-      })
-      .catch(err => console.error(err));
+    const { team_id, channel_id } = req.body;
+    const token =
+      env === 'prod'
+        ? admin
+            .firestore()
+            .collection('tokens')
+            .doc(team_id)
+            .get()
+            .then(doc => {
+              if (!doc.exists) {
+                throw new Error('Token not found');
+              } else {
+                return doc.get('token');
+              }
+            })
+        : functions.config().slack.token;
 
     const postData = {
       text: attendancePostContent,
-      channel: 'C2Z635VUJ',
-      icon_emoji: ':ballot_box_with_check:',
+      channel: channel_id,
       as_user: false,
       username: 'Attendance Bot',
-      attachments: [
+      attachments: JSON.stringify([
         {
+          title: 'Testing!',
+          fallback: 'Please react with emoji today',
+          attachment_type: 'default',
           callback_id: 'attendance_reply',
           actions: [
             {
-              name: 'attending',
+              name: 'option',
               text: ':+1:',
               type: 'button',
-              value: 'pressed'
+              value: 'yes'
             },
             {
-              name: 'notAttending',
+              name: 'option',
               text: ':-1:',
               type: 'button',
-              value: 'pressed'
+              value: 'no'
             },
             {
-              name: 'physical',
+              name: 'option',
               text: ':muscle:',
               type: 'button',
-              value: 'pressed'
+              value: 'phys'
             },
             {
-              name: 'musical',
+              name: 'option',
               text: ':musical_note:',
               type: 'button',
-              value: 'pressed'
+              value: 'mus'
             },
             {
-              name: 'facilitator',
+              name: 'option',
               text: ':raised_hands:',
               type: 'button',
-              value: 'pressed'
+              value: 'fac'
             }
           ]
         }
-      ]
+      ])
     };
     fetch('https://slack.com/api/chat.postMessage', {
       method: 'POST',
@@ -88,7 +93,11 @@ exports.addAttendancePost = functions
     })
       .then(res => res.json())
       .then(json => {
+        if (!json.ok) throw new Error(json.error);
         const { ts, channel } = json.message;
+        if (env !== 'prod') {
+          return { id: ts };
+        }
         return admin
           .firestore()
           .collection('attendance')

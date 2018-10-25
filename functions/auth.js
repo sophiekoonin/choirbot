@@ -50,7 +50,7 @@ exports.oauth_redirect = functions
         return admin
           .firestore()
           .collection('tokens')
-          .doc('token')
+          .doc(result.team_id)
           .set({
             token: result.access_token,
             team: result.team_id

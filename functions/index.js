@@ -15,3 +15,24 @@ exports.ping = functions
 
 exports.addAttendancePost = attendance.addAttendancePost;
 exports.oauth_redirect = auth.oauth_redirect;
+
+exports.test = functions
+  .region('europe-west1')
+  .https.onRequest((request, response) => {
+    return admin
+      .firestore()
+      .collection('tokens')
+      .doc('token')
+      .get()
+      .then(doc => {
+        if (!doc.exists) {
+          throw new Error('Token not found');
+        } else {
+          return doc.get('token');
+        }
+      })
+      .then(value => {
+        return response.send(`Data is ${value}`);
+      })
+      .catch(err => console.error(err));
+  });
