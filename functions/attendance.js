@@ -20,7 +20,7 @@ exports.addAttendancePost = functions
       'To volunteer for Physical warm up, respond with :muscle: ' +
       'For Musical warm up, respond with :musical_note:.';
 
-    const { team_id, channel_id } = req.body;
+function getTokenAndPostOptions() {
     const token =
       env === 'prod'
         ? admin
@@ -37,6 +37,28 @@ exports.addAttendancePost = functions
             })
         : functions.config().slack.token;
 
+  return {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Authorization: `Bearer ${token}`
+    }
+  };
+}
+
+exports.addAttendancePost = functions
+  .region('europe-west1')
+  .https.onRequest((req, res) => {
+    const attendancePostContent =
+      ':dancing_banana: Rehearsal day! :dancing_banana: <!channel> \n' +
+      'Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup:' +
+      '(present) or :thumbsdown: (absent).\n' +
+      'Facilitator please respond with :raised_hands:!\n' +
+      'To volunteer for Physical warm up, respond with :muscle: ' +
+      'For Musical warm up, respond with :musical_note:.';
+
+    const { team_id, channel_id } = req.body;
+
     const postData = {
       text: attendancePostContent,
       channel: channel_id,
@@ -44,53 +66,75 @@ exports.addAttendancePost = functions
       username: 'Attendance Bot',
       attachments: JSON.stringify([
         {
-          title: 'Testing!',
           fallback: 'Please react with emoji today',
           attachment_type: 'default',
           callback_id: 'attendance_reply',
+          fields: [
+            {
+              title: `${valueToEmojiMapper['attending']} 0`,
+              value: '',
+              short: false
+            },
+            {
+              title: `${valueToEmojiMapper['notAttending']} 0`,
+              value: '',
+              short: false
+            },
+            {
+              title: `${valueToEmojiMapper['facilitator']}`,
+              value: '',
+              short: false
+            },
+            {
+              title: `${valueToEmojiMapper['physical']}`,
+              value: '',
+              short: false
+            },
+            {
+              title: `${valueToEmojiMapper['musical']}`,
+              value: '',
+              short: false
+            }
+          ],
           actions: [
             {
               name: 'option',
-              text: ':+1:',
+              text: valueToEmojiMapper['attending'],
               type: 'button',
-              value: 'yes'
+              value: 'attending'
             },
             {
               name: 'option',
-              text: ':-1:',
+              text: valueToEmojiMapper['notAttending'],
               type: 'button',
-              value: 'no'
+              value: 'notAttending'
             },
             {
               name: 'option',
-              text: ':muscle:',
+              text: valueToEmojiMapper['facilitator'],
+              type: 'button',
+              value: 'fac'
+            },
+            {
+              name: 'option',
+              text: valueToEmojiMapper['physical'],
               type: 'button',
               value: 'phys'
             },
             {
               name: 'option',
-              text: ':musical_note:',
+              text: valueToEmojiMapper['musical'],
               type: 'button',
               value: 'mus'
-            },
-            {
-              name: 'option',
-              text: ':raised_hands:',
-              type: 'button',
-              value: 'fac'
             }
           ]
         }
       ])
     };
-    fetch('https://slack.com/api/chat.postMessage', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: `Bearer ${token}`
-      },
-      body: querystring.stringify(postData)
-    })
+
+    const options = getTokenAndPostOptions();
+    options.body = querystring.stringify(postData);
+    fetch('https://slack.com/api/chat.postMessage', options)
       .then(res => res.json())
       .then(json => {
         if (!json.ok) throw new Error(json.error);
@@ -103,6 +147,7 @@ exports.addAttendancePost = functions
           .collection('attendance')
           .add({
             rehearsal_date: new Date().format(),
+            created_at: firebase.firestore.FieldValue.serverTimestamp(),
             ts: ts,
             attending: [],
             notAttending: [],
