@@ -2,40 +2,67 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const fetch = require('node-fetch');
 const querystring = require('querystring');
+const env = functions.config().shebot.env;
 
 // eslint-disable-next-line
 Date.prototype.format = function() {
   return `${this.getDate()}/${this.getMonth() + 1}/${this.getFullYear()}`;
 };
 
-exports.addAttendancePost = functions
-  .region('europe-west1')
-  .https.onRequest((req, res) => {
-    const env = functions.config().shebot.env;
-    const attendancePostContent =
-      ':dancing_banana: Rehearsal day! :dancing_banana: <!channel> \n' +
-      'Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup:' +
-      '(present) or :thumbsdown: (absent).\n' +
-      'Facilitator please respond with :raised_hands:!\n' +
-      'To volunteer for Physical warm up, respond with :muscle: ' +
-      'For Musical warm up, respond with :musical_note:.';
+const valueToEmojiMapper = {
+  attending: ':+1:',
+  notAttending: ':-1:',
+  facilitator: ':raised_hands:',
+  musical: ':musical_note:',
+  physical: ':muscle:'
+};
+
+function findField(fields, value) {
+  const field = fields.find(field =>
+    field.text.includes(valueToEmojiMapper[value])
+  );
+  return {
+    indexOfField: fields.indexOf(field),
+    field: field
+  };
+}
+
+function getCount(text) {
+  return parseInt(field.text.substring(field.text.length - 1));
+}
+
+function addUserToField(field, value, user) {
+  const newField = Object.assign({}, field);
+  if (value === 'attending') {
+    newField.text = `${valueToEmojiMapper[value]} ${getCount(field.text) + 1}`;
+  }
+  newField.value = `${field.value} <!${user}>`;
+  return newField;
+}
+
+function removeUserFromField(fields, value, user) {
+  const newField = Object.assign({}, field);
+  newField.text = `${valueToEmojiMapper[value]} ${getCount(field.text) - 1}`;
+  newField.value = field.value.replace(`<!${user}>`, '');
+  return newField;
+}
 
 function getTokenAndPostOptions() {
-    const token =
-      env === 'prod'
-        ? admin
-            .firestore()
-            .collection('tokens')
-            .doc(team_id)
-            .get()
-            .then(doc => {
-              if (!doc.exists) {
-                throw new Error('Token not found');
-              } else {
-                return doc.get('token');
-              }
-            })
-        : functions.config().slack.token;
+  const token =
+    env === 'prod'
+      ? admin
+          .firestore()
+          .collection('tokens')
+          .doc(team_id)
+          .get()
+          .then(doc => {
+            if (!doc.exists) {
+              throw new Error('Token not found');
+            } else {
+              return doc.get('token');
+            }
+          })
+      : functions.config().slack.token;
 
   return {
     method: 'POST',
@@ -113,19 +140,19 @@ exports.addAttendancePost = functions
               name: 'option',
               text: valueToEmojiMapper['facilitator'],
               type: 'button',
-              value: 'fac'
+              value: 'facilitator'
             },
             {
               name: 'option',
               text: valueToEmojiMapper['physical'],
               type: 'button',
-              value: 'phys'
+              value: 'physical'
             },
             {
               name: 'option',
               text: valueToEmojiMapper['musical'],
               type: 'button',
-              value: 'mus'
+              value: 'musical'
             }
           ]
         }
@@ -161,3 +188,82 @@ exports.addAttendancePost = functions
         throw new Error(err);
       });
   });
+
+exports.registerAttendance = functions
+  .region('europe-west1')
+  .https.onRequest((req, res) => {
+    const { payload } = req.body;
+    const parsedPayload = JSON.parse(payload);
+    const { original_message, message_ts, user } = parsedPayload;
+    const { value } = parsedPayload['actions'][0] || null;
+    const { id } = user;
+    if (['attending', 'notAttending'].includes(value)) {
+      if (env === 'prod') {
+        admin.firestore
+          .collection('attendance')
+          .orderBy('created_at')
+          .limit(1)
+          .get()
+          .then(results => results[0])
+          .then(doc =>
+            doc.update({ [value]: admin.firestore.FieldValue.arrayUnion(user) })
+          )
+          .catch(err => console.error(err));
+      }
+      const options = getTokenAndPostOptions();
+      const { attachments } = original_message;
+      console.log('att', attachments);
+      const { fields } = attachments;
+      const { field, indexOfField } = findField(fields, value);
+      const updatedField =
+        value !== 'notAttending'
+          ? addUserToField(field, value, user)
+          : removeUserFromField(field, value, user);
+      fields[index] = field;
+      attachments.fields = fields;
+      const postBody = original_message;
+      postBody.attachments = attachments;
+      options.postBody = postBody;
+      fetch('https://slack.com/api/chat.update', options);
+    }
+  });
+
+const foo = {
+  original_message: {
+    text: 'New comic book alert!',
+    attachments: [
+      {
+        title: 'The Further Adventures of Slackbot',
+        fields: [
+          { title: 'Volume', value: '1', short: true },
+          { title: 'Issue', value: '3', short: true }
+        ],
+        author_name: 'Stanford S. Strickland',
+        author_icon:
+          'https://api.slack.comhttps://a.slack-edge.com/bfaba/img/api/homepage_custom_integrations-2x.png',
+        image_url: 'http://i.imgur.com/OJkaVOI.jpg?1'
+      },
+      {
+        title: 'Synopsis',
+        text:
+          'After @episod pushed exciting changes to a devious new branch back in Issue 1, Slackbot notifies @don about an unexpected deploy...'
+      },
+      {
+        fallback: 'Would you recommend it to customers?',
+        title: 'Would you recommend it to customers?',
+        callback_id: 'comic_1234_xyz',
+        color: '#3AA3E3',
+        attachment_type: 'default',
+        actions: [
+          {
+            name: 'recommend',
+            text: 'Recommend',
+            type: 'button',
+            value: 'recommend'
+          },
+          { name: 'no', text: 'No', type: 'button', value: 'bad' }
+        ]
+      }
+    ]
+  }
+};

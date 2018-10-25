@@ -15,7 +15,7 @@ exports.ping = functions
 
 exports.addAttendancePost = attendance.addAttendancePost;
 exports.oauth_redirect = auth.oauth_redirect;
-
+exports.registerAttendance = attendance.registerAttendance;
 exports.test = functions
   .region('europe-west1')
   .https.onRequest((request, response) => {
