@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const fetch = require('node-fetch');
+const querystring = require('querystring');
 
 // eslint-disable-next-line
 Date.prototype.format = function() {
@@ -28,64 +29,65 @@ exports.addAttendancePost = functions
           console.log('Token not found!');
           return null;
         } else {
-          return doc.data()['token'];
+          return doc.data()['access_token'];
         }
       })
       .catch(err => console.error(err));
+
+    const postData = {
+      text: attendancePostContent,
+      channel: 'C2Z635VUJ',
+      icon_emoji: ':ballot_box_with_check:',
+      as_user: false,
+      username: 'Attendance Bot',
+      attachments: [
+        {
+          callback_id: 'attendance_reply',
+          actions: [
+            {
+              name: 'attending',
+              text: ':+1:',
+              type: 'button',
+              value: 'pressed'
+            },
+            {
+              name: 'notAttending',
+              text: ':-1:',
+              type: 'button',
+              value: 'pressed'
+            },
+            {
+              name: 'physical',
+              text: ':muscle:',
+              type: 'button',
+              value: 'pressed'
+            },
+            {
+              name: 'musical',
+              text: ':musical_note:',
+              type: 'button',
+              value: 'pressed'
+            },
+            {
+              name: 'facilitator',
+              text: ':raised_hands:',
+              type: 'button',
+              value: 'pressed'
+            }
+          ]
+        }
+      ]
+    };
     fetch('https://slack.com/api/chat.postMessage', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+        'Content-Type': 'application/x-www-form-urlencoded',
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify({
-        text: attendancePostContent,
-        channel: 'C2Z635VUJ',
-        icon_emoji: ':ballot_box_with_check:',
-        as_user: false,
-        username: 'Attendance Bot',
-        attachments: [
-          {
-            callback_id: 'attendance_reply',
-            actions: [
-              {
-                name: 'attending',
-                text: ':+1:',
-                type: 'button',
-                value: 'pressed'
-              },
-              {
-                name: 'notAttending',
-                text: ':-1:',
-                type: 'button',
-                value: 'pressed'
-              },
-              {
-                name: 'physical',
-                text: ':muscle:',
-                type: 'button',
-                value: 'pressed'
-              },
-              {
-                name: 'musical',
-                text: ':musical_note:',
-                type: 'button',
-                value: 'pressed'
-              },
-              {
-                name: 'facilitator',
-                text: ':raised_hands:',
-                type: 'button',
-                value: 'pressed'
-              }
-            ]
-          }
-        ]
-      })
+      body: querystring.stringify(postData)
     })
       .then(res => res.json())
       .then(json => {
-        console.log(json);
         const { ts, channel } = json.message;
         return admin
           .firestore()
