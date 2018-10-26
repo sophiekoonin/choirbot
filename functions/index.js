@@ -5,6 +5,7 @@ const admin = require('firebase-admin');
 const auth = require('./auth');
 const attendance = require('./attendance');
 const rehearsals = require('./rehearsals');
+const google = require('./google');
 
 admin.initializeApp();
 admin.firestore().settings({ timestampsInSnapshots: true });
@@ -18,6 +19,9 @@ exports.addAttendancePost = attendance.addAttendancePost;
 exports.oauth_redirect = auth.oauth_redirect;
 exports.registerAttendance = attendance.registerAttendance;
 exports.postRehearsalMusic = rehearsals.postRehearsalMusic;
+exports.authGoogleAPI = google.authGoogleAPI;
+exports.googleOauthRedirect = google.googleOauthRedirect;
+
 exports.test = functions
   .region('europe-west1')
   .https.onRequest((request, response) => {

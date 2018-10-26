@@ -1,6 +1,8 @@
 {
   "name": "functions",
-  "engines": { "node": "8" },
+  "engines": {
+    "node": "8"
+  },
   "description": "Cloud Functions for Firebase",
   "scripts": {
     "lint": "eslint .",
@@ -14,7 +16,8 @@
     "firebase-admin": "6.0.0",
     "firebase-functions": "2.0.5",
     "node-fetch": "^2.2.0",
-    "moment": "^2.22.2"
+    "moment": "^2.22.2",
+    "google-auth-library": "^2.0.0"
   },
   "devDependencies": {
     "eslint": "^4.12.0",

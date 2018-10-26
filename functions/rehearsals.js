@@ -2,6 +2,7 @@ const functions = require('firebase-functions');
 const fetch = require('node-fetch');
 const querystring = require('querystring');
 const moment = require('moment');
+
 const utils = require('./utils');
 
 exports.postRehearsalMusic = functions
@@ -12,6 +13,7 @@ exports.postRehearsalMusic = functions
       .day(1)
       .format('DD/MM/YYYY');
     const message = `Hello everyone! ${nextMonday}`;
+
     const options = utils.getTokenAndPostOptions();
     options.body = querystring.stringify({
       text: message,
