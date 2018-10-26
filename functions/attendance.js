@@ -28,23 +28,33 @@ function findField(fields, value) {
 }
 
 function getCount(title) {
-  return parseInt(title.substring(title.length - 1));
+  return parseInt(title.substring(title.length - 2));
 }
 
 function addUserToField(field, value, user) {
-  const newField = Object.assign({}, field);
-  if (value === 'attending') {
-    newField.title = `${valueToEmojiMapper[value]} ${getCount(field.title) +
-      1}`;
+  if (field.value.includes(user)) {
+    return removeUserFromField(field, value, user);
   }
-  newField.value = `${field.value} <!${user}>`;
+  const newField = Object.assign({}, field);
+  if (value === 'attending' || value === 'notAttending') {
+    newField.title = newField.title.replace(
+      `\`${getCount(field.title)}\``,
+      `\`${getCount(field.title) + 1}\``
+    );
+  }
+  newField.value = `${field.value} <@${user}>`;
   return newField;
 }
 
-function removeUserFromField(fields, value, user) {
+function removeUserFromField(field, value, user) {
   const newField = Object.assign({}, field);
-  newField.title = `${valueToEmojiMapper[value]} ${getCount(field.title) - 1}`;
-  newField.value = field.value.replace(`<!${user}>`, '');
+  if (value === 'attending' || value === 'notAttending') {
+    newField.title = newField.title.replace(
+      `\`${getCount(field.title)}\``,
+      `\`${getCount(field.title) - 1}\``
+    );
+  }
+  newField.value = field.value.replace(`<@${user}>`, '');
   return newField;
 }
 
@@ -97,29 +107,32 @@ exports.addAttendancePost = functions
           fallback: 'Please react with emoji today',
           attachment_type: 'default',
           callback_id: 'attendance_reply',
+          mrkdwn_in: ['fields'],
           fields: [
             {
-              title: `${valueToEmojiMapper['attending']} 0`,
+              title: `${valueToEmojiMapper['attending']} Attending: \`0\``,
               value: '',
               short: false
             },
             {
-              title: `${valueToEmojiMapper['notAttending']} 0`,
+              title: `${
+                valueToEmojiMapper['notAttending']
+              } Not attending: \`0\``,
               value: '',
               short: false
             },
             {
-              title: `${valueToEmojiMapper['facilitator']}`,
+              title: `${valueToEmojiMapper['facilitator']} Facilitator`,
               value: '',
               short: false
             },
             {
-              title: `${valueToEmojiMapper['physical']}`,
+              title: `${valueToEmojiMapper['physical']} Physical warmup`,
               value: '',
               short: false
             },
             {
-              title: `${valueToEmojiMapper['musical']}`,
+              title: `${valueToEmojiMapper['musical']} Musical warmup`,
               value: '',
               short: false
             }
@@ -194,12 +207,11 @@ exports.registerAttendance = functions
   .region('europe-west1')
   .https.onRequest((req, res) => {
     const { payload } = req.body;
-    console.log(payload);
     const parsedPayload = JSON.parse(payload);
-    const { original_message, message_ts, user } = parsedPayload;
+    const { original_message, message_ts, user, channel } = parsedPayload;
     const { value } = parsedPayload['actions'][0] || null;
-    const { id } = user;
-    const channel = payload.channel.id;
+    const userId = user.id;
+    const channelId = channel.id;
     if (env === 'prod' && ['attending', 'notAttending'].includes(value)) {
       admin.firestore
         .collection('attendance')
@@ -208,7 +220,7 @@ exports.registerAttendance = functions
         .get()
         .then(results => results[0])
         .then(doc =>
-          doc.update({ [value]: admin.firestore.FieldValue.arrayUnion(id) })
+          doc.update({ [value]: admin.firestore.FieldValue.arrayUnion(userId) })
         )
         .catch(err => console.error(err));
     }
@@ -216,16 +228,19 @@ exports.registerAttendance = functions
     const { attachments } = original_message;
     const { fields } = attachments[0];
     const { field, indexOfField } = findField(fields, value);
-    const updatedField =
-      value !== 'notAttending'
-        ? addUserToField(field, value, id)
-        : removeUserFromField(field, value, id);
+    const updatedField = addUserToField(field, value, userId);
     fields[indexOfField] = updatedField;
     attachments.fields = fields;
-    options.attachments = attachments;
-    options.ts = message_ts;
-    options.channel = channel;
-    fetch('https://slack.com/api/chat.update', options);
+    const body = {
+      attachments: JSON.stringify(attachments),
+      ts: message_ts,
+      channel: channelId,
+      link_names: true
+    };
+    options.body = querystring.stringify(body);
+    fetch('https://slack.com/api/chat.update', options).catch(err => {
+      throw new Error(err);
+    });
 
     res.status(200).send();
   });
