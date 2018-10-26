@@ -58,32 +58,6 @@ function removeUserFromField(field, value, user) {
   return newField;
 }
 
-function getTokenAndPostOptions() {
-  const token =
-    env === 'prod'
-      ? admin
-          .firestore()
-          .collection('tokens')
-          .doc(team_id)
-          .get()
-          .then(doc => {
-            if (!doc.exists) {
-              throw new Error('Token not found');
-            } else {
-              return doc.get('token');
-            }
-          })
-      : functions.config().slack.token;
-
-  return {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: `Bearer ${token}`
-    }
-  };
-}
-
 exports.addAttendancePost = functions
   .region('europe-west1')
   .https.onRequest((req, res) => {
@@ -96,7 +70,6 @@ exports.addAttendancePost = functions
       'For Musical warm up, respond with :musical_note:.';
 
     const { team_id, channel_id } = req.body;
-
     const postData = {
       text: attendancePostContent,
       channel: channel_id,
@@ -244,43 +217,3 @@ exports.registerAttendance = functions
 
     res.status(200).send();
   });
-
-const foo = {
-  original_message: {
-    text: 'New comic book alert!',
-    attachments: [
-      {
-        title: 'The Further Adventures of Slackbot',
-        fields: [
-          { title: 'Volume', value: '1', short: true },
-          { title: 'Issue', value: '3', short: true }
-        ],
-        author_name: 'Stanford S. Strickland',
-        author_icon:
-          'https://api.slack.comhttps://a.slack-edge.com/bfaba/img/api/homepage_custom_integrations-2x.png',
-        image_url: 'http://i.imgur.com/OJkaVOI.jpg?1'
-      },
-      {
-        title: 'Synopsis',
-        text:
-          'After @episod pushed exciting changes to a devious new branch back in Issue 1, Slackbot notifies @don about an unexpected deploy...'
-      },
-      {
-        fallback: 'Would you recommend it to customers?',
-        title: 'Would you recommend it to customers?',
-        callback_id: 'comic_1234_xyz',
-        color: '#3AA3E3',
-        attachment_type: 'default',
-        actions: [
-          {
-            name: 'recommend',
-            text: 'Recommend',
-            type: 'button',
-            value: 'recommend'
-          },
-          { name: 'no', text: 'No', type: 'button', value: 'bad' }
-        ]
-      }
-    ]
-  }
-};
