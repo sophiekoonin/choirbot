@@ -19,7 +19,7 @@ const valueToEmojiMapper = {
 
 function findField(fields, value) {
   const field = fields.find(field =>
-    field.text.includes(valueToEmojiMapper[value])
+    field.title.includes(valueToEmojiMapper[value])
   );
   return {
     indexOfField: fields.indexOf(field),
@@ -27,14 +27,15 @@ function findField(fields, value) {
   };
 }
 
-function getCount(text) {
-  return parseInt(field.text.substring(field.text.length - 1));
+function getCount(title) {
+  return parseInt(title.substring(title.length - 1));
 }
 
 function addUserToField(field, value, user) {
   const newField = Object.assign({}, field);
   if (value === 'attending') {
-    newField.text = `${valueToEmojiMapper[value]} ${getCount(field.text) + 1}`;
+    newField.title = `${valueToEmojiMapper[value]} ${getCount(field.title) +
+      1}`;
   }
   newField.value = `${field.value} <!${user}>`;
   return newField;
@@ -42,7 +43,7 @@ function addUserToField(field, value, user) {
 
 function removeUserFromField(fields, value, user) {
   const newField = Object.assign({}, field);
-  newField.text = `${valueToEmojiMapper[value]} ${getCount(field.text) - 1}`;
+  newField.title = `${valueToEmojiMapper[value]} ${getCount(field.title) - 1}`;
   newField.value = field.value.replace(`<!${user}>`, '');
   return newField;
 }
@@ -193,39 +194,40 @@ exports.registerAttendance = functions
   .region('europe-west1')
   .https.onRequest((req, res) => {
     const { payload } = req.body;
+    console.log(payload);
     const parsedPayload = JSON.parse(payload);
     const { original_message, message_ts, user } = parsedPayload;
     const { value } = parsedPayload['actions'][0] || null;
     const { id } = user;
-    if (['attending', 'notAttending'].includes(value)) {
-      if (env === 'prod') {
-        admin.firestore
-          .collection('attendance')
-          .orderBy('created_at')
-          .limit(1)
-          .get()
-          .then(results => results[0])
-          .then(doc =>
-            doc.update({ [value]: admin.firestore.FieldValue.arrayUnion(user) })
-          )
-          .catch(err => console.error(err));
-      }
-      const options = getTokenAndPostOptions();
-      const { attachments } = original_message;
-      console.log('att', attachments);
-      const { fields } = attachments;
-      const { field, indexOfField } = findField(fields, value);
-      const updatedField =
-        value !== 'notAttending'
-          ? addUserToField(field, value, user)
-          : removeUserFromField(field, value, user);
-      fields[index] = field;
-      attachments.fields = fields;
-      const postBody = original_message;
-      postBody.attachments = attachments;
-      options.postBody = postBody;
-      fetch('https://slack.com/api/chat.update', options);
+    const channel = payload.channel.id;
+    if (env === 'prod' && ['attending', 'notAttending'].includes(value)) {
+      admin.firestore
+        .collection('attendance')
+        .orderBy('created_at')
+        .limit(1)
+        .get()
+        .then(results => results[0])
+        .then(doc =>
+          doc.update({ [value]: admin.firestore.FieldValue.arrayUnion(id) })
+        )
+        .catch(err => console.error(err));
     }
+    const options = getTokenAndPostOptions();
+    const { attachments } = original_message;
+    const { fields } = attachments[0];
+    const { field, indexOfField } = findField(fields, value);
+    const updatedField =
+      value !== 'notAttending'
+        ? addUserToField(field, value, id)
+        : removeUserFromField(field, value, id);
+    fields[indexOfField] = updatedField;
+    attachments.fields = fields;
+    options.attachments = attachments;
+    options.ts = message_ts;
+    options.channel = channel;
+    fetch('https://slack.com/api/chat.update', options);
+
+    res.status(200).send();
   });
 
 const foo = {
