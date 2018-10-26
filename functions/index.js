@@ -22,23 +22,14 @@ exports.postRehearsalMusic = rehearsals.postRehearsalMusic;
 exports.authGoogleAPI = google.authGoogleAPI;
 exports.googleOauthRedirect = google.googleOauthRedirect;
 
-exports.test = functions
+exports.testGoogle = functions
   .region('europe-west1')
-  .https.onRequest((request, response) => {
-    return admin
-      .firestore()
-      .collection('tokens')
-      .doc('token')
-      .get()
-      .then(doc => {
-        if (!doc.exists) {
-          throw new Error('Token not found');
-        } else {
-          return doc.get('token');
-        }
+  .https.onRequest((req, res) => {
+    google
+      .readValueFromSheet()
+      .then(result => {
+        console.log('result: ', result);
+        res.send(result);
       })
-      .then(value => {
-        return response.send(`Data is ${value}`);
-      })
-      .catch(err => console.error(err));
+      .catch(err => res.send(err));
   });

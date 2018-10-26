@@ -15,9 +15,10 @@
   "dependencies": {
     "firebase-admin": "6.0.0",
     "firebase-functions": "2.0.5",
-    "node-fetch": "^2.2.0",
+    "google-auth-library": "^2.0.0",
+    "googleapis": "34.0.0",
     "moment": "^2.22.2",
-    "google-auth-library": "^2.0.0"
+    "node-fetch": "^2.2.0"
   },
   "devDependencies": {
     "eslint": "^4.12.0",
