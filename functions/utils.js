@@ -1,6 +1,15 @@
 const admin = require('firebase-admin');
 const functions = require('firebase-functions');
+const moment = require('moment');
 const env = functions.config().shebot.env;
+
+exports.getNextMonday = function() {
+  const today = moment().day();
+  const monday = today > 1 ? 8 : 1; //set day of week according to whether today is before sunday or not - see Moment.js docs
+  return moment()
+    .day(monday)
+    .format('DD/MM/YYYY');
+};
 
 exports.getTokenAndPostOptions = function() {
   const token =

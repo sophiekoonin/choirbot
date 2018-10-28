@@ -9,9 +9,7 @@ exports.postRehearsalMusic = functions
   .region('europe-west1')
   .https.onRequest((req, res) => {
     const { channel_id } = req.body;
-    const nextMonday = moment()
-      .day(1)
-      .format('DD/MM/YYYY');
+    const nextMonday = utils.getNextMonday();
     const message = `Hello everyone! ${nextMonday}`;
 
     const options = utils.getTokenAndPostOptions();

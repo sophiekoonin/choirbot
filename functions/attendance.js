@@ -4,11 +4,6 @@ const fetch = require('node-fetch');
 const querystring = require('querystring');
 const env = functions.config().shebot.env;
 
-// eslint-disable-next-line
-Date.prototype.format = function() {
-  return `${this.getDate()}/${this.getMonth() + 1}/${this.getFullYear()}`;
-};
-
 const valueToEmojiMapper = {
   attending: ':+1:',
   notAttending: ':-1:',

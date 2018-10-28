@@ -2,8 +2,12 @@ const functions = require('firebase-functions');
 const { OAuth2Client } = require('google-auth-library');
 const { google } = require('googleapis');
 const admin = require('firebase-admin');
+const moment = require('moment');
 
+const utils = require('./utils');
 const env = functions.config().shebot.env;
+const sheetId = functions.config().google.sheet;
+const sheets = google.sheets('v4');
 
 const clientId = functions.config().google.id;
 const clientSecret = functions.config().google.secret;
@@ -36,10 +40,14 @@ function getAuthorizedClient() {
         functionsOauthClient.setCredentials(data);
         return resolve(functionsOauthClient);
       })
-      .catch(() => reject());
+      .catch(err => reject(err));
   });
 }
 
+function getValuesAndFlatten(response) {
+  const { values } = response.data;
+  return [].concat.apply([], values);
+}
 // visit the URL for this Function to obtain tokens
 exports.authGoogleAPI = functions.https.onRequest((req, res) =>
   res.redirect(
@@ -69,25 +77,64 @@ exports.googleOauthRedirect = functions.https.onRequest((req, res) => {
   });
 });
 
-exports.readValueFromSheet = function() {
-  const sheetId = functions.config().google.sheet;
+function getRowNumber() {
   return new Promise((resolve, reject) => {
     return getAuthorizedClient()
       .then(client => {
-        const sheets = google.sheets('v4');
         const request = {
           auth: client,
-          spreadsheetId: sheetId
+          spreadsheetId: sheetId,
+          range: 'A:A'
         };
-        sheets.spreadsheets.get(request, (err, response) => {
+        return sheets.spreadsheets.values.get(request, (err, response) => {
           if (err) {
             console.log(`The API returned an error: ${err}`);
-            return reject();
+            return reject(err);
           }
-          console.log(response.data.sheets[0]);
-          return resolve(response);
+          const rowNumber =
+            getValuesAndFlatten(response).indexOf(utils.getNextMonday()) + 1;
+          console.log('1', rowNumber);
+          return resolve(rowNumber);
         });
       })
-      .catch(() => reject());
+      .catch(err => reject(err));
   });
+}
+
+function getSongDetailsFromSheet(rowNumber) {
+  return new Promise((resolve, reject) => {
+    return getAuthorizedClient().then(client => {
+      return sheets.spreadsheets.values.get(
+        {
+          auth: client,
+          spreadsheetId: sheetId,
+          range: `B${rowNumber}:I${rowNumber}`
+        },
+        (err, response) => {
+          if (err) {
+            console.log(`The API returned an error: ${err}`);
+            return reject(err);
+          }
+          const values = getValuesAndFlatten(response);
+          const mainSong = values[0];
+          const runThrough = values[1];
+          const mainSongLink = values[6];
+          const runThroughLink = values[7];
+          return resolve({
+            mainSong,
+            mainSongLink,
+            runThrough,
+            runThroughLink
+          });
+        }
+      );
+    });
+  });
+}
+
+exports.readValueFromSheet = function() {
+  return getRowNumber()
+    .then(rowNumber => getSongDetailsFromSheet(rowNumber))
+    .then(res => res)
+    .catch(err => new Error(err));
 };

@@ -22,12 +22,18 @@ exports.postRehearsalMusic = rehearsals.postRehearsalMusic;
 exports.authGoogleAPI = google.authGoogleAPI;
 exports.googleOauthRedirect = google.googleOauthRedirect;
 
+// eslint-disable-next-line
+Date.prototype.format = function() {
+  return `${this.getDate()}/${this.getMonth() + 1}/${this.getFullYear()}`;
+};
+
 exports.testGoogle = functions
   .region('europe-west1')
   .https.onRequest((req, res) => {
     google
       .readValueFromSheet()
       .then(result => {
+        console.log('res', result);
         res.send(result);
       })
       .catch(err => res.send(err));
