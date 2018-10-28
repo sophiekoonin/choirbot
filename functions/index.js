@@ -28,7 +28,6 @@ exports.testGoogle = functions
     google
       .readValueFromSheet()
       .then(result => {
-        console.log('result: ', result);
         res.send(result);
       })
       .catch(err => res.send(err));

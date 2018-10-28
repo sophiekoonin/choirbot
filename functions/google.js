@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const { OAuth2Client } = require('google-auth-library');
+const { google } = require('googleapis');
 const admin = require('firebase-admin');
 
 const env = functions.config().shebot.env;
@@ -74,18 +75,16 @@ exports.readValueFromSheet = function() {
     return getAuthorizedClient()
       .then(client => {
         const sheets = google.sheets('v4');
-        console.log(sheets);
         const request = {
           auth: client,
           spreadsheetId: sheetId
         };
-        console.log('req', request);
         sheets.spreadsheets.get(request, (err, response) => {
           if (err) {
             console.log(`The API returned an error: ${err}`);
             return reject();
           }
-          console.log(response);
+          console.log(response.data.sheets[0]);
           return resolve(response);
         });
       })
