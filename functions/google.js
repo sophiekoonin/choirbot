@@ -93,7 +93,6 @@ function getRowNumber() {
           }
           const rowNumber =
             getValuesAndFlatten(response).indexOf(utils.getNextMonday()) + 1;
-          console.log('1', rowNumber);
           return resolve(rowNumber);
         });
       })
@@ -119,7 +118,10 @@ function getSongDetailsFromSheet(rowNumber) {
           const mainSong = values[0];
           const runThrough = values[1];
           const mainSongLink = values[6];
-          const runThroughLink = values[7];
+          const runThroughLink =
+            values[1] === '' || values[1] === null
+              ? `https://docs.google.com/spreadsheets/d/${sheetId}`
+              : values[7];
           return resolve({
             mainSong,
             mainSongLink,
@@ -132,7 +134,7 @@ function getSongDetailsFromSheet(rowNumber) {
   });
 }
 
-exports.readValueFromSheet = function() {
+exports.getNextSongs = function() {
   return getRowNumber()
     .then(rowNumber => getSongDetailsFromSheet(rowNumber))
     .then(res => res)
