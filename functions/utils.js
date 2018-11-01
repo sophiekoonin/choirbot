@@ -1,7 +1,7 @@
 const admin = require('firebase-admin');
 const functions = require('firebase-functions');
 const moment = require('moment');
-const env = functions.config().shebot.env;
+const env = functions.config().shebot;
 
 exports.getNextMonday = function() {
   const today = moment().day();
@@ -9,21 +9,4 @@ exports.getNextMonday = function() {
   return moment()
     .day(monday)
     .format('DD/MM/YYYY');
-};
-
-exports.getSlackToken = function() {
-  return env === 'prod'
-    ? admin
-        .firestore()
-        .collection('tokens')
-        .doc(team_id)
-        .get()
-        .then(doc => {
-          if (!doc.exists) {
-            throw new Error('Token not found');
-          } else {
-            return doc.get('token');
-          }
-        })
-    : functions.config().slack.token;
 };

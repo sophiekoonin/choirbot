@@ -1,19 +1,10 @@
 const functions = require('firebase-functions');
+const firebase = require('firebase');
 const admin = require('firebase-admin');
-const Slack = require('slack');
 const querystring = require('querystring');
-const { getSlackToken } = require('./utils');
-
+const slack = require('slack');
 const env = functions.config().shebot.env;
-const slack = new Slack({ token: getSlackToken() });
-
-const valueToEmojiMapper = {
-  attending: ':+1:',
-  notAttending: ':-1:',
-  facilitator: ':raised_hands:',
-  musical: ':musical_note:',
-  physical: ':muscle:'
-};
+const main = require('./index');
 
 exports.addAttendancePost = functions
   .region('europe-west1')
@@ -27,22 +18,41 @@ exports.addAttendancePost = functions
       'For Musical warm up, respond with :musical_note:.';
 
     const { channel_id } = req.body;
-    return slack.chat
-      .postMessage({
-        channel: channel_id,
-        as_user: false,
-        username: 'Attendance Bot',
-        text: attendancePostContent
-      })
-      .then(({ ts, channel }) =>
+    return main
+      .getSlackToken()
+      .then(token =>
         Promise.all([
-          ts,
-          slack.reactions.add({ timestamp: ts, channel, name: 'thumbsup' }),
-          slack.reactions.add({ timestamp: ts, channel, name: 'thumbsdown' })
+          token,
+          slack.chat.postMessage({
+            token,
+            channel: channel_id,
+            as_user: false,
+            username: 'Attendance Bot',
+            text: attendancePostContent
+          })
         ])
       )
       .then(results => {
-        const ts = results[0];
+        const token = results[0];
+        const { ts, channel } = results[1];
+        return Promise.all([
+          { ts, channel },
+          slack.reactions.add({
+            token,
+            timestamp: ts,
+            channel,
+            name: 'thumbsdown'
+          }),
+          slack.reactions.add({
+            token,
+            timestamp: ts,
+            channel,
+            name: 'thumbsup'
+          })
+        ]);
+      })
+      .then(results => {
+        const { ts, channel } = results[0];
         if (env !== 'prod') {
           return { id: ts };
         }
@@ -53,6 +63,7 @@ exports.addAttendancePost = functions
             rehearsal_date: new Date().format(),
             created_at: firebase.firestore.FieldValue.serverTimestamp(),
             ts: ts,
+            channel: channel,
             attending: [],
             notAttending: [],
             notResponded: []
@@ -66,45 +77,17 @@ exports.addAttendancePost = functions
       });
   });
 
-exports.registerAttendance = functions
+exports.processAttendance = functions
   .region('europe-west1')
   .https.onRequest((req, res) => {
-    const { payload } = req.body;
-    const parsedPayload = JSON.parse(payload);
-    const { original_message, message_ts, user, channel } = parsedPayload;
-    const { value } = parsedPayload['actions'][0] || null;
-    const userId = user.id;
-    const channelId = channel.id;
-    if (env === 'prod' && ['attending', 'notAttending'].includes(value)) {
-      admin.firestore
-        .collection('attendance')
-        .orderBy('created_at')
-        .limit(1)
-        .get()
-        .then(results => results[0])
-        .then(doc =>
-          doc.update({
-            [value]: admin.firestore.FieldValue.arrayUnion(userId)
-          })
-        )
-        .catch(err => console.error(err));
-    }
-    const options = getTokenAndPostOptions();
-    const { attachments } = original_message;
-    const { fields } = attachments[0];
-    const { field, indexOfField } = findField(fields, value);
-    const updatedField = addUserToField(field, value, userId);
-    fields[indexOfField] = updatedField;
-    attachments.fields = fields;
-    const body = {
-      attachments: JSON.stringify(attachments),
-      ts: message_ts,
-      channel: channelId,
-      link_names: true
-    };
-    options.body = querystring.stringify(body);
-    fetch('https://slack.com/api/chat.update', options).catch(err => {
-      throw new Error(err);
-    });
-    res.status(200).send();
+    return admin
+      .firestore()
+      .collection('attendance')
+      .orderBy('created_at')
+      .limit(1)
+      .get()
+      .then(results => results.docs[0])
+      .then(doc => console.log(doc.data()))
+      .then(_ => res.status(200).send('all good'))
+      .catch(err => console.error(err));
   });

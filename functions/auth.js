@@ -52,8 +52,7 @@ exports.oauth_redirect = functions
           .collection('tokens')
           .doc(result.team_id)
           .set({
-            token: result.access_token,
-            team: result.team_id
+            token: result.access_token
           });
       })
       .then(() =>

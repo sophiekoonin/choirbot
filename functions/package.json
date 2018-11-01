@@ -13,12 +13,14 @@
     "logs": "firebase functions:log"
   },
   "dependencies": {
+    "firebase": "5.5.6",
     "firebase-admin": "6.0.0",
-    "firebase-functions": "2.0.5",
+    "firebase-functions": "2.1.0",
     "google-auth-library": "^2.0.0",
     "googleapis": "34.0.0",
     "moment": "^2.22.2",
-    "node-fetch": "^2.2.0"
+    "node-fetch": "^2.2.0",
+    "slack": "^11.0.1"
   },
   "devDependencies": {
     "eslint": "^4.12.0",
