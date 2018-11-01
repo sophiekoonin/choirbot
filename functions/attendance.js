@@ -1,8 +1,11 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-const fetch = require('node-fetch');
+const Slack = require('slack');
 const querystring = require('querystring');
+const { getSlackToken } = require('./utils');
+
 const env = functions.config().shebot.env;
+const slack = new Slack({ token: getSlackToken() });
 
 const valueToEmojiMapper = {
   attending: ':+1:',
@@ -11,47 +14,6 @@ const valueToEmojiMapper = {
   musical: ':musical_note:',
   physical: ':muscle:'
 };
-
-function findField(fields, value) {
-  const field = fields.find(field =>
-    field.title.includes(valueToEmojiMapper[value])
-  );
-  return {
-    indexOfField: fields.indexOf(field),
-    field: field
-  };
-}
-
-function getCount(title) {
-  return parseInt(title.substring(title.length - 2));
-}
-
-function addUserToField(field, value, user) {
-  if (field.value.includes(user)) {
-    return removeUserFromField(field, value, user);
-  }
-  const newField = Object.assign({}, field);
-  if (value === 'attending' || value === 'notAttending') {
-    newField.title = newField.title.replace(
-      `\`${getCount(field.title)}\``,
-      `\`${getCount(field.title) + 1}\``
-    );
-  }
-  newField.value = `${field.value} <@${user}>`;
-  return newField;
-}
-
-function removeUserFromField(field, value, user) {
-  const newField = Object.assign({}, field);
-  if (value === 'attending' || value === 'notAttending') {
-    newField.title = newField.title.replace(
-      `\`${getCount(field.title)}\``,
-      `\`${getCount(field.title) - 1}\``
-    );
-  }
-  newField.value = field.value.replace(`<@${user}>`, '');
-  return newField;
-}
 
 exports.addAttendancePost = functions
   .region('europe-west1')
@@ -64,90 +26,23 @@ exports.addAttendancePost = functions
       'To volunteer for Physical warm up, respond with :muscle: ' +
       'For Musical warm up, respond with :musical_note:.';
 
-    const { team_id, channel_id } = req.body;
-    const postData = {
-      text: attendancePostContent,
-      channel: channel_id,
-      as_user: false,
-      username: 'Attendance Bot',
-      attachments: JSON.stringify([
-        {
-          fallback: 'Please react with emoji today',
-          attachment_type: 'default',
-          callback_id: 'attendance_reply',
-          mrkdwn_in: ['fields'],
-          fields: [
-            {
-              title: `${valueToEmojiMapper['attending']} Attending: \`0\``,
-              value: '',
-              short: false
-            },
-            {
-              title: `${
-                valueToEmojiMapper['notAttending']
-              } Not attending: \`0\``,
-              value: '',
-              short: false
-            },
-            {
-              title: `${valueToEmojiMapper['facilitator']} Facilitator`,
-              value: '',
-              short: false
-            },
-            {
-              title: `${valueToEmojiMapper['physical']} Physical warmup`,
-              value: '',
-              short: false
-            },
-            {
-              title: `${valueToEmojiMapper['musical']} Musical warmup`,
-              value: '',
-              short: false
-            }
-          ],
-          actions: [
-            {
-              name: 'option',
-              text: valueToEmojiMapper['attending'],
-              type: 'button',
-              value: 'attending'
-            },
-            {
-              name: 'option',
-              text: valueToEmojiMapper['notAttending'],
-              type: 'button',
-              value: 'notAttending'
-            },
-            {
-              name: 'option',
-              text: valueToEmojiMapper['facilitator'],
-              type: 'button',
-              value: 'facilitator'
-            },
-            {
-              name: 'option',
-              text: valueToEmojiMapper['physical'],
-              type: 'button',
-              value: 'physical'
-            },
-            {
-              name: 'option',
-              text: valueToEmojiMapper['musical'],
-              type: 'button',
-              value: 'musical'
-            }
-          ]
-        }
-      ])
-    };
-
-    const options = getTokenAndPostOptions();
-    options.body = querystring.stringify(postData);
-    fetch('https://slack.com/api/chat.postMessage', options)
-      .then(res => res.json())
-      .then(json => {
-        if (!json.ok) throw new Error(json.error);
-        const { ts, channel } = json.message;
+    const { channel_id } = req.body;
+    return slack.chat
+      .postMessage({
+        channel: channel_id,
+        as_user: false,
+        username: 'Attendance Bot',
+        text: attendancePostContent
+      })
+      .then(({ ts, channel }) =>
+        Promise.all([
+          ts,
+          slack.reactions.add({ timestamp: ts, channel, name: 'thumbsup' }),
+          slack.reactions.add({ timestamp: ts, channel, name: 'thumbsdown' })
+        ])
+      )
+      .then(results => {
+        const ts = results[0];
         if (env !== 'prod') {
           return { id: ts };
         }
@@ -188,7 +83,9 @@ exports.registerAttendance = functions
         .get()
         .then(results => results[0])
         .then(doc =>
-          doc.update({ [value]: admin.firestore.FieldValue.arrayUnion(userId) })
+          doc.update({
+            [value]: admin.firestore.FieldValue.arrayUnion(userId)
+          })
         )
         .catch(err => console.error(err));
     }
@@ -209,6 +106,5 @@ exports.registerAttendance = functions
     fetch('https://slack.com/api/chat.update', options).catch(err => {
       throw new Error(err);
     });
-
     res.status(200).send();
   });
