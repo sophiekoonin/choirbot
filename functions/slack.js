@@ -40,15 +40,18 @@ exports.addAttendancePost = functions
           'For Musical warm up, respond with :musical_note:.';
 
         const { channel_id } = req.body;
-        return slack.chat.postMessage({
+        return Promise.all([
           token,
-          channel: channel_id,
-          as_user: false,
-          username: 'Attendance Bot',
-          text: attendancePostContent
-        });
+          slack.chat.postMessage({
+            token,
+            channel: channel_id,
+            as_user: false,
+            username: 'Attendance Bot',
+            text: attendancePostContent
+          })
+        ]);
       })
-      .then(({ ts, channel }) => {
+      .then(([token, { ts, channel }]) => {
         return Promise.all([
           { ts, channel },
           slack.reactions.add({
@@ -106,25 +109,40 @@ exports.processAttendance = functions
       .then(doc =>
         Promise.all([
           getToken(),
-          () => ({
+          {
             id: doc.id,
-            ts: doc.get('ts'),
+            timestamp: doc.get('ts'),
             channel: doc.get('channel')
-          })
+          }
         ])
       )
-      .then(([token, slackData]) =>
+      .then(([token, { id, timestamp, channel }]) =>
         Promise.all([
-          (id: slackData.id),
+          id,
           slack.reactions.get({
-            token: token,
-            timestamp: slackData.ts,
-            channel: slackData.channel
+            token,
+            timestamp,
+            channel
           })
         ])
       )
-      .then(results => console.log(results[1]))
-      .then(_ => res.status(200).send('all good'))
+      .then(([id, response]) => {
+        if (!response.ok) {
+          throw new Error('Something went wrong!');
+        } else {
+          const { reactions } = response.message;
+          const attending =
+            reactions.find(group => (group.name = '+1'))['users'] || [];
+          const notAttending =
+            reactions.find(group => (group.name = '-1'))['users'] || [];
+          return admin
+            .firestore()
+            .collection('attendance')
+            .doc(id)
+            .update({ attending: attending, notAttending: notAttending });
+        }
+      })
+      .then(_ => res.status(200).send('Done!'))
       .catch(err => {
         console.error(err);
         res.status(500).send(`Error: ${err}`);
