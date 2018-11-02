@@ -23,9 +23,21 @@ function getToken() {
             return doc.get('token');
           }
         })
-    : functions.config().slack.token;
+    : new Promise((resolve, reject) => resolve(functions.config().slack.token));
 }
 
+function getSlackUsers() {
+  return getToken()
+    .then(token => slack.users.list({ token }))
+    .then(response => {
+      const { members } = response;
+      return members
+        .filter(member => !member.deleted)
+        .map(member => member.id)
+        .filter(id => id !== 'USLACKBOT');
+    })
+    .catch(err => console.error(err));
+}
 exports.addAttendancePost = functions
   .region('europe-west1')
   .https.onRequest((req, res) => {
@@ -68,8 +80,7 @@ exports.addAttendancePost = functions
           })
         ]);
       })
-      .then(results => {
-        const { ts, channel } = results[0];
+      .then(([{ ts, channel }, _1, _2]) => {
         const rehearsal_date = new Date().format();
         if (env !== 'prod') {
           return { id: ts };
@@ -147,6 +158,12 @@ exports.processAttendance = functions
         console.error(err);
         res.status(500).send(`Error: ${err}`);
       });
+  });
+
+exports.reportAttendance = functions
+  .region('europe-west1')
+  .https.onRequest((req, res) => {
+    return getSlackUsers().then(users => res.send(users));
   });
 
 exports.postRehearsalMusic = functions

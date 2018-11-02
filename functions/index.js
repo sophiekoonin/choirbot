@@ -22,6 +22,7 @@ exports.addAttendancePost = slackFunctions.addAttendancePost;
 exports.oauth_redirect = auth.oauth_redirect;
 exports.processAttendance = slackFunctions.processAttendance;
 exports.postRehearsalMusic = slackFunctions.postRehearsalMusic;
+exports.reportAttendance = slackFunctions.reportAttendance;
 exports.authGoogleAPI = google.authGoogleAPI;
 exports.googleOauthRedirect = google.googleOauthRedirect;
 
