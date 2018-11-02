@@ -3,8 +3,8 @@ const { OAuth2Client } = require('google-auth-library');
 const { google } = require('googleapis');
 const admin = require('firebase-admin');
 const moment = require('moment');
-
 const utils = require('./utils');
+
 const env = functions.config().shebot.env;
 const sheetId = functions.config().google.sheet;
 const sheets = google.sheets('v4');

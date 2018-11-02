@@ -4,51 +4,24 @@ const admin = require('firebase-admin');
 const slack = require('slack');
 
 const auth = require('./auth');
-const attendance = require('./attendance');
+const slackFunctions = require('./slack');
 const rehearsals = require('./rehearsals');
 const google = require('./google');
-const { env, teamid } = functions.config().shebot;
+const { env } = functions.config().shebot;
 
 admin.initializeApp();
 admin.firestore().settings({ timestampsInSnapshots: true });
-exports.getSlackToken = function() {
-  return env === 'prod'
-    ? admin
-        .firestore()
-        .collection('tokens')
-        .doc(teamid)
-        .get()
-        .then(doc => {
-          if (!doc.exists) {
-            throw new Error('Token not found');
-          } else {
-            return doc.get('token');
-          }
-        })
-    : functions.config().slack.token;
-};
 
 exports.ping = functions
   .region('europe-west1')
   .https.onRequest((request, response) => {
-    getSlackToken()
-      .then(token => slack.auth.test({ token }))
-      .then(res => {
-        console.log(res);
-        return res;
-      })
-      .then(res =>
-        response.send(
-          `SHE slash commands up and running! v0.2 \n Slack auth status: ${res}`
-        )
-      )
-      .catch(err => console.error(err));
+    response.send(`SHE slash commands up and running! v0.2.5`);
   });
 
-exports.addAttendancePost = attendance.addAttendancePost;
+exports.addAttendancePost = slackFunctions.addAttendancePost;
 exports.oauth_redirect = auth.oauth_redirect;
-exports.processAttendance = attendance.processAttendance;
-// exports.postRehearsalMusic = rehearsals.postRehearsalMusic;
+exports.processAttendance = slackFunctions.processAttendance;
+exports.postRehearsalMusic = slackFunctions.postRehearsalMusic;
 exports.authGoogleAPI = google.authGoogleAPI;
 exports.googleOauthRedirect = google.googleOauthRedirect;
 
