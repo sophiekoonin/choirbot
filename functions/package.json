@@ -18,6 +18,7 @@
     "firebase-functions": "2.1.0",
     "google-auth-library": "^2.0.0",
     "googleapis": "34.0.0",
+    "lodash": "4.17.11",
     "moment": "^2.22.2",
     "node-fetch": "^2.2.0",
     "slack": "^11.0.1"

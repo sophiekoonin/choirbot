@@ -2,12 +2,23 @@ const functions = require('firebase-functions');
 const firebase = require('firebase');
 const admin = require('firebase-admin');
 const slack = require('slack');
+const { flattenDeep } = require('lodash');
 
 const google = require('./google');
 const utils = require('./utils');
 
 const { env, teamid } = functions.config().shebot;
 const main = require('./index');
+
+function getAttendancePosts(limit) {
+  return admin
+    .firestore()
+    .collection('attendance')
+    .orderBy('created_at', 'desc')
+    .limit(limit)
+    .get()
+    .then(results => results.docs);
+}
 
 function getToken() {
   return env === 'prod'
@@ -38,6 +49,7 @@ function getSlackUsers() {
     })
     .catch(err => console.error(err));
 }
+
 exports.addAttendancePost = functions
   .region('europe-west1')
   .https.onRequest((req, res) => {
@@ -94,8 +106,7 @@ exports.addAttendancePost = functions
             ts: ts,
             channel: channel,
             attending: [],
-            notAttending: [],
-            notResponded: []
+            notAttending: []
           });
       })
       .then(result =>
@@ -110,12 +121,7 @@ exports.addAttendancePost = functions
 exports.processAttendance = functions
   .region('europe-west1')
   .https.onRequest((req, res) => {
-    return admin
-      .firestore()
-      .collection('attendance')
-      .orderBy('created_at', 'desc')
-      .limit(1)
-      .get()
+    return getAttendancePosts(1)
       .then(results => results.docs[0])
       .then(doc =>
         Promise.all([
@@ -159,11 +165,32 @@ exports.processAttendance = functions
         res.status(500).send(`Error: ${err}`);
       });
   });
-
+/*
+1. Fetch last 4 rehearsals
+2. Filter list of users against attending/not attending 
+3. Show who hasn't responded
+ */
 exports.reportAttendance = functions
   .region('europe-west1')
   .https.onRequest((req, res) => {
-    return getSlackUsers().then(users => res.send(users));
+    return Promise.all([getAttendancePosts(4), getSlackUsers()])
+      .then(([posts, users]) => {
+        const postData = posts.map(post => ({
+          attending: post.get('attending'),
+          notAttending: post.get('notAttending'),
+          date: post.get('rehearsal_date')
+        }));
+        const responded = flattenDeep(
+          postData.map(post => [post.attending, post.notAttending])
+        );
+        const notResponded = users.filter(user => !responded.includes(user));
+
+        return {
+          notResponded,
+          posts: postData
+        };
+      })
+      .then(result => res.send(result));
   });
 
 exports.postRehearsalMusic = functions
