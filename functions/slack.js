@@ -54,7 +54,7 @@ exports.addAttendancePost = functions
 
     const attendancePostContent =
       ':dancing_banana: Rehearsal day! :dancing_banana: <!channel> \n' +
-      'Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup:' +
+      'Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup: ' +
       '(present) or :thumbsdown: (absent).\n' +
       'Facilitator please respond with :raised_hands:!\n' +
       'To volunteer for Physical warm up, respond with :muscle: ' +
@@ -87,7 +87,7 @@ exports.addAttendancePost = functions
       }
       const result = await admin
         .firestore()
-        .collection('attendance')
+        .collection(`attendance/${team_id}`)
         .add({
           rehearsal_date: rehearsal_date,
           created_at: admin.firestore.Timestamp.now()._seconds,
@@ -96,7 +96,7 @@ exports.addAttendancePost = functions
           attending: [],
           notAttending: []
         });
-      res.send(`Message posted! Saved to datastore with ID ${result.id}.`);
+      res.status(200).send(':+1:');
     } catch (err) {
       res.status(500).send('Oh no, something went wrong!');
       console.error(err);
