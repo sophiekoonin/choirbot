@@ -9,6 +9,9 @@ firebase-debug.log*
 # Firebase cache
 .firebase/
 
+#Secret bits
+keys/
+
 # Firebase config
 .runtimeconfig.json
 
