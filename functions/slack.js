@@ -49,23 +49,17 @@ async function getSlackUsers() {
 exports.addAttendancePost = functions
   .region('europe-west1')
   .https.onRequest(async (req, res) => {
-    const { team_id, channel_id } = req.body;
+    const { team_id, channel_id, text: message } = req.body;
     const token = await getToken(team_id);
-
-    const attendancePostContent =
-      ':dancing_banana: Rehearsal day! :dancing_banana: <!channel> \n' +
-      'Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup: ' +
-      '(present) or :thumbsdown: (absent).\n' +
-      'Facilitator please respond with :raised_hands:!\n' +
-      'To volunteer for Physical warm up, respond with :muscle: ' +
-      'For Musical warm up, respond with :musical_note:.';
+    const nextWeekSongs = await google.getNextSongs();
+    const text = utils.getAttendancePostMessage(nextWeekSongs, message);
     try {
       const { ts, channel } = await slack.chat.postMessage({
         token,
         channel: channel_id,
         as_user: false,
         username: 'Attendance Bot',
-        text: attendancePostContent
+        text
       });
 
       await slack.reactions.add({
@@ -179,15 +173,7 @@ exports.postRehearsalMusic = functions
       if (!nextWeekSongs || !nextWeekSongs.mainSong) {
         throw new Error(`Couldn't fetch next week's songs!`);
       }
-      const text = `<!channel> Here's the plan for Monday's rehearsal! \n
-      We'll be doing ${nextWeekSongs.mainSong} - ${nextWeekSongs.mainSongLink ||
-        "I can't find a link for this - please check the Arrangements Folder!"} \n
-      *Run through*: ${
-        nextWeekSongs.runThrough
-          ? nextWeekSongs.runThrough
-          : 'No information - please check schedule:'
-      } - ${nextWeekSongs.runThroughLink} \n
-      Please make sure you've listened to the recordings! :sparkles:`;
+      const text = utils.getRehearsalMusicMessage(nextWeekSongs);
       await slack.chat.postMessage({
         token,
         text,
