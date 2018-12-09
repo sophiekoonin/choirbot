@@ -7,25 +7,25 @@ const { flattenDeep } = require('lodash');
 const google = require('./google');
 const utils = require('./utils');
 
-const { env, teamid } = functions.config().shebot;
+const { env } = functions.config().shebot;
 const main = require('./index');
 
-async function getAttendancePosts(limit) {
-  const { docs } = await admin
+async function getAttendancePosts(team_id, limit) {
+  const snapshot = await admin
     .firestore()
-    .collection('attendance')
+    .collection(`attendance-${team_id}`)
     .orderBy('created_at', 'desc')
     .limit(limit)
     .get();
-  return docs;
+  return snapshot.docs;
 }
 
-async function getToken() {
+async function getToken(team_id) {
   if (env === 'prod') {
     const doc = await admin
       .firestore()
       .collection('tokens')
-      .doc(teamid)
+      .doc(team_id)
       .get();
     if (!doc.exists) {
       throw new Error('Token not found');
@@ -37,11 +37,12 @@ async function getToken() {
   }
 }
 
-async function getSlackUsers() {
-  const token = await getToken();
+async function getSlackUsers(team_id) {
+  const token = await getToken(team_id);
   const { members } = await slack.users.list({ token });
   return members
     .filter(member => !member.deleted)
+    .filter(member => !member.is_bot)
     .map(member => member.id)
     .filter(id => id !== 'USLACKBOT');
 }
@@ -81,7 +82,7 @@ exports.addAttendancePost = functions
       }
       const result = await admin
         .firestore()
-        .collection(`attendance/${team_id}`)
+        .collection(`attendance-${team_id}`)
         .add({
           rehearsal_date: rehearsal_date,
           created_at: admin.firestore.Timestamp.now()._seconds,
@@ -101,24 +102,19 @@ exports.processAttendance = functions
   .region('europe-west1')
   .https.onRequest(async (req, res) => {
     const { team_id } = req.body;
-    const { docs } = await getAttendancePosts(1);
+    const docs = await getAttendancePosts(team_id, 1);
     const firstResult = docs[0];
     const token = await getToken(team_id);
-    const reactionRequestBody = {
-      id: doc.id,
-      timestamp: doc.get('ts'),
-      channel: doc.get('channel')
-    };
-
     try {
       const response = await slack.reactions.get({
         token,
-        timestamp,
-        channel
+        timestamp: firstResult.get('ts'),
+        channel: firstResult.get('channel')
       });
       if (!response.ok) {
         throw new Error('Something went wrong!');
       }
+      const id = firstResult.id;
       const { reactions } = response.message;
       const attending =
         reactions.find(group => (group.name = '+1'))['users'] || [];
@@ -126,9 +122,9 @@ exports.processAttendance = functions
         reactions.find(group => (group.name = '-1'))['users'] || [];
       await admin
         .firestore()
-        .collection('attendance')
+        .collection(`attendance-${team_id}`)
         .doc(id)
-        .update({ attending: attending, notAttending: notAttending });
+        .update({ attending, notAttending });
       res.status(200).send('Done!');
     } catch (err) {
       console.error(err);
@@ -143,9 +139,10 @@ exports.processAttendance = functions
 exports.reportAttendance = functions
   .region('europe-west1')
   .https.onRequest(async (req, res) => {
-    const lastFourWeeks = await getAttendancePosts(4);
-    const allUsers = await getSlackUsers();
-    const postData = posts.map(post => ({
+    const { team_id } = req;
+    const lastFourWeeks = await getAttendancePosts(team_id, 4);
+    const allUsers = await getSlackUsers(team_id);
+    const postData = lastFourWeeks.map(post => ({
       attending: post.get('attending'),
       notAttending: post.get('notAttending'),
       date: post.get('rehearsal_date')
@@ -153,14 +150,10 @@ exports.reportAttendance = functions
     const responded = flattenDeep(
       postData.map(post => [post.attending, post.notAttending])
     );
-    const notResponded = users.filter(user => !responded.includes(user));
-
-    const data = {
-      notResponded,
-      posts: postData
-    };
-
-    await res.send(result);
+    const notResponded = allUsers.filter(user => !responded.includes(user));
+    await res.send(
+      `Not responded: ${notResponded.map(uid => `<@${uid}>`).join(', ')}`
+    );
   });
 
 exports.postRehearsalMusic = functions

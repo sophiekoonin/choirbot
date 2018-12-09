@@ -29,13 +29,14 @@ async function getAuthorizedClient() {
   if (oauthTokens) {
     return functionsOauthClient;
   }
-  const doc = await admin.firestore
+  const doc = await admin
+    .firestore()
     .collection('tokens')
     .doc(clientId)
     .get();
   const data = doc.data();
   oauthTokens = data;
-  functionsOauthClient.setCredentials(data);
+  await functionsOauthClient.setCredentials(data);
   return functionsOauthClient;
 }
 
@@ -65,9 +66,7 @@ exports.googleOauthRedirect = functions.https.onRequest(async (req, res) => {
       .firestore()
       .collection('tokens')
       .doc(clientId)
-      .set({
-        tokens
-      });
+      .set(tokens);
     res.status(200).send('OK');
   });
 });

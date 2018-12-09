@@ -25,7 +25,7 @@ exports.postRehearsalMusic = slackFunctions.postRehearsalMusic;
 exports.reportAttendance = slackFunctions.reportAttendance;
 exports.authGoogleAPI = google.authGoogleAPI;
 exports.googleOauthRedirect = google.googleOauthRedirect;
-
+exports.getSlackUsers = slack.getSlackUsers;
 // eslint-disable-next-line
 Date.prototype.format = function() {
   return `${this.getDate()}/${this.getMonth() + 1}/${this.getFullYear()}`;
