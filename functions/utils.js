@@ -1,4 +1,5 @@
 const moment = require('moment');
+const fetch = require('node-fetch');
 
 exports.getNextMonday = function() {
   const today = moment().day();
@@ -6,6 +7,15 @@ exports.getNextMonday = function() {
   return moment()
     .day(monday)
     .format('DD/MM/YYYY');
+};
+
+exports.isBankHoliday = async function(date) {
+  const dateFormatted = moment(date).format('YYYY-MM-DD');
+  const response = await fetch('https://www.gov.uk/bank-holidays.json');
+  const allBankHols = await response.json();
+  const { events } = allBankHols['england-and-wales'];
+  const allDates = events.map(evt => evt.date);
+  return allDates.includes(dateFormatted);
 };
 
 exports.getRehearsalMusicMessage = function({
