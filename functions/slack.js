@@ -3,6 +3,7 @@ const firebase = require('firebase');
 const admin = require('firebase-admin');
 const slack = require('slack');
 const { flattenDeep } = require('lodash');
+const moment = require('moment');
 
 const google = require('./google');
 const utils = require('./utils');
@@ -50,51 +51,56 @@ async function getSlackUsers(team_id) {
 exports.addAttendancePost = functions
   .region('europe-west1')
   .https.onRequest(async (req, res) => {
-    const { team_id, channel_id, text: message } = req.body;
-    const token = await getToken(team_id);
-    const nextWeekSongs = await google.getNextSongs();
-    const text = utils.getAttendancePostMessage(nextWeekSongs, message);
-    try {
-      const { ts, channel } = await slack.chat.postMessage({
-        token,
-        channel: channel_id,
-        as_user: false,
-        username: 'Attendance Bot',
-        text
-      });
-
-      await slack.reactions.add({
-        token,
-        timestamp: ts,
-        channel,
-        name: 'thumbsdown'
-      });
-      await slack.reactions.add({
-        token,
-        timestamp: ts,
-        channel,
-        name: 'thumbsup'
-      });
-
-      const rehearsal_date = new Date().format();
-      if (env !== 'prod') {
-        return { id: ts };
-      }
-      const result = await admin
-        .firestore()
-        .collection(`attendance-${team_id}`)
-        .add({
-          rehearsal_date: rehearsal_date,
-          created_at: admin.firestore.Timestamp.now()._seconds,
-          ts: ts,
-          channel: channel,
-          attending: [],
-          notAttending: []
+    const today = utils.formatDate(moment());
+    if (utils.isBankHoliday(today)) {
+      res.status(200).send('Bank holiday - not posting');
+      return;
+    } else {
+      const { team_id, channel_id, text: message } = req.body;
+      const token = await getToken(team_id);
+      const nextWeekSongs = await google.getNextSongs(today);
+      const text = utils.getAttendancePostMessage(nextWeekSongs, message);
+      try {
+        const { ts, channel } = await slack.chat.postMessage({
+          token,
+          channel: channel_id,
+          as_user: false,
+          username: 'Attendance Bot',
+          text
         });
-      res.status(200).send(':+1:');
-    } catch (err) {
-      res.status(500).send('Oh no, something went wrong!');
-      console.error(err);
+
+        await slack.reactions.add({
+          token,
+          timestamp: ts,
+          channel,
+          name: 'thumbsdown'
+        });
+        await slack.reactions.add({
+          token,
+          timestamp: ts,
+          channel,
+          name: 'thumbsup'
+        });
+
+        if (env === 'prod') {
+          const result = await admin
+            .firestore()
+            .collection(`attendance-${team_id}`)
+            .add({
+              rehearsal_date: today,
+              created_at: admin.firestore.Timestamp.now()._seconds,
+              ts: ts,
+              channel: channel,
+              attending: [],
+              notAttending: []
+            });
+        }
+
+        res.status(200).send(':+1:');
+      } catch (err) {
+        res.status(500).send('Oh no, something went wrong!');
+        console.error(err);
+      }
     }
   });
 
@@ -161,12 +167,21 @@ exports.postRehearsalMusic = functions
   .https.onRequest(async (req, res) => {
     const { team_id, channel_id } = req.body;
     try {
-      const nextWeekSongs = await google.getNextSongs();
-      const token = await getToken(team_id);
-      if (!nextWeekSongs || !nextWeekSongs.mainSong) {
-        throw new Error(`Couldn't fetch next week's songs!`);
+      const nextMonday = utils.getNextMonday();
+      let text;
+      if (utils.isBankHoliday(nextMonday)) {
+        text =
+          "<!channel> It's a bank holiday next Monday, so no rehearsal! Have a lovely day off!";
+      } else {
+        const nextWeekSongs = await google.getNextSongs(nextMonday);
+        if (!nextWeekSongs || !nextWeekSongs.mainSong) {
+          throw new Error(`Couldn't fetch next week's songs!`);
+        }
+        text = utils.getRehearsalMusicMessage(nextWeekSongs);
       }
-      const text = utils.getRehearsalMusicMessage(nextWeekSongs);
+
+      const token = await getToken(team_id);
+
       await slack.chat.postMessage({
         token,
         text,

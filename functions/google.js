@@ -71,7 +71,7 @@ exports.googleOauthRedirect = functions.https.onRequest(async (req, res) => {
   });
 });
 
-async function getRowNumber() {
+async function getRowNumberForDate(dateString) {
   const client = await getAuthorizedClient();
   const request = {
     auth: client,
@@ -80,8 +80,7 @@ async function getRowNumber() {
   };
   try {
     const response = await sheets.spreadsheets.values.get(request);
-    const rowNumber =
-      getValuesAndFlatten(response).indexOf(utils.getNextMonday()) + 1;
+    const rowNumber = getValuesAndFlatten(response).indexOf(dateString) + 1;
     return rowNumber;
   } catch (err) {
     console.error(`Error getting row number: ${err}`);
@@ -119,7 +118,7 @@ async function getSongDetailsFromSheet(rowNumber) {
   }
 }
 
-exports.getNextSongs = async function() {
-  const rowNumber = await getRowNumber();
+exports.getNextSongs = async function(dateString) {
+  const rowNumber = await getRowNumber(dateString);
   return await getSongDetailsFromSheet(rowNumber);
 };
