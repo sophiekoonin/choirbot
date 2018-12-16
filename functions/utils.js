@@ -1,14 +1,18 @@
 const moment = require('moment');
 const fetch = require('node-fetch');
 
-exports.formatDate = function(date) {
-  return date.format('DD/MM/YYYY');
+exports.formatDateForSpreadsheet = function(date) {
+  return moment(date).format('DD/MM/YYYY');
+};
+
+exports.formatDateISO = function(date) {
+  return moment(date).format('YYYY-MM-DD');
 };
 
 exports.getNextMonday = function() {
   const today = moment().day();
   const monday = today > 1 ? 8 : 1; //set day of week according to whether today is before sunday or not - see Moment.js docs
-  return formatDate(moment().day(monday));
+  return formatDateForSpreadsheet(moment().day(monday));
 };
 
 exports.isBankHoliday = async function(date) {

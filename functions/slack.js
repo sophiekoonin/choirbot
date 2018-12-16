@@ -3,7 +3,6 @@ const firebase = require('firebase');
 const admin = require('firebase-admin');
 const slack = require('slack');
 const { flattenDeep } = require('lodash');
-const moment = require('moment');
 
 const google = require('./google');
 const utils = require('./utils');
@@ -51,14 +50,17 @@ async function getSlackUsers(team_id) {
 exports.addAttendancePost = functions
   .region('europe-west1')
   .https.onRequest(async (req, res) => {
-    const today = utils.formatDate(moment());
-    if (utils.isBankHoliday(today)) {
+    const today = utils.formatDateISO(new Date());
+    const isBankHol = await utils.isBankHoliday(today);
+    if (isBankHol) {
       res.status(200).send('Bank holiday - not posting');
       return;
     } else {
       const { team_id, channel_id, text: message } = req.body;
       const token = await getToken(team_id);
-      const nextWeekSongs = await google.getNextSongs(today);
+      const nextWeekSongs = await google.getNextSongs(
+        utils.formatDateForSpreadsheet(date)
+      );
       const text = utils.getAttendancePostMessage(nextWeekSongs, message);
       try {
         const { ts, channel } = await slack.chat.postMessage({
