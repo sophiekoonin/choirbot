@@ -81,6 +81,7 @@ async function getRowNumberForDate(dateString) {
   try {
     const response = await sheets.spreadsheets.values.get(request);
     const rowNumber = getValuesAndFlatten(response).indexOf(dateString) + 1;
+    if (rowNumber === 0) return 1;
     return rowNumber;
   } catch (err) {
     console.error(`Error getting row number: ${err}`);
@@ -119,6 +120,6 @@ async function getSongDetailsFromSheet(rowNumber) {
 }
 
 exports.getNextSongs = async function(dateString) {
-  const rowNumber = await getRowNumber(dateString);
+  const rowNumber = await getRowNumberForDate(dateString);
   return await getSongDetailsFromSheet(rowNumber);
 };

@@ -12,6 +12,16 @@ const { env } = functions.config().shebot;
 admin.initializeApp();
 admin.firestore().settings({ timestampsInSnapshots: true });
 
+exports.hourly_job = functions.pubsub.topic('attendance').onPublish(message => {
+  console.log('This job is run every minute!');
+  if (message.data) {
+    const dataString = Buffer.from(message.data, 'base64').toString();
+    console.log(`Message Data: ${dataString}`);
+  }
+
+  return true;
+});
+
 exports.ping = functions
   .region('europe-west1')
   .https.onRequest((request, response) => {

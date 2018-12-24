@@ -59,7 +59,7 @@ exports.addAttendancePost = functions
       const { team_id, channel_id, text: message } = req.body;
       const token = await getToken(team_id);
       const nextWeekSongs = await google.getNextSongs(
-        utils.formatDateForSpreadsheet(date)
+        utils.formatDateForSpreadsheet(today)
       );
       const text = utils.getAttendancePostMessage(nextWeekSongs, message);
       try {

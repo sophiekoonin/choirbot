@@ -1,5 +1,6 @@
 const moment = require('moment');
 const fetch = require('node-fetch');
+const memcache = require('memory-cache');
 
 exports.formatDateForSpreadsheet = function(date) {
   return moment(date).format('DD/MM/YYYY');
@@ -17,8 +18,16 @@ exports.getNextMonday = function() {
 
 exports.isBankHoliday = async function(date) {
   const dateFormatted = moment(date).format('YYYY-MM-DD');
-  const response = await fetch('https://www.gov.uk/bank-holidays.json');
-  const allBankHols = await response.json();
+  let allBankHols;
+  allBankHols = memcache.get('bank-holidays');
+  if (!allBankHols) {
+    console.log('not in ze cache');
+    const response = await fetch('https://www.gov.uk/bank-holidays.json');
+    allBankHols = await response.json();
+    memcache.put('bank-holidays', allBankHols);
+  } else {
+    console.log('is cached');
+  }
   const { events } = allBankHols['england-and-wales'];
   const allDates = events.map(evt => evt.date);
   return allDates.includes(dateFormatted);
@@ -46,7 +55,7 @@ exports.getAttendancePostMessage = function(
   return (
     ':dancing_banana: Rehearsal day! :dancing_banana: <!channel> \n' +
     `*Today's rehearsal:* ${mainSong}\n` +
-    ` ${runThrough && `*Run through:* ${nextWeekSongs.runThrough}\n`}` +
+    ` ${runThrough && `*Run through:* ${runThrough}\n`}` +
     `${message && `*Important note:* ${message}\n`}` +
     'Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup: ' +
     '(present) or :thumbsdown: (absent).\n' +
