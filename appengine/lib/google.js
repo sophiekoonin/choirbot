@@ -4,13 +4,22 @@ const utils = require('./utils');
 const db = require('./db');
 
 const { NODE_ENV } = process.env;
-const sheetId = utils.getDbOrConfigValue('config', 'google', 'sheet_id');
 const sheets = google.sheets('v4');
 
-const auth = google.auth.getClient({
-  // Scopes can be specified either as an array or as a single, space-delimited string.
-  scopes: ['https://www.googleapis.com/auth/spreadsheets']
-});
+let auth,
+  sheetId = null;
+init();
+async function init() {
+  auth = await google.auth.getClient({
+    scopes: ['https://www.googleapis.com/auth/spreadsheets']
+  });
+  sheetId = await utils.getDbOrConfigValue('config', 'google', 'sheet_id');
+}
+
+function getValuesAndFlatten(response) {
+  const { values } = response.data;
+  return [].concat.apply([], values);
+}
 
 async function getRowNumberForDate(dateString) {
   const request = {
@@ -18,6 +27,7 @@ async function getRowNumberForDate(dateString) {
     spreadsheetId: sheetId,
     range: 'A:A'
   };
+  console.log(request);
   try {
     const response = await sheets.spreadsheets.values.get(request);
     const rowNumber = getValuesAndFlatten(response).indexOf(dateString) + 1;

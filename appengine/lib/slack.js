@@ -70,7 +70,7 @@ exports.addAttendancePost = async function(req, res) {
         name: 'thumbsup'
       });
 
-      if (env === 'prod') {
+      if (NODE_ENV === 'prod') {
         const result = await db.collection(`attendance-${team_id}`).add({
           rehearsal_date: today,
           created_at: admin.firestore.Timestamp.now()._seconds,
