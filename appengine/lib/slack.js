@@ -7,7 +7,6 @@ const db = require('./db');
 
 const { NODE_ENV } = process.env;
 const config = NODE_ENV === 'dev' ? require('../config.json') : {};
-const main = require('../index');
 
 async function getAttendancePosts(team_id, limit) {
   const snapshot = await db
