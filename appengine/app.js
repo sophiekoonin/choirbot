@@ -3,7 +3,8 @@ const express = require('express');
 const {
   addAttendancePost,
   processAttendance,
-  postRehearsalMusic
+  postRehearsalMusic,
+  testSlackIntegration
 } = require('./lib/slack');
 
 const app = express();
@@ -15,6 +16,7 @@ app.get('/', (req, res) => {
 app.get('/attendance', addAttendancePost);
 app.get('/process', processAttendance);
 app.get('/rehearsals', postRehearsalMusic);
+app.get('/test', testSlackIntegration);
 
 const PORT = process.env.PORT || 6060;
 app.listen(PORT, () => {

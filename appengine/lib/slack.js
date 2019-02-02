@@ -182,3 +182,18 @@ exports.postRehearsalMusic = async function(req, res) {
     throw new Error(err);
   }
 };
+
+exports.testSlackIntegration = async function(req, res) {
+  try {
+    await slack.chat.postMessage({
+      token,
+      text: 'Test post, please ignore!',
+      username: 'Attendance Bot Test',
+      as_user: false,
+      channel: channel_id
+    });
+    res.status(200).send();
+  } catch (err) {
+    console.log('Error trying to test slack:', err);
+  }
+};
