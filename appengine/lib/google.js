@@ -27,12 +27,10 @@ async function getRowNumberForDate(dateString) {
     spreadsheetId: sheetId,
     range: 'A:A'
   };
-  console.log(request);
   try {
     const response = await sheets.spreadsheets.values.get(request);
     const rowNumber = getValuesAndFlatten(response).indexOf(dateString) + 1;
-    if (rowNumber === 0) return 1;
-    return rowNumber;
+    return rowNumber > 0 ? rowNumber : 1;
   } catch (err) {
     console.error(`Error getting row number: ${err}`);
     throw new Error(err);

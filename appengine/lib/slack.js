@@ -44,10 +44,9 @@ exports.addAttendancePost = async function(req, res) {
       ['team_id', 'channel_id']
     );
     const token = await getToken(team_id);
-    const nextWeekSongs = await google.getNextSongs(
-      utils.formatDateForSpreadsheet(today)
-    );
-    const text = utils.getAttendancePostMessage(nextWeekSongs);
+    const date = utils.formatDateForSpreadsheet(today);
+    const songs = await google.getNextSongs(date);
+    const text = utils.getAttendancePostMessage(songs);
     try {
       const { ts, channel } = await slack.chat.postMessage({
         token,
@@ -109,10 +108,13 @@ exports.processAttendance = async function(req, res) {
       reactions.find(group => (group.name = '+1'))['users'] || [];
     const notAttending =
       reactions.find(group => (group.name = '-1'))['users'] || [];
+    const numAttending = attending.length;
+    const numNotAttending = notAttending.length;
     await db
       .collection(`attendance-${team_id}`)
       .doc(id)
       .update({ attending, notAttending });
+
     res.status(200).send('Done!');
   } catch (err) {
     console.error(err);
@@ -149,7 +151,7 @@ exports.postRehearsalMusic = async function(req, res) {
     ['team_id', 'channel_id']
   );
   try {
-    const nextMonday = utils.getNextMonday();
+    console.log('next mon', nextMonday);
     let text;
     if (utils.isBankHoliday(nextMonday)) {
       text =

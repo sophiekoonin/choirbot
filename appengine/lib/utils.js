@@ -49,7 +49,7 @@ exports.getRehearsalMusicMessage = function({
   *Run through*: ${
     runThrough ? runThrough : 'No information - please check schedule:'
   } - ${runThroughLink} \n
-  Please make sure you've listened to the recordings! :sparkles:`;
+  Please give the recordings a listen! :sparkles:`;
 };
 
 exports.getAttendancePostMessage = function({
