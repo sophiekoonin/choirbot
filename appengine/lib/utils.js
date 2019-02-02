@@ -68,12 +68,10 @@ exports.getDbOrConfigValue = async function(collection, docName, key) {
   if (NODE_ENV !== 'prod') {
     return config[docName][key];
   } else {
-    console.log('in prod');
     const doc = await db
       .collection(collection)
       .doc(docName)
       .get();
-    console.log('doc is ', doc);
     if (!doc.exists) {
       throw new Error(`Config not found for ${docName}-${key}`);
     } else {

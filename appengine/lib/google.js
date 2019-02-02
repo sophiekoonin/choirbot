@@ -10,10 +10,15 @@ let auth,
   sheetId = null;
 init();
 async function init() {
-  auth = await google.auth.getClient({
-    scopes: ['https://www.googleapis.com/auth/spreadsheets']
-  });
-  sheetId = await utils.getDbOrConfigValue('config', 'google', 'sheet_id');
+  try {
+    auth = await google.auth.getClient({
+      scopes: ['https://www.googleapis.com/auth/spreadsheets']
+    });
+    sheetId = await utils.getDbOrConfigValue('config', 'google', 'sheet_id');
+  } catch (err) {
+    console.error('Error initialising Google APIs:', err);
+    throw err;
+  }
 }
 
 function getValuesAndFlatten(response) {
@@ -67,6 +72,10 @@ async function getSongDetailsFromSheet(rowNumber) {
 }
 
 exports.getNextSongs = async function(dateString) {
-  const rowNumber = await getRowNumberForDate(dateString);
-  return await getSongDetailsFromSheet(rowNumber);
+  try {
+    const rowNumber = await getRowNumberForDate(dateString);
+    return await getSongDetailsFromSheet(rowNumber);
+  } catch (err) {
+    throw err;
+  }
 };

@@ -5,7 +5,7 @@ const { addAttendancePost, processAttendance } = require('./lib/slack');
 const app = express();
 
 app.get('/', (req, res) => {
-  res.send('Hello world! SHEbot v0.1');
+  res.send('Hello world! SHEbot v1.0');
 });
 
 app.get('/attendance', addAttendancePost);

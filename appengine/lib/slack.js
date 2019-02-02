@@ -1,5 +1,6 @@
 const slack = require('slack');
 const { flattenDeep } = require('lodash');
+const Firestore = require('@google-cloud/firestore');
 
 const google = require('./google');
 const utils = require('./utils');
@@ -72,7 +73,7 @@ exports.addAttendancePost = async function(req, res) {
       if (NODE_ENV === 'prod') {
         const result = await db.collection(`attendance-${team_id}`).add({
           rehearsal_date: today,
-          created_at: admin.firestore.Timestamp.now()._seconds,
+          created_at: Firestore.Timestamp.now()._seconds,
           ts: ts,
           channel: channel,
           attending: [],
