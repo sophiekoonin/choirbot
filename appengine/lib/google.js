@@ -52,6 +52,7 @@ async function getSongDetailsFromSheet(rowNumber) {
     const values = getValuesAndFlatten(response);
     const mainSong = values[0];
     const runThrough = values[1];
+    const notes = values[2];
     const mainSongLink = values[6];
     const runThroughLink =
       values[1] === '' || values[1] === null
@@ -61,7 +62,8 @@ async function getSongDetailsFromSheet(rowNumber) {
       mainSong,
       mainSongLink,
       runThrough,
-      runThroughLink
+      runThroughLink,
+      notes
     };
   } catch (err) {
     console.log(

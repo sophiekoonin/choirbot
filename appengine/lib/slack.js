@@ -48,6 +48,10 @@ exports.addAttendancePost = async function(req, res) {
     const token = await getToken(team_id);
     const date = moment(today).format('DD/MM/YYYY');
     const songs = await google.getNextSongs(date);
+    if (songs.mainSong.toLowerCase().includes('no rehearsal')) {
+      res.status(200).send('No rehearsal - not posting');
+      return;
+    }
     const text = utils.getAttendancePostMessage(songs);
     try {
       const { ts, channel } = await slack.chat.postMessage({
@@ -163,8 +167,13 @@ exports.postRehearsalMusic = async function(req, res) {
       const nextWeekSongs = await google.getNextSongs(nextMonday);
       if (!nextWeekSongs || !nextWeekSongs.mainSong) {
         throw new Error(`Couldn't fetch next week's songs!`);
+      } else if (
+        nextWeekSongs.mainSong.toLowerCase().includes('no rehearsal')
+      ) {
+        text = "<!channel> Reminder: there's no rehearsal next week!";
+      } else {
+        text = utils.getRehearsalMusicMessage(nextWeekSongs);
       }
-      text = utils.getRehearsalMusicMessage(nextWeekSongs);
     }
 
     const token = await getToken(team_id);
