@@ -1,6 +1,7 @@
 const slack = require('slack');
 const { flattenDeep } = require('lodash');
 const Firestore = require('@google-cloud/firestore');
+const moment = require('moment');
 
 const google = require('./google');
 const utils = require('./utils');
@@ -45,7 +46,7 @@ exports.addAttendancePost = async function(req, res) {
       ['team_id', 'channel_id']
     );
     const token = await getToken(team_id);
-    const date = utils.formatDateForSpreadsheet(today);
+    const date = moment(today).format('DD/MM/YYYY');
     const songs = await google.getNextSongs(date);
     const text = utils.getAttendancePostMessage(songs);
     try {
@@ -152,9 +153,10 @@ exports.postRehearsalMusic = async function(req, res) {
     ['team_id', 'channel_id']
   );
   try {
-    console.log('next mon', nextMonday);
+    const nextMonday = utils.getNextMonday();
     let text;
-    if (utils.isBankHoliday(nextMonday)) {
+    const isBankHoliday = await utils.isBankHoliday(nextMonday);
+    if (isBankHoliday) {
       text =
         "<!channel> It's a bank holiday next Monday, so no rehearsal! Have a lovely day off!";
     } else {

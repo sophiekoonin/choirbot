@@ -1,6 +1,10 @@
 const express = require('express');
 
-const { addAttendancePost, processAttendance } = require('./lib/slack');
+const {
+  addAttendancePost,
+  processAttendance,
+  postRehearsalMusic
+} = require('./lib/slack');
 
 const app = express();
 
@@ -10,6 +14,7 @@ app.get('/', (req, res) => {
 
 app.get('/attendance', addAttendancePost);
 app.get('/process', processAttendance);
+app.get('/rehearsals', postRehearsalMusic);
 
 const PORT = process.env.PORT || 6060;
 app.listen(PORT, () => {
