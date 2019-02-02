@@ -25,12 +25,9 @@ exports.isBankHoliday = async function(date) {
   let allBankHols;
   allBankHols = memcache.get('bank-holidays');
   if (!allBankHols) {
-    console.log('not in ze cache');
     const response = await fetch('https://www.gov.uk/bank-holidays.json');
     allBankHols = await response.json();
     memcache.put('bank-holidays', allBankHols);
-  } else {
-    console.log('is cached');
   }
   const { events } = allBankHols['england-and-wales'];
   const allDates = events.map(evt => evt.date);
@@ -71,10 +68,12 @@ exports.getDbOrConfigValue = async function(collection, docName, key) {
   if (NODE_ENV !== 'prod') {
     return config[docName][key];
   } else {
+    console.log('in prod');
     const doc = await db
       .collection(collection)
       .doc(docName)
       .get();
+    console.log('doc is ', doc);
     if (!doc.exists) {
       throw new Error(`Config not found for ${docName}-${key}`);
     } else {
