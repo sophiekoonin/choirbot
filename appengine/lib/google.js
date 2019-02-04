@@ -81,3 +81,9 @@ exports.getNextSongs = async function(dateString) {
     throw err;
   }
 };
+
+exports.testGoogleIntegration = async function(req, res) {
+  const testDate = '04/02/2019';
+  const rowNumber = await getRowNumberForDate(testDate);
+  res.status(200).send(rowNumber);
+};

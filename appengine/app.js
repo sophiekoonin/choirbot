@@ -7,6 +7,7 @@ const {
   testSlackIntegration
 } = require('./lib/slack');
 
+const { testGoogleIntegration } = require('./lib/google');
 const app = express();
 
 app.get('/', (req, res) => {
@@ -16,8 +17,8 @@ app.get('/', (req, res) => {
 app.get('/attendance', addAttendancePost);
 app.get('/process', processAttendance);
 app.get('/rehearsals', postRehearsalMusic);
-app.get('/test', testSlackIntegration);
-
+app.get('/test-slack', testSlackIntegration);
+app.get('/test-google', testGoogleIntegration);
 const PORT = process.env.PORT || 6060;
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
