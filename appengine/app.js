@@ -11,7 +11,7 @@ const { testGoogleIntegration } = require('./lib/google');
 const app = express();
 
 app.get('/', (req, res) => {
-  res.send('Hello world! SHEbot v1.0');
+  res.send('Hello world! SHEbot v1.1');
 });
 
 app.get('/attendance', addAttendancePost);

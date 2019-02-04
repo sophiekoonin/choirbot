@@ -6,15 +6,15 @@ const db = require('./db');
 const { NODE_ENV } = process.env;
 const sheets = google.sheets('v4');
 
-let auth,
-  sheetId = null;
-init();
+const { auth, sheetId } = init().then(res => res);
+
 async function init() {
   try {
-    auth = await google.auth.getClient({
+    const authClient = await google.auth.getClient({
       scopes: ['https://www.googleapis.com/auth/spreadsheets']
     });
-    sheetId = await utils.getDbOrConfigValue('config', 'google', 'sheet_id');
+    const id = await utils.getDbOrConfigValue('config', 'google', 'sheet_id');
+    return { authClient, id };
   } catch (err) {
     console.error('Error initialising Google APIs:', err);
     throw err;
@@ -33,6 +33,7 @@ async function getRowNumberForDate(dateString) {
     range: 'A:A'
   };
   try {
+    console.log(auth);
     const response = await sheets.spreadsheets.values.get(request);
     const rowNumber = getValuesAndFlatten(response).indexOf(dateString) + 1;
     return rowNumber > 0 ? rowNumber : 1;
