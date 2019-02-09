@@ -45,8 +45,11 @@ exports.getRehearsalMusicMessage = function({
   notes
 }) {
   return `<!channel> Here's the plan for Monday's rehearsal! \n
-  ${notes.toLowerCase().includes('team updates') &&
-    'Team updates meeting at 6:30! All welcome :tada:\n'}
+  ${
+    notes.toLowerCase().includes('team updates')
+      ? 'Team updates meeting at 6:30! All welcome :tada:\n'
+      : ''
+  }
   We'll be doing ${mainSong} - ${mainSongLink ||
     "I can't find a link for this - please check the Arrangements Folder!"} \n
   *Run through*: ${
