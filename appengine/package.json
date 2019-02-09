@@ -9,7 +9,7 @@
   "scripts": {
     "deploy": "gcloud app deploy --quiet app.yaml cron.yaml",
     "start": "NODE_ENV=prod node app.js",
-    "start:dev": "GOOGLE_APPLICATION_CREDENTIALS=\"./keys/shechoirlondon-977-b055521d681f.json\" NODE_ENV=dev nodemon app.js"
+    "start:dev": "NODE_ENV=prod nodemon app.js"
   },
   "author": "",
   "license": "ISC",

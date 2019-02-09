@@ -10,19 +10,7 @@ function getValuesAndFlatten(response) {
   return [].concat.apply([], values);
 }
 
-let auth,
-  sheetId = null;
-init();
-async function init() {
-  credentials = await utils.getDbOrConfigValue('tokens', 'google');
-  auth = await google.auth.getClient({
-    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-    credentials
-  });
-  sheetId = await utils.getDbOrConfigValue('config', 'google', 'sheet_id');
-}
-
-async function getRowNumberForDate(sheetId, dateString) {
+async function getRowNumberForDate(auth, sheetId, dateString) {
   const request = {
     auth,
     spreadsheetId: sheetId,
@@ -38,7 +26,7 @@ async function getRowNumberForDate(sheetId, dateString) {
   }
 }
 
-async function getSongDetailsFromSheet(sheetId, rowNumber) {
+async function getSongDetailsFromSheet(auth, sheetId, rowNumber) {
   try {
     const response = await sheets.spreadsheets.values.get({
       auth,
@@ -62,7 +50,7 @@ async function getSongDetailsFromSheet(sheetId, rowNumber) {
       notes
     };
   } catch (err) {
-    console.log(
+    console.error(
       `The API returned an error when trying to get song details: ${err}`
     );
     throw new Error(err);
@@ -70,6 +58,11 @@ async function getSongDetailsFromSheet(sheetId, rowNumber) {
 }
 
 exports.getNextSongs = async function(dateString) {
+  const credentials = await utils.getDocData('tokens', 'google');
+  const auth = await google.auth.getClient({
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    credentials
+  });
   try {
     const sheetId = await utils.getDbOrConfigValue(
       'config',
@@ -102,6 +95,11 @@ exports.testGoogleIntegration = async function(req, res) {
       'google',
       'sheet_id'
     );
+    const credentials = await utils.getDocData('tokens', 'google');
+    const auth = await google.auth.getClient({
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+      credentials
+    });
     const testDate = '04/02/2019';
     const rowNumber = await getRowNumberForDate(auth, sheetId, testDate);
     res.status(200).send(`Row number is ${rowNumber}`);

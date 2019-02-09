@@ -73,14 +73,25 @@ exports.getAttendancePostMessage = function({
     'For Musical warm up, respond with :musical_note:.'
   );
 };
+
+const getDbDoc = async function(collection, docName) {
+  console.log('collection', collection);
+  return await db
+    .collection(collection)
+    .doc(docName)
+    .get();
+};
+
+exports.getDocData = async function(collection, docName) {
+  const doc = await getDbDoc(collection, docName);
+  return await doc.data();
+};
+
 exports.getDbOrConfigValue = async function(collection, docName, key) {
   if (NODE_ENV !== 'prod') {
     return config[docName][key];
   } else {
-    const doc = await db
-      .collection(collection)
-      .doc(docName)
-      .get();
+    const doc = await getDbDoc(collection, docName);
     if (!doc.exists) {
       throw new Error(`Config not found for ${docName}-${key}`);
     } else {
