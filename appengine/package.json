@@ -9,14 +9,14 @@
   "scripts": {
     "deploy": "gcloud app deploy --quiet app.yaml cron.yaml",
     "start": "NODE_ENV=prod node app.js",
-    "start:dev": "GOOGLE_APPLICATION_CREDENTIALS=\"./keys/google.json\" NODE_ENV=dev nodemon app.js"
+    "start:dev": "GOOGLE_APPLICATION_CREDENTIALS=\"./keys/shechoirlondon-977-b055521d681f.json\" NODE_ENV=dev nodemon app.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@google-cloud/firestore": "^1.0.1",
     "express": "4.16.4",
-    "google-auth-library": "^3.0.1",
+    "google-auth-library": "^3.1.0",
     "googleapis": "^37.1.0",
     "lodash": "4.17.11",
     "memory-cache": "0.2.0",
