@@ -10,7 +10,19 @@ function getValuesAndFlatten(response) {
   return [].concat.apply([], values);
 }
 
-async function getRowNumberForDate(auth, sheetId, dateString) {
+let auth,
+  sheetId = null;
+init();
+async function init() {
+  credentials = await utils.getDbOrConfigValue('tokens', 'google');
+  auth = await google.auth.getClient({
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    credentials
+  });
+  sheetId = await utils.getDbOrConfigValue('config', 'google', 'sheet_id');
+}
+
+async function getRowNumberForDate(sheetId, dateString) {
   const request = {
     auth,
     spreadsheetId: sheetId,
@@ -26,7 +38,7 @@ async function getRowNumberForDate(auth, sheetId, dateString) {
   }
 }
 
-async function getSongDetailsFromSheet(auth, sheetId, rowNumber) {
+async function getSongDetailsFromSheet(sheetId, rowNumber) {
   try {
     const response = await sheets.spreadsheets.values.get({
       auth,
@@ -59,9 +71,6 @@ async function getSongDetailsFromSheet(auth, sheetId, rowNumber) {
 
 exports.getNextSongs = async function(dateString) {
   try {
-    const auth = await google.auth.getClient({
-      scopes: ['https://www.googleapis.com/auth/spreadsheets']
-    });
     const sheetId = await utils.getDbOrConfigValue(
       'config',
       'google',
@@ -74,11 +83,20 @@ exports.getNextSongs = async function(dateString) {
   }
 };
 
+exports.putGoogleCredentials = async function(req, res) {
+  const { credentials } = req.body;
+  try {
+    const document = await db.doc('tokens/google');
+    document.update(credentials);
+    res.status(201).send('Successfully set!');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error setting google credentials', err);
+  }
+};
+
 exports.testGoogleIntegration = async function(req, res) {
   try {
-    const auth = await google.auth.getClient({
-      scopes: ['https://www.googleapis.com/auth/spreadsheets']
-    });
     const sheetId = await utils.getDbOrConfigValue(
       'config',
       'google',
@@ -88,6 +106,7 @@ exports.testGoogleIntegration = async function(req, res) {
     const rowNumber = await getRowNumberForDate(auth, sheetId, testDate);
     res.status(200).send(`Row number is ${rowNumber}`);
   } catch (err) {
+    console.error(err);
     res.status(500).send(err);
   }
 };

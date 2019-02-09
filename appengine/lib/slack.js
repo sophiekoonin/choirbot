@@ -86,7 +86,7 @@ exports.addAttendancePost = async function(req, res) {
         });
       }
 
-      res.status(200).send(':+1:');
+      res.status(200).send('Posted and stored in DB successfully!');
     } catch (err) {
       res.status(500).send('Oh no, something went wrong!');
       console.error(err);
