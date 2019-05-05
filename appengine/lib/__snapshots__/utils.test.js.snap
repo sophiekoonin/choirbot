@@ -28,3 +28,62 @@ exports[`utils getAttendancePostMessage should format correctly when there is no
 Facilitator please respond with :raised_hands:!
 To volunteer for Physical warm up, respond with :muscle: For Musical warm up, respond with :musical_note:."
 `;
+
+exports[`utils getRehearsalMusicMessage should format correctly with all bits present 1`] = `
+"<!channel> Here's the plan for Monday's rehearsal! 
+
+  Team updates meeting at 6:30! All welcome :tada:
+
+  We'll be doing Hide and Seek - link-to-hideandseek 
+
+  *Run through*: Dreams  - link-to-dreams 
+
+  Please give the recordings a listen! :sparkles:"
+`;
+
+exports[`utils getRehearsalMusicMessage should format correctly with no main song link 1`] = `
+"<!channel> Here's the plan for Monday's rehearsal! 
+
+  Team updates meeting at 6:30! All welcome :tada:
+
+  We'll be doing Hide and Seek - I can't find a link for this - please check the Arrangements Folder! 
+
+  *Run through*: Dreams  - link-to-dreams 
+
+  Please give the recordings a listen! :sparkles:"
+`;
+
+exports[`utils getRehearsalMusicMessage should format correctly with no run through 1`] = `
+"<!channel> Here's the plan for Monday's rehearsal! 
+
+  Team updates meeting at 6:30! All welcome :tada:
+
+  We'll be doing Hide and Seek - link-to-hideandseek 
+
+  *Run through*: Please check the schedule for more info.  
+
+  Please give the recordings a listen! :sparkles:"
+`;
+
+exports[`utils getRehearsalMusicMessage should format correctly with no team updates 1`] = `
+"<!channel> Here's the plan for Monday's rehearsal! 
+
+  
+  We'll be doing Hide and Seek - link-to-hideandseek 
+
+  *Run through*: Dreams  - link-to-dreams 
+
+  Please give the recordings a listen! :sparkles:"
+`;
+
+exports[`utils getRehearsalMusicMessage should format correctly with run through but no link 1`] = `
+"<!channel> Here's the plan for Monday's rehearsal! 
+
+  Team updates meeting at 6:30! All welcome :tada:
+
+  We'll be doing Hide and Seek - link-to-hideandseek 
+
+  *Run through*: Dreams  
+
+  Please give the recordings a listen! :sparkles:"
+`;
