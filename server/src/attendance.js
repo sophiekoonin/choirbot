@@ -20,7 +20,7 @@ exports.getAttendanceReport = async function(req, res) {
     notAttending: doc.get('notAttending')
   }));
 
-  const allDates = allAttendance.map(record => record.date);
+  const allDates = allAttendance.map(record => record.date).sort();
 
   const usersWithAttendance = allUsers.map(user => {
     const attendance = allAttendance.reduce((acc, curr) => {
