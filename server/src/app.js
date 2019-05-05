@@ -6,9 +6,11 @@ const {
   processAttendance,
   postRehearsalMusic,
   testSlackIntegration
-} = require('./lib/slack');
+} = require('./slack');
 
-const { testGoogleIntegration, putGoogleCredentials } = require('./lib/google');
+const { getAttendanceReport } = require('./attendance');
+
+const { testGoogleIntegration, putGoogleCredentials } = require('./google');
 const app = express();
 app.use(bodyParser.json()); // for parsing application/json
 
@@ -22,6 +24,8 @@ app.get('/rehearsals', postRehearsalMusic);
 app.get('/test-slack', testSlackIntegration);
 app.get('/test-google', testGoogleIntegration);
 app.put('/google-creds', putGoogleCredentials);
+app.get('/report', getAttendanceReport);
+
 const PORT = process.env.PORT || 6060;
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

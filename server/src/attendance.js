@@ -10,7 +10,7 @@ function getAttendanceValue(attendance, user_id) {
   return 'unknown';
 }
 
-exports.getAttendanceReport = async function() {
+exports.getAttendanceReport = async function(req, res) {
   const teamId = await utils.getDbOrConfigValue('config', 'slack', 'team_id');
   const allUsers = await getSlackUsers(teamId);
   const attendanceRecords = await getAttendancePosts(teamId, 50);
@@ -33,8 +33,10 @@ exports.getAttendanceReport = async function() {
       attendance: attendance
     };
   });
-  return {
-    dates: allDates,
-    users: allUsers
-  };
+  res.status(200).send(
+    JSON.stringify({
+      dates: allDates,
+      users: usersWithAttendance
+    })
+  );
 };
