@@ -10,20 +10,20 @@ const db = require('./db');
 const { NODE_ENV } = process.env;
 const config = NODE_ENV === 'dev' ? require('../config.json') : {};
 
-async function getAttendancePosts(team_id, limit) {
+exports.getAttendancePosts = async function(team_id, limit) {
   const snapshot = await db
     .collection(`attendance-${team_id}`)
     .orderBy('created_at', 'desc')
     .limit(limit)
     .get();
   return snapshot.docs;
-}
+};
 
 async function getToken(team_id) {
   return await utils.getDbOrConfigValue('tokens', team_id, 'token');
 }
 
-async function getSlackUsers(team_id) {
+async function getSlackUserIds(team_id) {
   const token = await getToken(team_id);
   const { members } = await slack.users.list({ token });
   return members
@@ -32,6 +32,15 @@ async function getSlackUsers(team_id) {
     .map(member => member.id)
     .filter(id => id !== 'USLACKBOT');
 }
+
+exports.getSlackUsers = async function(team_id) {
+  const token = await getToken(team_id);
+  const { members } = await slack.users.list({ token });
+  return members
+    .filter(member => !member.deleted)
+    .filter(member => !member.is_bot)
+    .filter(member => member.id !== 'USLACKBOT');
+};
 
 exports.addAttendancePost = async function(req, res) {
   const today = utils.formatDateISO(new Date());
@@ -135,7 +144,7 @@ exports.processAttendance = async function(req, res) {
 exports.reportAttendance = async function(req, res) {
   const team_id = await utils.getDbOrConfigValue('config', 'slack', 'team_id');
   const lastFourWeeks = await getAttendancePosts(team_id, 4);
-  const allUsers = await getSlackUsers(team_id);
+  const allUsers = await getSlackUserIds(team_id);
   const postData = lastFourWeeks.map(post => ({
     attending: post.get('attending'),
     notAttending: post.get('notAttending'),
