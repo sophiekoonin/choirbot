@@ -10,14 +10,14 @@ const db = require('./db');
 const { NODE_ENV } = process.env;
 const config = NODE_ENV === 'dev' ? require('../config.json') : {};
 
-exports.getAttendancePosts = async function(team_id, limit) {
+async function getAttendancePosts(team_id, limit) {
   const snapshot = await db
     .collection(`attendance-${team_id}`)
     .orderBy('created_at', 'desc')
     .limit(limit)
     .get();
   return snapshot.docs;
-};
+}
 
 async function getToken(team_id) {
   return await utils.getDbOrConfigValue('tokens', team_id, 'token');
@@ -120,11 +120,9 @@ exports.processAttendance = async function(req, res) {
     const id = firstResult.id;
     const { reactions } = response.message;
     const attending =
-      reactions.find(group => (group.name = '+1'))['users'] || [];
+      reactions.find(group => group.name === '+1')['users'] || [];
     const notAttending =
-      reactions.find(group => (group.name = '-1'))['users'] || [];
-    const numAttending = attending.length;
-    const numNotAttending = notAttending.length;
+      reactions.find(group => group.name === '-1')['users'] || [];
     await db
       .collection(`attendance-${team_id}`)
       .doc(id)
@@ -221,3 +219,5 @@ exports.testSlackIntegration = async function(req, res) {
     console.log('Error trying to test slack:', err);
   }
 };
+
+exports.getAttendancePosts = getAttendancePosts;
