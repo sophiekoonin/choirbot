@@ -1,5 +1,4 @@
 import React from 'react';
-import attendanceData from './test.json';
 
 function getAttendanceSymbol(attendance) {
   switch (attendance) {
@@ -22,9 +21,9 @@ class Report extends React.Component {
     this.renderAttendanceTable = this.renderAttendanceTable.bind(this);
   }
   async componentDidMount() {
-    // const attendanceData = await fetch(
-    //   'https://shechoirlondon-977.appspot.com/report'
-    // );
+    const attendanceData = await fetch(
+      'https://api-dot-shechoirlondon-977.appspot.com/report'
+    );
 
     this.setState({
       dates: attendanceData.dates,
