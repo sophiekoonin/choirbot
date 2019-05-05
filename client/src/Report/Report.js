@@ -1,5 +1,16 @@
 import React from 'react';
 import attendanceData from './test.json';
+
+function getAttendanceSymbol(attendance) {
+  switch (attendance) {
+    case 'present':
+      return '✅';
+    case 'absent':
+      return '👎';
+    default:
+      return '❌';
+  }
+}
 class Report extends React.Component {
   constructor() {
     super();
@@ -35,11 +46,17 @@ class Report extends React.Component {
 
   renderUsersWithAttendance(dates, users) {
     function renderUserAttendance(user) {
-      return dates.map(date => (
-        <td key={`${user.name}-${date}`}>
-          {user.attendance[date] ? user.attendance[date] : '?'}
-        </td>
-      ));
+      return dates.map(date => {
+        const className = user.attendance[date]
+          ? user.attendance[date]
+          : 'unknown';
+
+        return (
+          <td key={`${user.name}-${date}`} className={className}>
+            {getAttendanceSymbol(user.attendance[date])}
+          </td>
+        );
+      });
     }
     const sortedUsers = users.sort((a, b) =>
       a.name.split(' ')[0].toLowerCase() < b.name.split(' ')[0].toLowerCase()
