@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`utils getAttendancePostMessage should format correctly when there is a team updates meeting 1`] = `
+":dancing_banana: Rehearsal day! :dancing_banana: <!channel> 
+*Today's rehearsal:* Bills Bills Bills
+ *Run through:* Poison
+
+ *Team updates meeting at 6:30! All welcome* :tada:
+Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup: (present) or :thumbsdown: (absent).
+Facilitator please respond with :raised_hands:!
+To volunteer for Physical warm up, respond with :muscle: For Musical warm up, respond with :musical_note:."
+`;
+
+exports[`utils getAttendancePostMessage should format correctly when there is no run through 1`] = `
+":dancing_banana: Rehearsal day! :dancing_banana: <!channel> 
+*Today's rehearsal:* Bills Bills Bills
+  Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup: (present) or :thumbsdown: (absent).
+Facilitator please respond with :raised_hands:!
+To volunteer for Physical warm up, respond with :muscle: For Musical warm up, respond with :musical_note:."
+`;
+
+exports[`utils getAttendancePostMessage should format correctly when there is no team updates meeting 1`] = `
+":dancing_banana: Rehearsal day! :dancing_banana: <!channel> 
+*Today's rehearsal:* Bills Bills Bills
+ *Run through:* Poison
+
+ Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup: (present) or :thumbsdown: (absent).
+Facilitator please respond with :raised_hands:!
+To volunteer for Physical warm up, respond with :muscle: For Musical warm up, respond with :musical_note:."
+`;
