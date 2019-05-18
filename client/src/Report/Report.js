@@ -10,6 +10,7 @@ function getAttendanceSymbol(attendance) {
       return '❌';
   }
 }
+
 class Report extends React.Component {
   constructor() {
     super();
@@ -50,26 +51,30 @@ class Report extends React.Component {
     return (
       <tr>
         <th />
-        {dates.map(date => (
-          <th key={date}>{date}</th>
-        ))}
+        {dates
+          .sort((a, b) => new Date(a) - new Date(b))
+          .map(date => (
+            <th key={date}>{date}</th>
+          ))}
       </tr>
     );
   }
 
   renderUsersWithAttendance(dates, users) {
     function renderUserAttendance(user) {
-      return dates.map(date => {
-        const className = user.attendance[date]
-          ? user.attendance[date]
-          : 'unknown';
+      return dates
+        .sort((a, b) => new Date(a) - new Date(b))
+        .map(date => {
+          const className = user.attendance[date]
+            ? user.attendance[date]
+            : 'unknown';
 
-        return (
-          <td key={`${user.name}-${date}`} className={className}>
-            {getAttendanceSymbol(user.attendance[date])}
-          </td>
-        );
-      });
+          return (
+            <td key={`${user.name}-${date}`} className={className}>
+              {getAttendanceSymbol(user.attendance[date])}
+            </td>
+          );
+        });
     }
     const sortedUsers = users.sort((a, b) =>
       a.name.split(' ')[0].toLowerCase() < b.name.split(' ')[0].toLowerCase()
