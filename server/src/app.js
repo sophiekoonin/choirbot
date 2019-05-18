@@ -1,5 +1,6 @@
 const express = require('express');
-var bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
+const { getDbOrConfigValue } = require('./utils');
 
 const {
   addAttendancePost,
@@ -9,11 +10,10 @@ const {
 } = require('./slack');
 
 const { getAttendanceReport } = require('./attendance');
-
 const { testGoogleIntegration, putGoogleCredentials } = require('./google');
+
 const app = express();
 app.use(bodyParser.json()); // for parsing application/json
-
 app.get('/', (req, res) => {
   res.send('Hello world! SHEbot v1.1');
 });

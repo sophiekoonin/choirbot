@@ -16,20 +16,30 @@ class Report extends React.Component {
     this.state = {
       isLoading: true,
       dates: [],
-      users: []
+      users: [],
+      error: false
     };
     this.renderAttendanceTable = this.renderAttendanceTable.bind(this);
   }
   async componentDidMount() {
-    const attendanceData = await fetch(
-      'https://api-dot-shechoirlondon-977.appspot.com/report'
-    );
+    try {
+      const res = await fetch(
+        'https://api-dot-shechoirlondon-977.appspot.com/report'
+      );
 
-    this.setState({
-      dates: attendanceData.dates,
-      users: attendanceData.users,
-      isLoading: false
-    });
+      const attendanceData = await res.json();
+      this.setState({
+        dates: attendanceData.dates,
+        users: attendanceData.users,
+        isLoading: false
+      });
+    } catch (error) {
+      this.setState({
+        isLoading: false,
+        error: true
+      });
+      throw error;
+    }
   }
 
   renderHeaderRows(dates) {
@@ -85,7 +95,8 @@ class Report extends React.Component {
   }
 
   render() {
-    const { isLoading } = this.state;
+    const { isLoading, error } = this.state;
+    if (error) return 'Something went wrong!';
     return isLoading ? 'Loading...' : this.renderAttendanceTable();
   }
 }
