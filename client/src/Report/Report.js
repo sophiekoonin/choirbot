@@ -30,7 +30,7 @@ class Report extends React.Component {
 
   async componentDidMount() {
     try {
-      const res = await fetch('http://localhost:6060/report');
+      const res = await fetch(`${process.env.REACT_APP_BASE_URL}/report`);
 
       const attendanceData = await res.json();
       this.setState({
@@ -86,6 +86,7 @@ class Report extends React.Component {
       </tr>
     ));
   }
+
   renderAttendanceTable() {
     const { dates, users } = this.state;
     return (
