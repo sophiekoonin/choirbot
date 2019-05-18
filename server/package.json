@@ -9,7 +9,7 @@
   "scripts": {
     "deploy": "gcloud app deploy --quiet app.yaml cron.yaml",
     "start": "NODE_ENV=prod node src/app.js",
-    "start:dev": "NODE_ENV=prod SECRET=testsecret nodemon src/app.js",
+    "start:dev": "NODE_ENV=dev nodemon src/app.js",
     "test": "jest"
   },
   "author": "",

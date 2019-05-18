@@ -13,6 +13,14 @@ const { getAttendanceReport } = require('./attendance');
 const { testGoogleIntegration, putGoogleCredentials } = require('./google');
 
 const app = express();
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept'
+  );
+  next();
+});
 app.use(bodyParser.json()); // for parsing application/json
 app.get('/', (req, res) => {
   res.send('Hello world! SHEbot v1.1');

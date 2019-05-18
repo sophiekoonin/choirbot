@@ -17,15 +17,20 @@ class Report extends React.Component {
       isLoading: true,
       dates: [],
       users: [],
-      error: false
+      error: null
     };
     this.renderAttendanceTable = this.renderAttendanceTable.bind(this);
   }
+
+  componentDidCatch(error) {
+    this.setState({
+      error: error
+    });
+  }
+
   async componentDidMount() {
     try {
-      const res = await fetch(
-        'https://api-dot-shechoirlondon-977.appspot.com/report'
-      );
+      const res = await fetch('http://localhost:6060/report');
 
       const attendanceData = await res.json();
       this.setState({
@@ -35,8 +40,7 @@ class Report extends React.Component {
       });
     } catch (error) {
       this.setState({
-        isLoading: false,
-        error: true
+        isLoading: false
       });
       throw error;
     }
@@ -95,8 +99,7 @@ class Report extends React.Component {
   }
 
   render() {
-    const { isLoading, error } = this.state;
-    if (error) return 'Something went wrong!';
+    const { isLoading } = this.state;
     return isLoading ? 'Loading...' : this.renderAttendanceTable();
   }
 }
