@@ -19,6 +19,7 @@ passport.use(getLocalStrategy());
 
 const app = express();
 app.use(passport.initialize());
+app.use(passport.session());
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header(
@@ -29,6 +30,15 @@ app.use((req, res, next) => {
 });
 
 app.use(bodyParser.json()); // for parsing application/json
+
+app.post(
+  '/login',
+  passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/login'
+  })
+);
+
 app.get('/', (req, res) => {
   res.send('Hello world! SHEbot v1.1');
 });
