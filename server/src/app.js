@@ -1,6 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { getDbOrConfigValue } = require('./utils');
+const passport = require('passport');
+
+const { getDbOrConfigValue, getDbOrConfigValues } = require('./utils');
+const { getLocalStrategy } = require('./passport');
 
 const {
   addAttendancePost,
@@ -12,7 +15,10 @@ const {
 const { getAttendanceReport } = require('./attendance');
 const { testGoogleIntegration, putGoogleCredentials } = require('./google');
 
+passport.use(getLocalStrategy());
+
 const app = express();
+app.use(passport.initialize());
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header(
@@ -21,6 +27,7 @@ app.use((req, res, next) => {
   );
   next();
 });
+
 app.use(bodyParser.json()); // for parsing application/json
 app.get('/', (req, res) => {
   res.send('Hello world! SHEbot v1.1');
@@ -32,7 +39,11 @@ app.get('/rehearsals', postRehearsalMusic);
 app.get('/test-slack', testSlackIntegration);
 app.get('/test-google', testGoogleIntegration);
 app.put('/google-creds', putGoogleCredentials);
-app.get('/report', getAttendanceReport);
+app.get(
+  '/report',
+  passport.authenticate('basic', { session: false }),
+  getAttendanceReport
+);
 
 const PORT = process.env.PORT || 6060;
 app.listen(PORT, () => {
