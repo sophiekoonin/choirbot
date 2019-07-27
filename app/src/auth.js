@@ -15,10 +15,11 @@ exports.oauth_redirect = async function(req, res) {
     return res.status(401).send("Missing query attribute 'code'");
   }
 
-  const [id, secret] = await utils.getDbOrConfigValues('config', 'slack', [
-    'id',
-    'secret'
-  ]);
+  const [id, secret, app_id] = await utils.getDbOrConfigValues(
+    'config',
+    'slack',
+    ['id', 'secret', 'app_id']
+  );
 
   const queryParams = {
     code: req.query.code,
@@ -53,21 +54,29 @@ exports.oauth_redirect = async function(req, res) {
       .sendStatus(302);
   }
 
+  const {
+    incoming_webhook,
+    team_id,
+    team_name,
+    user_id,
+    access_token
+  } = responseJson;
+
   await db
-    .collection('tokens')
+    .collection('teams')
     .doc(responseJson.team_id)
     .set({
-      team_name: responseJson.team_name,
-      user_id: responseJson.user_id,
-      channel_id: responseJson.incoming_webhook.channel_id,
-      channel: responseJson.incoming_webhook.channel,
-      token: responseJson.access_token
+      team_name: team_name,
+      user_id: user_id,
+      channel_id: incoming_webhook.channel_id,
+      channel: incoming_webhook.channel,
+      token: access_token
     });
 
   return res
     .header(
       'Location',
-      `https://${process.env.GOOGLE_CLOUD_PROJECT}.appspot.com/oauth_success`
+      `https://slack.com/app_redirect?app=${app_id}&team=${team_id}`
     )
     .sendStatus(302);
 };
