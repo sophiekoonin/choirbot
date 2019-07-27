@@ -1,6 +1,7 @@
 const fetch = require('node-fetch');
 const querystring = require('querystring');
 const db = require('./db');
+const utils = require('./utils');
 
 // With thanks to Dennis Alund https://medium.com/evenbit/building-a-slack-app-with-firebase-as-a-backend-151c1c98641d
 
@@ -14,10 +15,15 @@ exports.oauth_redirect = async function(req, res) {
     return res.status(401).send("Missing query attribute 'code'");
   }
 
+  const [id, secret] = utils.getDbOrConfigValues('config', 'slack', [
+    'id',
+    'secret'
+  ]);
+
   const queryParams = {
     code: req.query.code,
-    client_id: functions.config().shebot.id,
-    client_secret: functions.config().shebot.secret,
+    client_id: id,
+    client_secret: secret,
     redirect_uri: `https://europe-west1-${
       process.env.GCLOUD_PROJECT
     }.cloudfunctions.net/oauth_redirect`
