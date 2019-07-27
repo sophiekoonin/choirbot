@@ -1,19 +1,53 @@
 const db = require('../db');
-const { onSlackInstall } = require('./installation');
+const {
+  onSlackInstall,
+  respondToRehearsalDaySelected,
+  respondToYesNoRehearsalReminders
+} = require('./config');
+const { Actions, ActionTypes } = require('./constants');
 
 exports.handleInteractions = async (req, res) => {
-  const { payload } = res;
+  const { payload } = req.body;
+  const { response_url, actions, team } = JSON.parse(payload);
+  const action = actions[0];
+  const { block_id, type } = action;
 
-  const { response_url, domain, actions } = payload;
-  const { id } = domain.team;
-  const { action_id, selected_option } = actions[0];
-  console.log({ payload });
-  await db
-    .collection('teams')
-    .doc(id)
-    .set({
-      [action_id]: selected_option.value
+  let value, text;
+  switch (type) {
+    case ActionTypes.STATIC_SELECT:
+      text = action.selected_option.text.text;
+      value = action.selected_option.value;
+      break;
+    case ActionTypes.BUTTON:
+      text = action.text.text;
+      value = action.value;
+      break;
+  }
+
+  db.collection('teams')
+    .doc(team.id)
+    .update({
+      [block_id]: value
     });
+
+  switch (block_id) {
+    case Actions.SELECT_REHEARSAL_DAY:
+      respondToRehearsalDaySelected({
+        responseUrl: response_url,
+        selectedOptionText: text
+      });
+      break;
+    case Actions.YES_NO_REMINDERS:
+      respondToYesNoRehearsalReminders({
+        responseUrl: response_url,
+        selectedOption: value
+      });
+      break;
+    default:
+      break;
+  }
+
+  return res.sendStatus(200);
 };
 
 exports.handleEvents = async (req, res) => {

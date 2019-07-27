@@ -4,6 +4,7 @@ const { postRehearsalMusic } = require('./rehearsals');
 const { handleInteractions, handleEvents } = require('./interactions');
 const { oauth_redirect, oauth_error, oauth_success } = require('./oauth');
 const { getAttendanceReport } = require('./reports');
+const { startConfigFlow } = require('./config');
 
 module.exports = {
   addAttendancePost,
@@ -15,5 +16,6 @@ module.exports = {
   oauth_redirect,
   oauth_error,
   oauth_success,
-  getAttendanceReport
+  getAttendanceReport,
+  startConfigFlow
 };

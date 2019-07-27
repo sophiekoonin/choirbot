@@ -13,7 +13,8 @@ const {
   getAttendanceReport,
   oauth_redirect,
   oauth_error,
-  oauth_success
+  oauth_success,
+  startConfigFlow
 } = require('./slack');
 const {
   testGoogleIntegration,
@@ -23,6 +24,7 @@ const {
 const app = express();
 
 app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
   res.send('Hello world! SHEbot v1.2');
@@ -40,6 +42,7 @@ app.post('/events', handleEvents);
 app.get('/oauth_redirect', oauth_redirect);
 app.get('/oauth_success', oauth_success);
 app.get('/oauth_error', oauth_error);
+app.get('/config-flow', startConfigFlow);
 
 const PORT = process.env.PORT || 6060;
 app.listen(PORT, () => {
