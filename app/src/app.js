@@ -10,7 +10,7 @@ const {
   testSlackIntegration
 } = require('./slack');
 
-const { oauth_redirect, success } = require('./auth');
+const { oauth_redirect, oauth_error, oauth_success } = require('./auth');
 const { getAttendanceReport } = require('./attendance');
 const { testGoogleIntegration, putGoogleCredentials } = require('./google');
 
@@ -30,7 +30,8 @@ app.get('/test-google', testGoogleIntegration);
 app.put('/google-creds', putGoogleCredentials);
 app.get('/report', getAttendanceReport);
 app.get('/oauth_redirect', oauth_redirect);
-app.get('/success', success);
+app.get('/oauth_success', oauth_success);
+app.get('/oauth_error', oauth_error);
 const PORT = process.env.PORT || 6060;
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

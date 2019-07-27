@@ -48,7 +48,7 @@ exports.oauth_redirect = async function(req, res) {
     return res
       .header(
         'Location',
-        `https://${process.env.GOOGLE_CLOUD_PROJECT}.appspot.com`
+        `https://${process.env.GOOGLE_CLOUD_PROJECT}.appspot.com/oauth_error`
       )
       .sendStatus(302);
   }
@@ -63,9 +63,10 @@ exports.oauth_redirect = async function(req, res) {
   return res
     .header(
       'Location',
-      `https://${process.env.GOOGLE_CLOUD_PROJECT}.appspot.com/success`
+      `https://${process.env.GOOGLE_CLOUD_PROJECT}.appspot.com/oauth_success`
     )
-    .send(302);
+    .sendStatus(302);
 };
 
-exports.success = (req, res) => res.send('Hooray! All authenticated.');
+exports.oauth_success = (req, res) => res.send('Hooray! All authenticated.');
+exports.oauth_error = (req, res) => res.send('Unable to authenticate :(');
