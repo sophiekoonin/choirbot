@@ -1,0 +1,37 @@
+{
+  "google": {
+    "client_id": "608576560281-1g0e4r23kcvhqf2qgqd1tu1vhph9flgs.apps.googleusercontent.com",
+    "client_secret": "P64wikZWRyJo_92QTtu97oN2",
+    "sheet_id": "1qAmQ9lyZEMjccZ0Qg7U5URu4gssyJwiw_2TFy3T7SOM",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "client_email": "shechoirlondon-977@appspot.gserviceaccount.com",
+    "client_id": "",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/shechoirlondon-977%40appspot.gserviceaccount.com",
+    "private_key": "-----BEGIN PRIVATE KEY----- MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDQkE2WwVDSJxKz 73Xd1DrPKUrcuRumWMBP6OxLw17G0pYGLm7yTGj+pxFHIQjgx1vfpZ0oGsX3YYK5 jFtVqmsZ1yC9PLMKz8HzZ8PFumMAZwFuSQve+jsGYQQeX8QPTzUTI05OFcfqXJ/P ZghXB4lLTxKACWrhq0Q9zh7tYgWdqkMC1UEv2X4VHRyOLf+VbEN2bav2T3Ntfdde Mbq1giAvBXfqAqx/nz6fAHKHGrMc8q1ZnMT8lOEqbv8CVQliBekhB2xbK8Q4y6HM zwDdB89YHhE//+zA7kEZvdB+S67BQrn0ZGy+o4NrfHHC6E+0Wn2PHI6PIK3jL9U1 hOKUVZWXAgMBAAECggEAHaOcOyPe2faujD6oB+3Mq7sJBgQSX1n2foSx6/RoSCYO JvO7VZixRRs1899IdTUvo8FT66qeXpEPdFHzeuGcldACOZJiOVOcEvy4kCV0Q07g H62mz7nM4JOx86UVZj2R49XdH3Ct9+rQ1TcBUWjjRH4IuYRdGZPuvz/HGmIXPTf+ kvv3d2mFv+AWHtkTjcb1Dk5F3G3deDjP27QHqCBHZmaXwv19vj+F/5bcWdXcROpm NC3cNj0Xq12H2LN0eaDAb28WvbIEg0HglWbCrmQrX5hWLgS92fUr8df02ZVJZii0 LLVh3a0N1mVbvyF/NISLhvd9O95AgGnIkhm0na9DGQKBgQD+RksIutG3VxcoBKiI T6yQNhPs5Zxt50Jri6Vs8dM7O2GjMFWnzKx8OJgyPM3qtVEukeJNX8FT83qSKq28 D8vWFNf3lRH44uNO2TjjM5BJ3T92lpzw9zhNltpjqiJiot7NcTOlGcSXsuXxJhN7 1DAEn45hfmxi2zRzdUqn0SVPzwKBgQDR+pq6Up3yb4ZjZNyvTwZ/XMpiJ1ek1iSM wF5V7HnC4/Hxyl4DrOhVxLSHdl6Xbd2iKuLLK5lgwXFD5OhfZECIODD9mKFTrVxB NvmaTCqbBcFnyYjrTdOHpuYnnY3/Ev6AYY8EVWv/UhVkYj/59V2AMScRHWrZ+QHp Eo6fU5vHuQKBgCOUDlewXDu9Ed5lmHdKPqkHCA6zqgmuvBp0Nbditt2o12aQEswh 1VikSpds7psSt8M+Yl3VMiXfAZ2GHz0bMLhJvlZEI3mhtZCI0G7p/hx3urOLK3aE APrKStB7M8h9ZZN1bXaCfoGDZK0zWLKQ5A8hjDiUCfJjHZmyJboJh6D9AoGBAJlQ PCcs6Ww5J8tsuoE51wmpS4/NH/4X6Qnn7zkXd3PoESC03F4comr1O8bok3pHWprs azli9RMjSrsC6PO1dDTBqmuPRMOfAYwQQsD5OeaElklcah88bOVP5B4quKH0UWSV VuIYKMl8OmhYIFQ2ZfWSbe7eJsVOPanaxc3pMwXpAoGABGd5ZiOTrB12sFfa0BWu dE/cbbNn/hEOznHx1ZkyICL3GK6kaDyUqk0cWg5vnr6GlCIeuCyomRGnw5uVVQyI euntMN4PfAAu9sfGeok1Gw0i2vKNDKBmWRn8iyLjj6S4EpSy92mkg4jWp5EG71rQ DMqy6l3sPqrKyuYSH9wIqk0= -----END PRIVATE KEY----- ",
+    "private_key_id": "b055521d681f26ea88b50ba141f156f92a7ce3c3",
+    "project_id": "shechoirlondon-977",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "type": "service_account",
+    "target_audience": "608576560281-qg6i4h7k4kh9l22p6nsavh13b2dighgf.apps.googleusercontent.com"
+  },
+  "sheets": {
+    "id": "1qAmQ9lyZEMjccZ0Qg7U5URu4gssyJwiw_2TFy3T7SOM"
+  },
+  "slack": {
+    "channel_id": "C2Z635VUJ",
+    "id": "93927944293.461942986529",
+    "secret": "6316a71fb1f61e62e30025b7983e8963",
+    "team_id": "T2RT9TS8M"
+  },
+  "T2RT9TS8M": {
+    "token": "xoxp-93927944293-93927944325-463951532646-54648a68cb428087565d1c244e02aa94"
+  },
+  "users": {
+    "username": "shechoirattendance", 
+    "password": "calf-lately-cattail-soapsuds"
+  },
+  "session": {
+    "secret": "asfasgadgdsg"
+  }
+}
