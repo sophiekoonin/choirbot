@@ -1,5 +1,5 @@
 const slack = require('slack');
-const utils = require('./utils');
+const utils = require('../utils');
 
 function getRehearsalMusicMessage({
   mainSong,
@@ -23,11 +23,12 @@ function getRehearsalMusicMessage({
 }
 
 exports.postRehearsalMusic = async function(req, res) {
-  const [team_id, channel_id] = await utils.getDbOrConfigValues(
-    'config',
-    'slack',
-    ['team_id', 'channel_id']
-  );
+  const { teamId } = req.query;
+  const [channel_id, token] = await utils.getDbOrConfigValues('teams', teamId, [
+    'channel_id',
+    'token'
+  ]);
+
   try {
     const nextMonday = utils.getNextMonday();
     let text;
@@ -47,8 +48,6 @@ exports.postRehearsalMusic = async function(req, res) {
         text = getRehearsalMusicMessage(nextWeekSongs);
       }
     }
-
-    const token = await getToken(team_id);
 
     await slack.chat.postMessage({
       token,

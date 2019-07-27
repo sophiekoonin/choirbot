@@ -5,6 +5,7 @@ const moment = require('moment');
 const google = require('../google/google');
 const utils = require('../utils');
 const db = require('../db');
+const { getToken } = require('./authentication');
 
 function flattenDeep(arr1) {
   return arr1.reduce(
@@ -21,10 +22,6 @@ async function getAttendancePosts(team_id, limit) {
     .limit(limit)
     .get();
   return snapshot.docs;
-}
-
-async function getToken(team_id) {
-  return await utils.getDbOrConfigValue('teams', team_id, 'token');
 }
 
 async function getSlackUserIds(team_id) {
@@ -53,12 +50,13 @@ exports.addAttendancePost = async function(req, res) {
     res.status(200).send('Bank holiday - not posting');
     return;
   } else {
-    const [team_id, channel_id] = await utils.getDbOrConfigValues(
-      'config',
-      'slack',
-      ['team_id', 'channel_id']
+    const { teamId } = req.query;
+    const [channel_id, token] = await utils.getDbOrConfigValues(
+      'teams',
+      teamId,
+      ['channel_id', 'token']
     );
-    const token = await getToken(team_id);
+
     const date = moment(today).format('DD/MM/YYYY');
     const songs = await google.getNextSongs(date);
     if (songs.mainSong.toLowerCase().includes('no rehearsal')) {

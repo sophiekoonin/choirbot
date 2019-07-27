@@ -15,7 +15,10 @@ const {
   oauth_error,
   oauth_success
 } = require('./slack');
-const { testGoogleIntegration, putGoogleCredentials } = require('./google');
+const {
+  testGoogleIntegration,
+  putGoogleCredentials
+} = require('./google/google');
 
 const app = express();
 
