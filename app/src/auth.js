@@ -24,9 +24,9 @@ exports.oauth_redirect = async function(req, res) {
     code: req.query.code,
     client_id: id,
     client_secret: secret,
-    redirect_uri: `https://europe-west1-${
+    redirect_uri: `https://${
       process.env.GCLOUD_PROJECT
-    }.cloudfunctions.net/oauth_redirect`
+    }.appspot.com/oauth_redirect`
   };
 
   const encodedQueryString = querystring.stringify(queryParams);
@@ -46,10 +46,7 @@ exports.oauth_redirect = async function(req, res) {
   if (!responseJson.ok) {
     console.error('The request was not ok: ' + JSON.stringify(result));
     return res
-      .header(
-        'Location',
-        `https://${process.env.GCLOUD_PROJECT}.firebaseapp.com`
-      )
+      .header('Location', `https://${process.env.GCLOUD_PROJECT}.appspot.com`)
       .send(302);
   }
 
@@ -63,7 +60,9 @@ exports.oauth_redirect = async function(req, res) {
   return res
     .header(
       'Location',
-      `https://${process.env.GCLOUD_PROJECT}.firebaseapp.com/success.html`
+      `https://${process.env.GCLOUD_PROJECT}.appspot.com/success`
     )
     .send(302);
 };
+
+exports.success = (req, res) => res.send('Hooray! All authenticated.');

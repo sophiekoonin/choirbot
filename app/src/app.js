@@ -10,24 +10,16 @@ const {
   testSlackIntegration
 } = require('./slack');
 
-const { oauth_redirect } = require('./auth');
+const { oauth_redirect, success } = require('./auth');
 const { getAttendanceReport } = require('./attendance');
 const { testGoogleIntegration, putGoogleCredentials } = require('./google');
 
 const app = express();
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
-  );
-  next();
-});
 
 app.use(bodyParser.json()); // for parsing application/json
 
 app.get('/', (req, res) => {
-  res.send('Hello world! SHEbot v1.1');
+  res.send('Hello world! SHEbot v1.2');
 });
 
 app.get('/attendance', addAttendancePost);
@@ -38,6 +30,7 @@ app.get('/test-google', testGoogleIntegration);
 app.put('/google-creds', putGoogleCredentials);
 app.get('/report', getAttendanceReport);
 app.get('/oauth_redirect', oauth_redirect);
+app.get('/success', success);
 const PORT = process.env.PORT || 6060;
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
