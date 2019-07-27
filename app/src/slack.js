@@ -1,5 +1,4 @@
 const slack = require('slack');
-const { flattenDeep } = require('lodash');
 const Firestore = require('@google-cloud/firestore');
 const moment = require('moment');
 
@@ -9,6 +8,14 @@ const db = require('./db');
 
 const { NODE_ENV } = process.env;
 const config = NODE_ENV === 'dev' ? require('../config.json.js') : {};
+
+function flattenDeep(arr1) {
+  return arr1.reduce(
+    (acc, val) =>
+      Array.isArray(val) ? acc.concat(flattenDeep(val)) : acc.concat(val),
+    []
+  );
+}
 
 async function getAttendancePosts(team_id, limit) {
   const snapshot = await db
