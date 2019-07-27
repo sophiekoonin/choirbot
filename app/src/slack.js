@@ -27,7 +27,7 @@ async function getAttendancePosts(team_id, limit) {
 }
 
 async function getToken(team_id) {
-  return await utils.getDbOrConfigValue('tokens', team_id, 'token');
+  return await utils.getDbOrConfigValue('teams', team_id, 'token');
 }
 
 async function getSlackUserIds(team_id) {
