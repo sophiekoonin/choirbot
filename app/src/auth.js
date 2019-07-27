@@ -15,7 +15,7 @@ exports.oauth_redirect = async function(req, res) {
     return res.status(401).send("Missing query attribute 'code'");
   }
 
-  const [id, secret] = utils.getDbOrConfigValues('config', 'slack', [
+  const [id, secret] = await utils.getDbOrConfigValues('config', 'slack', [
     'id',
     'secret'
   ]);
