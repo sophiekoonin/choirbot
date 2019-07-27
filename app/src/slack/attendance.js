@@ -106,10 +106,13 @@ exports.addAttendancePost = async function(req, res) {
 };
 
 exports.processAttendance = async function(req, res) {
-  const team_id = await utils.getDbOrConfigValue('config', 'slack', 'team_id');
-  const docs = await getAttendancePosts(team_id, 1);
+  const { teamId } = req.query;
+  const [channel_id, token] = await utils.getDbOrConfigValues('teams', teamId, [
+    'channel_id',
+    'token'
+  ]);
+  const docs = await getAttendancePosts(teamId, 1);
   const firstResult = docs[0];
-  const token = await getToken(team_id);
   try {
     const response = await slack.reactions.get({
       token,
@@ -126,7 +129,7 @@ exports.processAttendance = async function(req, res) {
     const notAttending =
       reactions.find(group => group.name === '-1')['users'] || [];
     await db
-      .collection(`attendance-${team_id}`)
+      .collection(`attendance-${teamId}`)
       .doc(id)
       .update({ attending, notAttending });
 
