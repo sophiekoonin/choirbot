@@ -7,7 +7,7 @@ const utils = require('./utils');
 const db = require('./db');
 
 const { NODE_ENV } = process.env;
-const config = NODE_ENV === 'dev' ? require('../config.json.js') : {};
+const config = NODE_ENV === 'dev' ? require('../config.json') : {};
 
 function flattenDeep(arr1) {
   return arr1.reduce(

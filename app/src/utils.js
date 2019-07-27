@@ -4,7 +4,7 @@ const memcache = require('memory-cache');
 const db = require('./db');
 
 const { NODE_ENV } = process.env;
-const config = NODE_ENV === 'dev' ? require('../config.json.js') : {};
+const config = NODE_ENV === 'dev' ? require('../config.json') : {};
 
 exports.formatDateISO = function(date) {
   return moment(date).format('YYYY-MM-DD');

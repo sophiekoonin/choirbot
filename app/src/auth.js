@@ -25,7 +25,7 @@ exports.oauth_redirect = async function(req, res) {
     client_id: id,
     client_secret: secret,
     redirect_uri: `https://${
-      process.env.GCLOUD_PROJECT
+      process.env.GOOGLE_CLOUD_PROJECT
     }.appspot.com/oauth_redirect`
   };
 
@@ -44,10 +44,13 @@ exports.oauth_redirect = async function(req, res) {
 
   const responseJson = await response.json();
   if (!responseJson.ok) {
-    console.error('The request was not ok: ' + JSON.stringify(result));
+    console.error('The request was not ok: ' + JSON.stringify(responseJson));
     return res
-      .header('Location', `https://${process.env.GCLOUD_PROJECT}.appspot.com`)
-      .send(302);
+      .header(
+        'Location',
+        `https://${process.env.GOOGLE_CLOUD_PROJECT}.appspot.com`
+      )
+      .sendStatus(302);
   }
 
   await db
@@ -60,7 +63,7 @@ exports.oauth_redirect = async function(req, res) {
   return res
     .header(
       'Location',
-      `https://${process.env.GCLOUD_PROJECT}.appspot.com/success`
+      `https://${process.env.GOOGLE_CLOUD_PROJECT}.appspot.com/success`
     )
     .send(302);
 };
