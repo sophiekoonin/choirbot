@@ -9,7 +9,7 @@ const {
   postRehearsalMusic,
   testSlackIntegration
 } = require('./slack');
-const { interact } = require('./interact');
+const { interact, handleEvents } = require('./interact');
 const { oauth_redirect, oauth_error, oauth_success } = require('./auth');
 const { getAttendanceReport } = require('./attendance');
 const { testGoogleIntegration, putGoogleCredentials } = require('./google');
@@ -30,7 +30,7 @@ app.get('/test-google', testGoogleIntegration);
 app.put('/google-creds', putGoogleCredentials);
 app.get('/report', getAttendanceReport);
 app.post('/interact', interact);
-
+app.post('/events', handleEvents);
 app.get('/oauth_redirect', oauth_redirect);
 app.get('/oauth_success', oauth_success);
 app.get('/oauth_error', oauth_error);

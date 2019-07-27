@@ -1,5 +1,5 @@
 const slack = require('slack');
-
+const { getDbOrConfigValue } = require('./utils');
 exports.onSlackInstall = async ({ token, userId }) => {
   await slack.chat.postMessage({
     token,

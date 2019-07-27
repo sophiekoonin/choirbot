@@ -1,4 +1,5 @@
 const db = require('./db');
+const { onSlackInstall } = require('./installation');
 
 exports.interact = async (req, res) => {
   const { payload } = res;
@@ -6,13 +7,26 @@ exports.interact = async (req, res) => {
   const { response_url, domain, actions } = payload;
   const { id } = domain.team;
   const { action_id, selected_option } = actions[0];
-
+  console.log({ payload });
   await db
     .collection('teams')
     .doc(id)
     .set({
       [action_id]: selected_option.value
     });
+};
+
+exports.handleEvents = async (req, res) => {
+  const { type, team_id, token } = req.body;
+  if (type === 'url_verification') {
+    return res.send(req.body.challenge);
+  }
+
+  const { user, channel, type: eventType } = req.body.event;
+  if (eventType === 'app_home_opened') {
+    await onSlackInstall({ teamId: team_id, userId: channel });
+  }
+  return res.sendStatus(200);
 };
 
 // {

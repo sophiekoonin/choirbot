@@ -1,10 +1,14 @@
 const fetch = require('node-fetch');
 const querystring = require('querystring');
 const db = require('./db');
+const { onSlackInstall } = require('./installation');
 const utils = require('./utils');
 
 // With thanks to Dennis Alund https://medium.com/evenbit/building-a-slack-app-with-firebase-as-a-backend-151c1c98641d
 
+const BASE_URL =
+  process.env.BASE_URL ||
+  `https://${process.env.GOOGLE_CLOUD_PROJECT}.appspot.com`;
 exports.oauth_redirect = async function(req, res) {
   if (req.method !== 'GET') {
     console.error(`Got unsupported ${req.method} request. Expected GET.`);
@@ -25,9 +29,7 @@ exports.oauth_redirect = async function(req, res) {
     code: req.query.code,
     client_id: id,
     client_secret: secret,
-    redirect_uri: `https://${
-      process.env.GOOGLE_CLOUD_PROJECT
-    }.appspot.com/oauth_redirect`
+    redirect_uri: `${BASE_URL}/oauth_redirect`
   };
 
   const encodedQueryString = querystring.stringify(queryParams);
@@ -46,12 +48,7 @@ exports.oauth_redirect = async function(req, res) {
   const responseJson = await response.json();
   if (!responseJson.ok) {
     console.error('The request was not ok: ' + JSON.stringify(responseJson));
-    return res
-      .header(
-        'Location',
-        `https://${process.env.GOOGLE_CLOUD_PROJECT}.appspot.com/oauth_error`
-      )
-      .sendStatus(302);
+    return res.header('Location', `${BASE_URL}/oauth_error`).sendStatus(302);
   }
 
   const {
@@ -72,6 +69,8 @@ exports.oauth_redirect = async function(req, res) {
       channel: incoming_webhook.channel,
       token: access_token
     });
+
+  // onSlackInstall({ token: access_token, userId: user_id });
 
   return res
     .header(
