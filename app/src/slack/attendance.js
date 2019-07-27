@@ -5,7 +5,7 @@ const moment = require('moment');
 const google = require('../google/google');
 const utils = require('../utils');
 const db = require('../db');
-const { getToken } = require('./authentication');
+const { getToken } = require('./auth');
 
 function flattenDeep(arr1) {
   return arr1.reduce(

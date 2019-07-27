@@ -7,18 +7,17 @@ exports.testSlackIntegration = async function(req, res) {
     if (!team_id || team_id === '') {
       return res.sendStatus(200);
     }
-    const [channel_id, token] = await utils.getDbOrConfigValues(
-      'teams',
-      team_id,
-      ['channel_id', 'token']
-    );
+    const [user_id, token] = await utils.getDbOrConfigValues('teams', team_id, [
+      'user_id',
+      'bot_access_token'
+    ]);
 
     await slack.chat.postMessage({
       token,
       text: 'Test post, please ignore!',
       username: 'Attendance Bot Test',
-      as_user: false,
-      channel: channel_id
+      as_user: true,
+      channel: user_id
     });
     return res.sendStatus(200);
   } catch (err) {

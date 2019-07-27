@@ -1,12 +1,12 @@
 const slack = require('slack');
 const { getDbOrConfigValue } = require('../utils');
-const { getToken } = require('./authentication');
+const { getToken } = require('./auth');
 
 exports.onSlackInstall = async ({ token, userId }) => {
   await slack.chat.postMessage({
     token,
     channel: userId,
-    as_user: false,
+    as_user: true,
     username: 'SHE Bot',
     text: 'Welcome to the SHE Bot!'
   });
@@ -17,7 +17,7 @@ const configureRehearsalDay = async ({ token, userId }) => {
   const { ts, channel } = await slack.chat.postMessage({
     token,
     channel: userId,
-    as_user: false,
+    as_user: true,
     username: 'SHE Bot',
     text: 'Which day do you rehearse?',
     blocks: [

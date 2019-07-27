@@ -47,7 +47,7 @@ exports.oauth_redirect = async function(req, res) {
 
   const responseJson = await response.json();
   if (!responseJson.ok) {
-    console.error('The request was not ok: ' + JSON.stringify(responseJson));
+    console.error('Error: ' + JSON.stringify(responseJson));
     return res.header('Location', `${BASE_URL}/oauth_error`).sendStatus(302);
   }
 
@@ -56,21 +56,27 @@ exports.oauth_redirect = async function(req, res) {
     team_id,
     team_name,
     user_id,
-    access_token
+    access_token,
+    bot
   } = responseJson;
+
+  const { bot_user_id, bot_access_token } = bot;
+  const { channel_id, channel } = incoming_webhook;
 
   await db
     .collection('teams')
     .doc(responseJson.team_id)
     .set({
-      team_name: team_name,
-      user_id: user_id,
-      channel_id: incoming_webhook.channel_id,
-      channel: incoming_webhook.channel,
+      team_name,
+      user_id,
+      channel_id,
+      channel,
+      bot_user_id,
+      bot_access_token,
       token: access_token
     });
 
-  // onSlackInstall({ token: access_token, userId: user_id });
+  onSlackInstall({ token: bot_access_token, userId: user_id });
 
   return res
     .header(
