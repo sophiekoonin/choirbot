@@ -57,6 +57,10 @@ exports.oauth_redirect = async function(req, res) {
     .collection('tokens')
     .doc(responseJson.team_id)
     .set({
+      team_name: responseJson.team_name,
+      user_id: responseJson.user_id,
+      channel_id: responseJson.incoming_webhook.channel_id,
+      channel: responseJson.incoming_webhook.channel,
       token: responseJson.access_token
     });
 
