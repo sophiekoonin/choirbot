@@ -2,12 +2,9 @@ const slack = require('slack');
 const Firestore = require('@google-cloud/firestore');
 const moment = require('moment');
 
-const google = require('./google');
-const utils = require('./utils');
-const db = require('./db');
-
-const { NODE_ENV } = process.env;
-const config = NODE_ENV === 'dev' ? require('../config.json') : {};
+const google = require('../google/google');
+const utils = require('../utils');
+const db = require('../db');
 
 function flattenDeep(arr1) {
   return arr1.reduce(
@@ -68,7 +65,7 @@ exports.addAttendancePost = async function(req, res) {
       res.status(200).send('No rehearsal - not posting');
       return;
     }
-    const text = utils.getAttendancePostMessage(songs);
+    const text = getAttendancePostMessage(songs);
     try {
       const { ts, channel } = await slack.chat.postMessage({
         token,
@@ -141,90 +138,27 @@ exports.processAttendance = async function(req, res) {
     res.status(500).send(`Error: ${err}`);
   }
 };
-/*
-1. Fetch last 4 rehearsals
-2. Filter list of users against attending/not attending 
-3. Show who hasn't responded
- */
-exports.reportAttendance = async function(req, res) {
-  const team_id = await utils.getDbOrConfigValue('config', 'slack', 'team_id');
-  const lastFourWeeks = await getAttendancePosts(team_id, 4);
-  const allUsers = await getSlackUserIds(team_id);
-  const postData = lastFourWeeks.map(post => ({
-    attending: post.get('attending'),
-    notAttending: post.get('notAttending'),
-    date: post.get('rehearsal_date')
-  }));
-  const responded = flattenDeep(
-    postData.map(post => [post.attending, post.notAttending])
-  );
-  const notResponded = allUsers.filter(user => !responded.includes(user));
-  await res.send(
-    `Not responded: ${notResponded.map(uid => `<@${uid}>`).join(', ')}`
-  );
-};
-
-exports.postRehearsalMusic = async function(req, res) {
-  const [team_id, channel_id] = await utils.getDbOrConfigValues(
-    'config',
-    'slack',
-    ['team_id', 'channel_id']
-  );
-  try {
-    const nextMonday = utils.getNextMonday();
-    let text;
-    const isBankHoliday = await utils.isBankHoliday(nextMonday);
-    if (isBankHoliday) {
-      text =
-        "<!channel> It's a bank holiday next Monday, so no rehearsal! Have a lovely day off!";
-    } else {
-      const nextWeekSongs = await google.getNextSongs(nextMonday);
-      if (!nextWeekSongs || !nextWeekSongs.mainSong) {
-        throw new Error(`Couldn't fetch next week's songs!`);
-      } else if (
-        nextWeekSongs.mainSong.toLowerCase().includes('no rehearsal')
-      ) {
-        text = "<!channel> Reminder: there's no rehearsal next week!";
-      } else {
-        text = utils.getRehearsalMusicMessage(nextWeekSongs);
-      }
-    }
-
-    const token = await getToken(team_id);
-
-    await slack.chat.postMessage({
-      token,
-      text,
-      username: 'Schedule Bot',
-      as_user: false,
-      channel: channel_id
-    });
-    res.status(200).send();
-  } catch (err) {
-    res.send('No song details available - please check the schedule!');
-    throw new Error(err);
-  }
-};
-
-exports.testSlackIntegration = async function(req, res) {
-  try {
-    const [team_id, channel_id] = await utils.getDbOrConfigValues(
-      'config',
-      'slack',
-      ['team_id', 'channel_id']
-    );
-    const token = await getToken(team_id);
-    await slack.chat.postMessage({
-      token,
-      text: 'Test post, please ignore!',
-      username: 'Attendance Bot Test',
-      as_user: false,
-      channel: channel_id
-    });
-    res.status(200).send();
-  } catch (err) {
-    console.log('Error trying to test slack:', err);
-  }
-};
 
 exports.getAttendancePosts = getAttendancePosts;
+
+function getAttendancePostMessage({
+  mainSong = 'please check schedule for details!',
+  runThrough,
+  notes
+}) {
+  return (
+    ':dancing_banana: Rehearsal day! :dancing_banana: <!channel> \n' +
+    `*Today's rehearsal:* ${mainSong}\n` +
+    ` ${runThrough ? `*Run through:* ${runThrough}\n\n` : ''}` +
+    ` ${
+      notes.toLowerCase().includes('team updates')
+        ? '*Team updates meeting at 6:30! All welcome* :tada:\n'
+        : ''
+    }` +
+    'Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup: ' +
+    '(present) or :thumbsdown: (absent).\n' +
+    'Facilitator please respond with :raised_hands:!\n' +
+    'To volunteer for Physical warm up, respond with :muscle: ' +
+    'For Musical warm up, respond with :musical_note:.'
+  );
+}

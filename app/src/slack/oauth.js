@@ -1,8 +1,8 @@
 const fetch = require('node-fetch');
 const querystring = require('querystring');
-const db = require('./db');
+const db = require('../db');
 const { onSlackInstall } = require('./installation');
-const utils = require('./utils');
+const utils = require('../utils');
 
 // With thanks to Dennis Alund https://medium.com/evenbit/building-a-slack-app-with-firebase-as-a-backend-151c1c98641d
 

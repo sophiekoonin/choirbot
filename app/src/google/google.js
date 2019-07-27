@@ -1,7 +1,7 @@
 const { google } = require('googleapis');
 const moment = require('moment');
-const utils = require('./utils');
-const db = require('./db');
+const utils = require('../utils');
+const db = require('../db');
 
 const { NODE_ENV } = process.env;
 const sheets = google.sheets('v4');

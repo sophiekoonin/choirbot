@@ -1,5 +1,5 @@
-const { getAttendancePosts, getSlackUsers } = require('./slack');
-const utils = require('./utils');
+const { getAttendancePosts, getSlackUsers } = require('.');
+const utils = require('../utils');
 
 function getAttendanceValue(attendance, user_id) {
   if (attendance.attending.includes(user_id)) {
@@ -38,5 +38,28 @@ exports.getAttendanceReport = async function(req, res) {
       dates: allDates,
       users: usersWithAttendance
     })
+  );
+};
+
+/*
+1. Fetch last 4 rehearsals
+2. Filter list of users against attending/not attending 
+3. Show who hasn't responded
+ */
+exports.reportAttendance = async function(req, res) {
+  const team_id = await utils.getDbOrConfigValue('config', 'slack', 'team_id');
+  const lastFourWeeks = await getAttendancePosts(team_id, 4);
+  const allUsers = await getSlackUserIds(team_id);
+  const postData = lastFourWeeks.map(post => ({
+    attending: post.get('attending'),
+    notAttending: post.get('notAttending'),
+    date: post.get('rehearsal_date')
+  }));
+  const responded = flattenDeep(
+    postData.map(post => [post.attending, post.notAttending])
+  );
+  const notResponded = allUsers.filter(user => !responded.includes(user));
+  await res.send(
+    `Not responded: ${notResponded.map(uid => `<@${uid}>`).join(', ')}`
   );
 };

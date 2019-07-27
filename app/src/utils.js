@@ -37,49 +37,6 @@ exports.isBankHoliday = async function(date) {
   return allDates.includes(dateFormatted);
 };
 
-exports.getRehearsalMusicMessage = function({
-  mainSong,
-  mainSongLink,
-  runThrough,
-  runThroughLink,
-  notes
-}) {
-  return `<!channel> Here's the plan for Monday's rehearsal! \n
-  ${
-    notes.toLowerCase().includes('team updates')
-      ? 'Team updates meeting at 6:30! All welcome :tada:\n'
-      : ''
-  }
-  We'll be doing ${mainSong} - ${mainSongLink ||
-    "I can't find a link for this - please check the Arrangements Folder!"} \n
-  *Run through*: ${
-    runThrough ? runThrough : 'Please check the schedule for more info.'
-  } ${runThroughLink ? ' - ' + runThroughLink : ''} \n
-  Please give the recordings a listen! :sparkles:`;
-};
-
-exports.getAttendancePostMessage = function({
-  mainSong = 'please check schedule for details!',
-  runThrough,
-  notes
-}) {
-  return (
-    ':dancing_banana: Rehearsal day! :dancing_banana: <!channel> \n' +
-    `*Today's rehearsal:* ${mainSong}\n` +
-    ` ${runThrough ? `*Run through:* ${runThrough}\n\n` : ''}` +
-    ` ${
-      notes.toLowerCase().includes('team updates')
-        ? '*Team updates meeting at 6:30! All welcome* :tada:\n'
-        : ''
-    }` +
-    'Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup: ' +
-    '(present) or :thumbsdown: (absent).\n' +
-    'Facilitator please respond with :raised_hands:!\n' +
-    'To volunteer for Physical warm up, respond with :muscle: ' +
-    'For Musical warm up, respond with :musical_note:.'
-  );
-};
-
 const getDbDoc = async function(collection, docName) {
   return await db
     .collection(collection)

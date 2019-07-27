@@ -1,7 +1,7 @@
-const db = require('./db');
+const db = require('../db');
 const { onSlackInstall } = require('./installation');
 
-exports.interact = async (req, res) => {
+exports.handleInteractions = async (req, res) => {
   const { payload } = res;
 
   const { response_url, domain, actions } = payload;
