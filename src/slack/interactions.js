@@ -1,6 +1,5 @@
 const db = require('../db')
 const {
-  onSlackInstall,
   respondToRehearsalDaySelected,
   respondToYesNoRehearsalReminders
 } = require('./config')
@@ -47,7 +46,7 @@ exports.handleInteractions = async (req, res) => {
 }
 
 exports.handleEvents = async (req, res) => {
-  const { type, team_id, token } = req.body
+  const { type } = req.body
   console.log('hi')
   if (type === 'url_verification') {
     return res.send(req.body.challenge)

@@ -5,7 +5,8 @@ const moment = require('moment')
 const google = require('../google/google')
 const utils = require('../utils')
 const db = require('../db')
-const { getToken } = require('./auth')
+
+const { NODE_ENV } = process.env
 
 async function getAttendancePosts(team_id, limit) {
   const snapshot = await db.db
@@ -60,7 +61,7 @@ exports.addAttendancePost = async function(req, res) {
       })
 
       if (NODE_ENV === 'prod') {
-        await db.setDbValue(`attendance-${team_id}`, rehearsal_date, {
+        await db.setDbValue(`attendance-${teamId}`, today, {
           rehearsal_date: today,
           created_at: Firestore.Timestamp.now()._seconds,
           ts: ts,
@@ -80,10 +81,7 @@ exports.addAttendancePost = async function(req, res) {
 
 exports.processAttendance = async function(req, res) {
   const { teamId } = req.query
-  const [channel_id, token] = await utils.getDbOrConfigValues('teams', teamId, [
-    'channel_id',
-    'token'
-  ])
+  const [token] = await utils.getDbOrConfigValue('teams', teamId, 'token')
   const docs = await getAttendancePosts(teamId, 1)
   const firstResult = docs[0]
   try {
