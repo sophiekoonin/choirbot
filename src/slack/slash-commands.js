@@ -1,4 +1,3 @@
-const slack = require('slack')
 const db = require('../db')
 const { reportAttendance } = require('./reports')
 

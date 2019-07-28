@@ -1,7 +1,6 @@
 const slack = require('slack')
 const { getAttendancePosts } = require('./attendance')
 const { getToken } = require('./auth')
-const utils = require('../utils')
 
 function flattenDeep(arr1) {
   return arr1.reduce(
