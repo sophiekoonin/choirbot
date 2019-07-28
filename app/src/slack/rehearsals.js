@@ -1,5 +1,5 @@
-const slack = require('slack');
-const utils = require('../utils');
+const slack = require('slack')
+const utils = require('../utils')
 
 function getRehearsalMusicMessage({
   mainSong,
@@ -19,33 +19,33 @@ function getRehearsalMusicMessage({
   *Run through*: ${
     runThrough ? runThrough : 'Please check the schedule for more info.'
   } ${runThroughLink ? ' - ' + runThroughLink : ''} \n
-  Please give the recordings a listen! :sparkles:`;
+  Please give the recordings a listen! :sparkles:`
 }
 
 exports.postRehearsalMusic = async function(req, res) {
-  const { teamId } = req.query;
+  const { teamId } = req.query
   const [channel_id, token] = await utils.getDbOrConfigValues('teams', teamId, [
     'channel_id',
     'token'
-  ]);
+  ])
 
   try {
-    const nextMonday = utils.getNextMonday();
-    let text;
-    const isBankHoliday = await utils.isBankHoliday(nextMonday);
+    const nextMonday = utils.getNextMonday()
+    let text
+    const isBankHoliday = await utils.isBankHoliday(nextMonday)
     if (isBankHoliday) {
       text =
-        "<!channel> It's a bank holiday next Monday, so no rehearsal! Have a lovely day off!";
+        "<!channel> It's a bank holiday next Monday, so no rehearsal! Have a lovely day off!"
     } else {
-      const nextWeekSongs = await google.getNextSongs(nextMonday);
+      const nextWeekSongs = await google.getNextSongs(nextMonday)
       if (!nextWeekSongs || !nextWeekSongs.mainSong) {
-        throw new Error(`Couldn't fetch next week's songs!`);
+        throw new Error(`Couldn't fetch next week's songs!`)
       } else if (
         nextWeekSongs.mainSong.toLowerCase().includes('no rehearsal')
       ) {
-        text = "<!channel> Reminder: there's no rehearsal next week!";
+        text = "<!channel> Reminder: there's no rehearsal next week!"
       } else {
-        text = getRehearsalMusicMessage(nextWeekSongs);
+        text = getRehearsalMusicMessage(nextWeekSongs)
       }
     }
 
@@ -55,10 +55,10 @@ exports.postRehearsalMusic = async function(req, res) {
       username: 'Schedule Bot',
       as_user: false,
       channel: channel_id
-    });
-    res.status(200).send();
+    })
+    res.status(200).send()
   } catch (err) {
-    res.send('No song details available - please check the schedule!');
-    throw new Error(err);
+    res.send('No song details available - please check the schedule!')
+    throw new Error(err)
   }
-};
+}

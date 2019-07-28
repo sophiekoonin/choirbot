@@ -1,9 +1,8 @@
-const slack = require('slack');
-const fetch = require('node-fetch');
+const slack = require('slack')
+const fetch = require('node-fetch')
 
-const { getDbOrConfigValue, getDbOrConfigValues } = require('../utils');
-const { getToken } = require('./auth');
-const { Actions } = require('./constants');
+const { getDbOrConfigValues } = require('../utils')
+const { Actions } = require('./constants')
 
 exports.onSlackInstall = async ({ token, userId }) => {
   await slack.chat.postMessage({
@@ -12,9 +11,9 @@ exports.onSlackInstall = async ({ token, userId }) => {
     as_user: true,
     username: 'SHE Bot',
     text: 'Welcome to the SHE Bot!'
-  });
-  await configureRehearsalDay({ token, userId });
-};
+  })
+  await configureRehearsalDay({ token, userId })
+}
 
 const configureRehearsalDay = async ({ token, userId }) =>
   await slack.chat.postMessage({
@@ -24,33 +23,22 @@ const configureRehearsalDay = async ({ token, userId }) =>
     username: 'SHE Bot',
     text: 'Which day do you rehearse?',
     blocks: rehearsalDayBlocks
-  });
-
-const configureRehearsalReminders = async ({ token, userId }) =>
-  await slack.chat.postMessage({
-    token,
-    channel: userId,
-    as_user: true,
-    username: 'SHE Bot',
-    text:
-      "Would you like to enable rehearsal reminders? This will post a reminder four days before rehearsal with the music you'll be doing - a Google Sheets schedule is required.",
-    blocks: yesNoRehearsalRemindersBlocks
-  });
+  })
 
 exports.startConfigFlow = async function(req, res) {
-  const { teamId } = req.query;
+  const { teamId } = req.query
   const [user_id, bot_access_token] = await getDbOrConfigValues(
     'teams',
     teamId,
     ['user_id', 'bot_access_token']
-  );
+  )
   configureRehearsalDay({
     token: bot_access_token,
     userId: user_id
-  });
+  })
 
-  return res.sendStatus(200);
-};
+  return res.sendStatus(200)
+}
 
 const rehearsalDayBlocks = [
   {
@@ -128,7 +116,7 @@ const rehearsalDayBlocks = [
       ]
     }
   }
-];
+]
 const yesNoRehearsalRemindersBlocks = selectedOptionText => [
   {
     type: 'section',
@@ -167,7 +155,7 @@ const yesNoRehearsalRemindersBlocks = selectedOptionText => [
       }
     ]
   }
-];
+]
 
 const postToResponseUrl = async (responseUrl, body) => {
   const options = {
@@ -176,14 +164,14 @@ const postToResponseUrl = async (responseUrl, body) => {
       'Content-Type': 'application/json; charset=utf8'
     },
     body: JSON.stringify(body)
-  };
-
-  const res = await fetch(responseUrl, options);
-  const resJson = await res.json();
-  if (!resJson.ok) {
-    console.error('error', { resJson });
   }
-};
+
+  const res = await fetch(responseUrl, options)
+  const resJson = await res.json()
+  if (!resJson.ok) {
+    console.error('error', { resJson })
+  }
+}
 
 exports.respondToRehearsalDaySelected = ({
   responseUrl,
@@ -192,32 +180,32 @@ exports.respondToRehearsalDaySelected = ({
   const body = {
     replace_original: true,
     blocks: yesNoRehearsalRemindersBlocks(selectedOptionText)
-  };
+  }
 
-  postToResponseUrl(responseUrl, body);
-};
+  postToResponseUrl(responseUrl, body)
+}
 
 exports.respondToYesNoRehearsalReminders = ({
   responseUrl,
   selectedOption
 }) => {
-  const wantsRehearsalReminders = selectedOption === 'true' ? true : false;
-  const body = { replace_original: true };
+  const wantsRehearsalReminders = selectedOption === 'true' ? true : false
+  const body = { replace_original: true }
   if (wantsRehearsalReminders) {
     const text =
       "I'll post rehearsal reminders! But first, I'll need the ID of your Google Sheet." +
       '\nYou can find it by getting the URL of your sheet and copying the string of letters and numbers that comes *after /d/* at the end of the URL.' +
       '\nThen, send me a message with the word `sheet` and the ID . \nFor example, `sheet 1ASGA89789GD0Qg7U5URu4gssyJwiw_DSGJ35ssfF`.' +
       "\n\nDon't have a schedule in Google Sheets? <https://docs.google.com/spreadsheets/d/1ngSxEdAuhdJTEb_pFE5nq1avNjzEjdMY8r-Z1QQL-v0/edit#gid=0|Here's the template>" +
-      ' - you can go to `File > Make a copy` to get your own.';
+      ' - you can go to `File > Make a copy` to get your own.'
 
-    body.text = text;
-    return postToResponseUrl(responseUrl, body);
+    body.text = text
+    return postToResponseUrl(responseUrl, body)
   }
 
   const text =
-    "No problem, I won't post any rehearsal reminders. You're all set! :+1:";
-  body.text = text;
-  body.response_type = 'ephemeral';
-  return postToResponseUrl(responseUrl, body);
-};
+    "No problem, I won't post any rehearsal reminders. You're all set! :+1:"
+  body.text = text
+  body.response_type = 'ephemeral'
+  return postToResponseUrl(responseUrl, body)
+}
