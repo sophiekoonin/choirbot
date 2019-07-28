@@ -202,9 +202,22 @@ exports.respondToYesNoRehearsalReminders = ({
   selectedOption
 }) => {
   const wantsRehearsalReminders = selectedOption === 'true' ? true : false;
-  const text = wantsRehearsalReminders
-    ? "I'll post rehearsal reminders! But first, I'll need the ID of your Google Sheet. \nYou can find it by getting the URL of your sheet and copying the string of letters and numbers that comes *after /d/* at the end of the URL. \nThen, send me a message with the word `sheet` and the ID . \nFor example, `sheet 1ASGA89789GD0Qg7U5URu4gssyJwiw_DSGJ35ssfF`.\n\nDon't have a schedule in Google Sheets? <https://docs.google.com/spreadsheets/d/1ngSxEdAuhdJTEb_pFE5nq1avNjzEjdMY8r-Z1QQL-v0/edit#gid=0|Here's the template> - you can go to `File > Make a copy` to get your own."
-    : "No problem, I won't post any rehearsal reminders. You're all set! 👍";
+  const body = { replace_original: true };
+  if (wantsRehearsalReminders) {
+    const text =
+      "I'll post rehearsal reminders! But first, I'll need the ID of your Google Sheet." +
+      '\nYou can find it by getting the URL of your sheet and copying the string of letters and numbers that comes *after /d/* at the end of the URL.' +
+      '\nThen, send me a message with the word `sheet` and the ID . \nFor example, `sheet 1ASGA89789GD0Qg7U5URu4gssyJwiw_DSGJ35ssfF`.' +
+      "\n\nDon't have a schedule in Google Sheets? <https://docs.google.com/spreadsheets/d/1ngSxEdAuhdJTEb_pFE5nq1avNjzEjdMY8r-Z1QQL-v0/edit#gid=0|Here's the template>" +
+      ' - you can go to `File > Make a copy` to get your own.';
 
-  postToResponseUrl(responseUrl, { replace_original: true, text });
+    body.text = text;
+    return postToResponseUrl(responseUrl, body);
+  }
+
+  const text =
+    "No problem, I won't post any rehearsal reminders. You're all set! :+1:";
+  body.text = text;
+  body.response_type = 'ephemeral';
+  return postToResponseUrl(responseUrl, body);
 };

@@ -5,6 +5,7 @@ const { handleInteractions, handleEvents } = require('./interactions');
 const { oauth_redirect, oauth_error, oauth_success } = require('./oauth');
 const { getAttendanceReport } = require('./reports');
 const { startConfigFlow } = require('./config');
+const { handleSlashCommands } = require('./slash-commands');
 
 module.exports = {
   addAttendancePost,
@@ -17,5 +18,6 @@ module.exports = {
   oauth_error,
   oauth_success,
   getAttendanceReport,
-  startConfigFlow
+  startConfigFlow,
+  handleSlashCommands
 };

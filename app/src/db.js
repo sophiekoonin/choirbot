@@ -17,6 +17,9 @@ const updateDbValue = async (collection, docName, value) =>
     .doc(docName)
     .update(value);
 
+const addDocument = async (collection, document) =>
+  await db.collection(collection).add(document);
+
 const getDbDoc = async function(collection, docName) {
   return await db
     .collection(collection)
@@ -49,7 +52,9 @@ const getValues = async (collection, docName, keys) => {
 };
 
 module.exports = {
+  db,
   updateDbValue,
+  addDocument,
   setDbValue,
   getValue,
   getValues,

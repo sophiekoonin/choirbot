@@ -79,8 +79,7 @@ exports.getNextSongs = async function(dateString) {
 exports.putGoogleCredentials = async function(req, res) {
   const { credentials } = req.body;
   try {
-    const document = await db.doc('tokens/google');
-    document.update(credentials);
+    await db.updateDbValue('tokens', 'google', credentials);
     res.status(201).send('Successfully set!');
   } catch (err) {
     console.error(err);

@@ -16,7 +16,7 @@ function flattenDeep(arr1) {
 }
 
 async function getAttendancePosts(team_id, limit) {
-  const snapshot = await db
+  const snapshot = await db.db
     .collection(`attendance-${team_id}`)
     .orderBy('created_at', 'desc')
     .limit(limit)
@@ -87,7 +87,7 @@ exports.addAttendancePost = async function(req, res) {
       });
 
       if (NODE_ENV === 'prod') {
-        const result = await db.collection(`attendance-${team_id}`).add({
+        await db.setDbValue(`attendance-${team_id}`, rehearsal_date, {
           rehearsal_date: today,
           created_at: Firestore.Timestamp.now()._seconds,
           ts: ts,
@@ -128,10 +128,10 @@ exports.processAttendance = async function(req, res) {
       reactions.find(group => group.name === '+1')['users'] || [];
     const notAttending =
       reactions.find(group => group.name === '-1')['users'] || [];
-    await db
-      .collection(`attendance-${teamId}`)
-      .doc(id)
-      .update({ attending, notAttending });
+    await db.updateDbValue(`attendance-${teamId}`, id, {
+      attending,
+      notAttending
+    });
 
     res.status(200).send('Done!');
   } catch (err) {

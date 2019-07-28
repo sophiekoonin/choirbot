@@ -14,7 +14,8 @@ const {
   oauth_redirect,
   oauth_error,
   oauth_success,
-  startConfigFlow
+  startConfigFlow,
+  handleSlashCommands
 } = require('./slack');
 const {
   testGoogleIntegration,
@@ -43,6 +44,7 @@ app.get('/oauth_redirect', oauth_redirect);
 app.get('/oauth_success', oauth_success);
 app.get('/oauth_error', oauth_error);
 app.get('/config-flow', startConfigFlow);
+app.post('/slash-commands', handleSlashCommands);
 
 const PORT = process.env.PORT || 6060;
 app.listen(PORT, () => {
