@@ -37,28 +37,11 @@ exports.isBankHoliday = async function(date) {
   return allDates.includes(dateFormatted);
 };
 
-const getDbDoc = async function(collection, docName) {
-  return await db
-    .collection(collection)
-    .doc(docName)
-    .get();
-};
-
-exports.getDocData = async function(collection, docName) {
-  const doc = await getDbDoc(collection, docName);
-  return await doc.data();
-};
-
 exports.getDbOrConfigValue = async function(collection, docName, key) {
   if (NODE_ENV !== 'prod') {
     return config[docName][key];
   } else {
-    const doc = await getDbDoc(collection, docName);
-    if (!doc.exists) {
-      throw new Error(`Config not found for ${docName}-${key}`);
-    } else {
-      return doc.get(key);
-    }
+    return await db.getValue(collection, docName, key);
   }
 };
 
@@ -66,16 +49,6 @@ exports.getDbOrConfigValues = async function(collection, docName, keys) {
   if (NODE_ENV !== 'prod') {
     return keys.map(key => config[docName][key]);
   } else {
-    const doc = await db
-      .collection(collection)
-      .doc(docName)
-      .get();
-    if (!doc.exists) {
-      throw new Error(`Config not found for ${docName}`);
-    } else {
-      const data = doc.data();
-
-      return keys.map(key => data[key]);
-    }
+    return await db.getValues(collection, docName, keys);
   }
 };
