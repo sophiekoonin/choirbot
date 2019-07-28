@@ -3,6 +3,7 @@ const fetch = require('node-fetch')
 
 const { getDbOrConfigValues } = require('../utils')
 const { Actions } = require('./constants')
+const { getToken } = require('./auth')
 
 exports.onSlackInstall = async ({ token, userId }) => {
   await slack.chat.postMessage({
@@ -25,8 +26,7 @@ const configureRehearsalDay = async ({ token, userId }) =>
     blocks: rehearsalDayBlocks
   })
 
-exports.startConfigFlow = async function(req, res) {
-  const { teamId } = req.query
+exports.startConfigFlow = async function(teamId) {
   const [user_id, bot_access_token] = await getDbOrConfigValues(
     'teams',
     teamId,
@@ -36,8 +36,7 @@ exports.startConfigFlow = async function(req, res) {
     token: bot_access_token,
     userId: user_id
   })
-
-  return res.sendStatus(200)
+  return
 }
 
 const rehearsalDayBlocks = [
@@ -117,12 +116,13 @@ const rehearsalDayBlocks = [
     }
   }
 ]
+
 const yesNoRehearsalRemindersBlocks = selectedOptionText => [
   {
     type: 'section',
     text: {
       type: 'mrkdwn',
-      text: `Great, I'll post a message every ${selectedOptionText}.`
+      text: `Your attendance posts will have the emoji :${selectedOptionText}:!`
     }
   },
   {
@@ -173,7 +173,7 @@ const postToResponseUrl = async (responseUrl, body) => {
   }
 }
 
-exports.respondToRehearsalDaySelected = ({
+exports.respondToRehearsalDaySelected = async ({
   responseUrl,
   selectedOptionText
 }) => {

@@ -3,7 +3,6 @@ const Firestore = require('@google-cloud/firestore')
 
 const google = require('../google/google')
 const db = require('../db')
-const { getToken } = require('./auth')
 
 const { NODE_ENV } = process.env
 

@@ -1,6 +1,7 @@
 exports.Actions = {
   SELECT_REHEARSAL_DAY: 'rehearsal_day',
-  YES_NO_REMINDERS: 'rehearsal_reminders'
+  YES_NO_REMINDERS: 'rehearsal_reminders',
+  EMOJI: 'emoji'
 }
 
 exports.ActionTypes = {

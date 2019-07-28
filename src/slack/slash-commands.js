@@ -1,20 +1,25 @@
 const db = require('../db')
 const { reportAttendance } = require('./reports')
+const { startConfigFlow } = require('./config')
 
 exports.handleSlashCommands = async (req, res) => {
-  const { text, team_id } = req.body
+  const { text, team_id: teamId } = req.body
   const textAsArray = text.split(' ')
   const command = textAsArray[0]
   switch (command) {
     case 'report':
-      return await sendReport(res, team_id)
+      return await sendReport(res, teamId)
     case 'sheet':
-      setGoogleSheetId(team_id, textAsArray[1])
+      setGoogleSheetId(teamId, textAsArray[1])
       return res.send(
         `I've set your Google Sheets ID to \`${
           textAsArray[1]
         }\` - if that's not right, you can do this again to reset it.`
       )
+    case 'config':
+      res.send('SHEBot Configuration')
+      startConfigFlow(teamId)
+      break
     default:
       return res.send("Sorry, I didn't understand that!")
   }
