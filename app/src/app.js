@@ -10,7 +10,6 @@ const {
   testSlackIntegration,
   handleInteractions,
   handleEvents,
-  getAttendanceReport,
   oauth_redirect,
   oauth_error,
   oauth_success,
@@ -37,7 +36,6 @@ app.get('/rehearsals', postRehearsalMusic);
 app.get('/test-slack', testSlackIntegration);
 app.get('/test-google', testGoogleIntegration);
 app.put('/google-creds', putGoogleCredentials);
-app.get('/report', getAttendanceReport);
 app.post('/interactions', handleInteractions);
 app.post('/events', handleEvents);
 app.get('/oauth_redirect', oauth_redirect);

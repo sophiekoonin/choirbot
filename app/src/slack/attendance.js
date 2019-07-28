@@ -7,14 +7,6 @@ const utils = require('../utils');
 const db = require('../db');
 const { getToken } = require('./auth');
 
-function flattenDeep(arr1) {
-  return arr1.reduce(
-    (acc, val) =>
-      Array.isArray(val) ? acc.concat(flattenDeep(val)) : acc.concat(val),
-    []
-  );
-}
-
 async function getAttendancePosts(team_id, limit) {
   const snapshot = await db.db
     .collection(`attendance-${team_id}`)
@@ -23,25 +15,6 @@ async function getAttendancePosts(team_id, limit) {
     .get();
   return snapshot.docs;
 }
-
-async function getSlackUserIds(team_id) {
-  const token = await getToken(team_id);
-  const { members } = await slack.users.list({ token });
-  return members
-    .filter(member => !member.deleted)
-    .filter(member => !member.is_bot)
-    .map(member => member.id)
-    .filter(id => id !== 'USLACKBOT');
-}
-
-exports.getSlackUsers = async function(team_id) {
-  const token = await getToken(team_id);
-  const { members } = await slack.users.list({ token });
-  return members
-    .filter(member => !member.deleted)
-    .filter(member => !member.is_bot)
-    .filter(member => member.id !== 'USLACKBOT');
-};
 
 exports.addAttendancePost = async function(req, res) {
   const today = utils.formatDateISO(new Date());

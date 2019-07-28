@@ -1,11 +1,14 @@
 const slack = require('slack');
 const db = require('../db');
+const { reportAttendance } = require('./reports');
 
 exports.handleSlashCommands = async (req, res) => {
   const { text, team_id } = req.body;
   const textAsArray = text.split(' ');
   const command = textAsArray[0];
   switch (command) {
+    case 'report':
+      return await sendReport(res, team_id);
     case 'sheet':
       setGoogleSheetId(team_id, textAsArray[1]);
       return res.send(
@@ -20,4 +23,9 @@ exports.handleSlashCommands = async (req, res) => {
 
 async function setGoogleSheetId(teamId, sheetId) {
   await db.updateDbValue('teams', teamId, { google_sheet_id: sheetId });
+}
+
+async function sendReport(res, teamId) {
+  const report = await reportAttendance(teamId);
+  res.send(report);
 }
