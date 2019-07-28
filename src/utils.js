@@ -6,15 +6,6 @@ const db = require('./db')
 const { NODE_ENV } = process.env
 const config = NODE_ENV === 'dev' ? require('../config.json') : {}
 
-exports.formatDateISO = function(date) {
-  return moment(date).format('YYYY-MM-DD')
-}
-
-const slashDateToISO = date => {
-  const parts = date.split('/')
-  return `${parts[2]}-${parts[1]}-${parts[0]}`
-}
-
 exports.getNextMonday = function() {
   const today = moment().day()
   const monday = today > 1 ? 8 : 1 //set day of week according to whether today is before sunday or not - see Moment.js docs
@@ -24,7 +15,6 @@ exports.getNextMonday = function() {
 }
 
 exports.isBankHoliday = async function(date) {
-  const dateFormatted = slashDateToISO(date)
   let allBankHols
   allBankHols = memcache.get('bank-holidays')
   if (!allBankHols) {
@@ -34,7 +24,7 @@ exports.isBankHoliday = async function(date) {
   }
   const { events } = allBankHols['england-and-wales']
   const allDates = events.map(evt => evt.date)
-  return allDates.includes(dateFormatted)
+  return allDates.includes(date)
 }
 
 exports.getDbOrConfigValue = async function(collection, docName, key) {
@@ -51,4 +41,14 @@ exports.getDbOrConfigValues = async function(collection, docName, keys) {
   } else {
     return await db.getValues(collection, docName, keys)
   }
+}
+
+exports.dayNumberToString = {
+  0: 'Sunday',
+  1: 'Monday',
+  2: 'Tuesday',
+  3: 'Wednesday',
+  4: 'Thursday',
+  5: 'Friday',
+  6: 'Saturday'
 }

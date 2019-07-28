@@ -1,10 +1,9 @@
 const slack = require('slack')
 const Firestore = require('@google-cloud/firestore')
-const moment = require('moment')
 
 const google = require('../google/google')
-const utils = require('../utils')
 const db = require('../db')
+const { getToken } = require('./auth')
 
 const { NODE_ENV } = process.env
 
@@ -17,78 +16,61 @@ async function getAttendancePosts(team_id, limit) {
   return snapshot.docs
 }
 
-exports.addAttendancePost = async function(req, res) {
-  const today = utils.formatDateISO(new Date())
-  const isBankHol = await utils.isBankHoliday(today)
-  if (isBankHol) {
-    res.status(200).send('Bank holiday - not posting')
+// exports.addAttendancePost = async function(req, res) {}
+
+exports.postAttendanceMessage = async ({ channel, token, teamId, date }) => {
+  const songs = await google.getNextSongs(date)
+  if (songs.mainSong.toLowerCase().includes('no rehearsal')) {
     return
-  } else {
-    const { teamId } = req.query
-    const [channel_id, token] = await utils.getDbOrConfigValues(
-      'teams',
-      teamId,
-      ['channel_id', 'token']
-    )
-
-    const date = moment(today).format('DD/MM/YYYY')
-    const songs = await google.getNextSongs(date)
-    if (songs.mainSong.toLowerCase().includes('no rehearsal')) {
-      res.status(200).send('No rehearsal - not posting')
-      return
-    }
-    const text = getAttendancePostMessage(songs)
-    try {
-      const { ts, channel } = await slack.chat.postMessage({
-        token,
-        channel: channel_id,
-        as_user: false,
-        username: 'Attendance Bot',
-        text
-      })
-
-      await slack.reactions.add({
-        token,
-        timestamp: ts,
-        channel,
-        name: 'thumbsdown'
-      })
-      await slack.reactions.add({
-        token,
-        timestamp: ts,
-        channel,
-        name: 'thumbsup'
-      })
-
-      if (NODE_ENV === 'prod') {
-        await db.setDbValue(`attendance-${teamId}`, today, {
-          rehearsal_date: today,
-          created_at: Firestore.Timestamp.now()._seconds,
-          ts: ts,
-          channel: channel,
-          attending: [],
-          notAttending: []
-        })
-      }
-
-      res.status(200).send('Posted and stored in DB successfully!')
-    } catch (err) {
-      res.status(500).send('Oh no, something went wrong!')
-      console.error(err)
-    }
   }
+  const text = getAttendancePostMessage(songs)
+  try {
+    const { ts } = await slack.chat.postMessage({
+      token,
+      channel,
+      as_user: false,
+      username: 'Attendance Bot',
+      text
+    })
+
+    await slack.reactions.add({
+      token,
+      timestamp: ts,
+      channel,
+      name: 'thumbsdown'
+    })
+    await slack.reactions.add({
+      token,
+      timestamp: ts,
+      channel,
+      name: 'thumbsup'
+    })
+
+    if (NODE_ENV === 'prod') {
+      await db.setDbValue(`attendance-${teamId}`, date, {
+        rehearsal_date: date,
+        created_at: Firestore.Timestamp.now()._seconds,
+        ts: ts,
+        channel: channel,
+        attending: [],
+        notAttending: []
+      })
+    }
+  } catch (err) {
+    console.error(err)
+  }
+
+  return
 }
 
-exports.processAttendance = async function(req, res) {
-  const { teamId } = req.query
-  const [token] = await utils.getDbOrConfigValue('teams', teamId, 'token')
+exports.processAttendanceForTeam = async function(teamId, token, channel) {
   const docs = await getAttendancePosts(teamId, 1)
   const firstResult = docs[0]
   try {
     const response = await slack.reactions.get({
       token,
       timestamp: firstResult.get('ts'),
-      channel: firstResult.get('channel')
+      channel
     })
     if (!response.ok) {
       throw new Error('Something went wrong!')
@@ -103,12 +85,10 @@ exports.processAttendance = async function(req, res) {
       attending,
       notAttending
     })
-
-    res.status(200).send('Done!')
   } catch (err) {
     console.error(err)
-    res.status(500).send(`Error: ${err}`)
   }
+  return
 }
 
 exports.getAttendancePosts = getAttendancePosts
