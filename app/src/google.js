@@ -58,7 +58,7 @@ async function getSongDetailsFromSheet(auth, sheetId, rowNumber) {
 }
 
 exports.getNextSongs = async function(dateString) {
-  const credentials = await utils.getDocData('tokens', 'google');
+  const credentials = await getGoogleCreds();
   const auth = await google.auth.getClient({
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     credentials
@@ -95,7 +95,7 @@ exports.testGoogleIntegration = async function(req, res) {
       'google',
       'sheet_id'
     );
-    const credentials = await utils.getDocData('tokens', 'google');
+    const credentials = await getGoogleCreds();
     const auth = await google.auth.getClient({
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
       credentials
@@ -108,3 +108,16 @@ exports.testGoogleIntegration = async function(req, res) {
     res.status(500).send(err);
   }
 };
+
+async function getGoogleCreds() {
+  const credentials = await utils.getDocData('tokens', 'google');
+  const privateKey = await utils.getDbOrConfigValue(
+    'tokens',
+    'google',
+    'private_key'
+  );
+  return {
+    ...credentials,
+    private_key: privateKey.replace(/\\n/g, '\n')
+  };
+}
