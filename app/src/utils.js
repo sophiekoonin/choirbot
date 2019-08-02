@@ -81,7 +81,6 @@ exports.getAttendancePostMessage = function({
 };
 
 const getDbDoc = async function(collection, docName) {
-  console.log('collection', collection);
   return await db
     .collection(collection)
     .doc(docName)
