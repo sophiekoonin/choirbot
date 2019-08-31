@@ -7,11 +7,16 @@ const db = require('../db')
 const { NODE_ENV } = process.env
 
 async function getAttendancePosts(team_id, limit) {
-  const snapshot = await db.db
+  const result = await db.db
     .collection(`attendance-${team_id}`)
     .orderBy('created_at', 'desc')
-    .limit(limit)
-    .get()
+
+  if (limit != null) {
+    const slice = await result.limit(limit).get()
+    return slice.docs
+  }
+
+  const snapshot = await result.get()
   return snapshot.docs
 }
 

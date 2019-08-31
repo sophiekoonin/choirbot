@@ -1,5 +1,5 @@
 const db = require('../db')
-const { reportAttendance } = require('./reports')
+const { reportAttendance, getStats } = require('./reports')
 const { startConfigFlow } = require('./config')
 
 exports.handleSlashCommands = async (req, res) => {
@@ -9,6 +9,8 @@ exports.handleSlashCommands = async (req, res) => {
   switch (command) {
     case 'report':
       return await sendReport(res, teamId)
+    case 'stats':
+      return await sendStats(res, teamId)
     case 'sheet':
       setGoogleSheetId(teamId, textAsArray[1])
       return res.send(
@@ -32,4 +34,9 @@ async function setGoogleSheetId(teamId, sheetId) {
 async function sendReport(res, teamId) {
   const report = await reportAttendance(teamId)
   res.send(report)
+}
+
+async function sendStats(res, teamId) {
+  const statsMsg = await getStats(teamId)
+  res.send(statsMsg)
 }

@@ -47,7 +47,6 @@ exports.handleInteractions = async (req, res) => {
 
 exports.handleEvents = async (req, res) => {
   const { type } = req.body
-  console.log('hi')
   if (type === 'url_verification') {
     return res.send(req.body.challenge)
   }

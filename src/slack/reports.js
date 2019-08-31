@@ -10,6 +10,14 @@ function flattenDeep(arr1) {
   )
 }
 
+function mapAttendance(posts) {
+  return posts.map(post => ({
+    attending: post.get('attending'),
+    notAttending: post.get('notAttending'),
+    date: post.get('rehearsal_date')
+  }))
+}
+
 async function getSlackUsers(teamId) {
   const token = await getToken(teamId)
   const { members } = await slack.users.list({ token })
@@ -41,11 +49,7 @@ function getAttendanceValue(attendance, user_id) {
 exports.getAttendanceReport = async function(teamId) {
   const allUsers = await getSlackUsers(teamId)
   const attendanceRecords = await getAttendancePosts(teamId, 10)
-  const allAttendance = attendanceRecords.map(doc => ({
-    date: doc.get('rehearsal_date'),
-    attending: doc.get('attending'),
-    notAttending: doc.get('notAttending')
-  }))
+  const allAttendance = mapAttendance(attendanceRecords)
 
   const allDates = allAttendance.map(record => record.date).sort()
 
@@ -74,11 +78,7 @@ exports.getAttendanceReport = async function(teamId) {
 exports.reportAttendance = async function(teamId) {
   const lastFourWeeks = await getAttendancePosts(teamId, 4)
   const allUsers = await getSlackUserIds(teamId)
-  const postData = lastFourWeeks.map(post => ({
-    attending: post.get('attending'),
-    notAttending: post.get('notAttending'),
-    date: post.get('rehearsal_date')
-  }))
+  const postData = mapAttendance(lastFourWeeks)
   const responded = flattenDeep(
     postData.map(post => [post.attending, post.notAttending])
   )
@@ -86,4 +86,49 @@ exports.reportAttendance = async function(teamId) {
   return `*Not responded in last 4 weeks:* \n${notResponded
     .map(uid => `<@${uid}>`)
     .join('\n')}`
+}
+
+exports.getStats = async function getStats(teamId) {
+  const allPosts = await getAttendancePosts(teamId)
+  const allUsers = await getSlackUserIds(teamId)
+  const attendanceData = mapAttendance(allPosts)
+  const sumAttending = attendanceData.reduce(
+    (acc, curr) => (acc += curr.attending.length),
+    0
+  )
+  const averageAttendance = sumAttending / attendanceData.length
+  const highestAttendanceValue = Math.max.apply(
+    Math,
+    attendanceData.map(data => data.attending.length)
+  )
+  const highestAttendanceDates = attendanceData
+    .filter(obj => obj.attending.length === highestAttendanceValue)
+    .map(obj => obj.date)
+
+  const membersToTotalAttendance = allUsers.map(user => ({
+    id: user,
+    attended: attendanceData.reduce(
+      (acc, curr) => (curr.attending.includes(user) ? (acc += 1) : acc),
+      0
+    )
+  }))
+  const highestAttended = Math.max.apply(
+    Math,
+    membersToTotalAttendance.map(data => data.attended)
+  )
+  const highestAttendanceMembers = membersToTotalAttendance
+    .filter(m => m.attended === highestAttended)
+    .map(m => `<@${m.id}>`)
+    .join(',')
+
+  return `:chart_with_upwards_trend: *Attendance statistics* - ${
+    attendanceData.length
+  } rehearsals\n
+*Highest attendance*: ${highestAttendanceValue} on ${
+    highestAttendanceDates.length > 1
+      ? highestAttendanceDates.join(', ')
+      : highestAttendanceDates[0]
+  }
+*Average attendance*: ${averageAttendance}
+*Most rehearsals attended:* ${highestAttendanceMembers} - ${highestAttended}`
 }
