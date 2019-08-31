@@ -3,7 +3,6 @@ const fetch = require('node-fetch')
 
 const { getDbOrConfigValues } = require('../utils')
 const { Actions } = require('./constants')
-const { getToken } = require('./auth')
 
 exports.onSlackInstall = async ({ token, userId }) => {
   await slack.chat.postMessage({
@@ -122,7 +121,7 @@ const yesNoRehearsalRemindersBlocks = selectedOptionText => [
     type: 'section',
     text: {
       type: 'mrkdwn',
-      text: `Your attendance posts will have the emoji :${selectedOptionText}:!`
+      text: `Attendance posts will be posted on ${selectedOptionText}s at 9:30am!`
     }
   },
   {
