@@ -55,13 +55,17 @@ async function getSongDetailsFromSheet(auth, sheetId, rowNumber) {
   }
 }
 
-exports.getNextSongs = async function(dateString) {
+exports.getNextSongs = async function(dateString, teamId) {
   const credentials = await getGoogleCreds()
   const auth = await google.auth.getClient({
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     credentials
   })
-  const sheetId = await utils.getDbOrConfigValue('config', 'google', 'sheet_id')
+  const sheetId = await utils.getDbOrConfigValue(
+    'teams',
+    teamId,
+    'google_sheet_id'
+  )
   const rowNumber = await getRowNumberForDate(auth, sheetId, dateString)
   return await getSongDetailsFromSheet(auth, sheetId, rowNumber)
 }
@@ -99,7 +103,7 @@ exports.testGoogleIntegration = async function(req, res) {
 }
 
 async function getGoogleCreds() {
-  const credentials = await utils.getDocData('tokens', 'google')
+  const credentials = await db.getDocData('tokens', 'google')
   const privateKey = await utils.getDbOrConfigValue(
     'tokens',
     'google',

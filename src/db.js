@@ -29,11 +29,10 @@ const getDbDoc = async function(collection, docName) {
 
 const getQueryResults = async query => {
   const snapshot = await query.get()
-  if (snapshot.empty) {
-    return []
-  }
+  const results = []
 
-  return snapshot.map(doc => ({ id: doc.id, ...doc.data() }))
+  snapshot.forEach(doc => results.push({ id: doc.id, ...doc.data() }))
+  return results
 }
 
 const getDocData = async function(collection, docName) {

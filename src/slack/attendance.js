@@ -20,10 +20,8 @@ async function getAttendancePosts(team_id, limit) {
   return snapshot.docs
 }
 
-// exports.addAttendancePost = async function(req, res) {}
-
 exports.postAttendanceMessage = async ({ channel, token, teamId, date }) => {
-  const songs = await google.getNextSongs(date)
+  const songs = await google.getNextSongs(date, teamId)
   if (songs.mainSong.toLowerCase().includes('no rehearsal')) {
     return
   }

@@ -21,7 +21,7 @@ exports.testSlackIntegration = async (req, res) => {
     })
     return res.sendStatus(200)
   } catch (err) {
-    console.log('Error trying to test slack:', err)
+    console.error('Error trying to test slack:', err)
     return res.sendStatus(500)
   }
 }

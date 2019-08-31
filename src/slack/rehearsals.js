@@ -28,7 +28,7 @@ exports.postRehearsalMusic = async function({
     if (isBankHoliday) {
       text = `<!channel> It's a bank holiday next ${dayOfWeek}, so no rehearsal! Have a lovely day off!`
     } else {
-      const nextWeekSongs = await google.getNextSongs(date)
+      const nextWeekSongs = await google.getNextSongs(date, teamId)
       if (!nextWeekSongs || !nextWeekSongs.mainSong) {
         throw new Error(
           `Couldn't fetch next week's songs! Next week's songs were missing`

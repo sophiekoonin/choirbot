@@ -1,10 +1,10 @@
 const moment = require('moment')
-const utils = require('../utils')
+const utils = require('./utils')
 const {
   postAttendanceMessage,
   processAttendanceForTeam
-} = require('./attendance')
-const { postRehearsalMusic } = require('./rehearsals')
+} = require('./slack/attendance')
+const { postRehearsalMusic } = require('./slack/rehearsals')
 const { db, getQueryResults } = require('./db')
 
 exports.checkForJobsToday = async (req, res) => {
@@ -22,24 +22,22 @@ async function checkForAttendancePostJobs(date) {
   const isBankHol = await utils.isBankHoliday(dateISO)
   if (isBankHol) return
 
-  const today = date.day()
+  const today = date.day().toString()
   const todayQuery = await db
     .collection('teams')
     .where('rehearsal_day', '==', today)
   const teams = await getQueryResults(todayQuery)
   if (teams.length === 0) return
 
-  await Promise.all(
-    teams.forEach(team => {
-      const { id, bot_token: token, channel_id: channel } = team
-      return postAttendanceMessage({
-        token,
-        channel,
-        date: dateString,
-        teamId: id
-      })
+  teams.forEach(async team => {
+    const { id, bot_access_token: token, channel_id: channel } = team
+    return await postAttendanceMessage({
+      token,
+      channel,
+      date: dateString,
+      teamId: id
     })
-  )
+  })
 }
 
 async function checkForRehearsalReminderJobs(date) {
@@ -55,19 +53,17 @@ async function checkForRehearsalReminderJobs(date) {
     .where('rehearsal_reminders', '==', 'true')
   const teams = await getQueryResults(todayQuery)
   if (teams.length === 0) return
-  await Promise.all(
-    teams.forEach(team => {
-      const { id, bot_token: token, channel_id: channel } = team
-      return postRehearsalMusic({
-        token,
-        teamId: id,
-        dayOfWeek,
-        channel,
-        date: dateString,
-        isBankHoliday
-      })
+  teams.forEach(async team => {
+    const { id, bot_access_token: token, channel_id: channel } = team
+    return await postRehearsalMusic({
+      token,
+      teamId: id,
+      dayOfWeek,
+      channel,
+      date: dateString,
+      isBankHoliday
     })
-  )
+  })
 
   return
 }
