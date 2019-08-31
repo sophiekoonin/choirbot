@@ -65,8 +65,9 @@ exports.postAttendanceMessage = async ({ channel, token, teamId, date }) => {
   return
 }
 
-exports.processAttendanceForTeam = async function(teamId, token, channel) {
+exports.processAttendanceForTeam = async function({ teamId, token, channel }) {
   const docs = await getAttendancePosts(teamId, 1)
+  if (docs.length === 0) return
   const firstResult = docs[0]
   try {
     const response = await slack.reactions.get({
@@ -89,6 +90,7 @@ exports.processAttendanceForTeam = async function(teamId, token, channel) {
     })
   } catch (err) {
     console.error(err)
+    return
   }
   return
 }

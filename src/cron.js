@@ -71,16 +71,14 @@ async function checkForRehearsalReminderJobs(date) {
 exports.processAttendance = async (req, res) => {
   const allTeams = await getQueryResults(await db.collection('teams'))
 
-  await Promise.all(
-    allTeams.forEach(team => {
-      const { id, bot_token: token, channel_id: channel } = team
-      return processAttendanceForTeam({
-        token,
-        channel,
-        teamId: id
-      })
+  allTeams.forEach(async team => {
+    const { id, bot_access_token: token, channel_id: channel } = team
+    return await processAttendanceForTeam({
+      token,
+      channel,
+      teamId: id
     })
-  )
+  })
 
   return res.sendStatus(200)
 }

@@ -14,7 +14,7 @@ const {
   testGoogleIntegration,
   putGoogleCredentials
 } = require('./google/google')
-const { checkForJobsToday } = require('./cron')
+const { checkForJobsToday, processAttendance } = require('./cron')
 
 const app = express()
 
@@ -30,6 +30,7 @@ app.get('/test-google', testGoogleIntegration)
 app.put('/google-creds', putGoogleCredentials)
 app.post('/interactions', handleInteractions)
 app.post('/events', handleEvents)
+app.get('/process-attendance', processAttendance)
 app.get('/oauth_redirect', oauth_redirect)
 app.get('/oauth_success', oauth_success)
 app.get('/oauth_error', oauth_error)
