@@ -6,7 +6,7 @@ const db = require('../db')
 
 const { NODE_ENV } = process.env
 
-async function getAttendancePosts(team_id, limit) {
+async function getAttendancePosts(team_id: string, limit: string) {
   const result = await db.db
     .collection(`attendance-${team_id}`)
     .orderBy('created_at', 'desc')
@@ -101,7 +101,7 @@ function getAttendancePostMessage({
   mainSong = 'please check schedule for details!',
   runThrough,
   notes
-}) {
+}): string {
   return (
     ':dancing_banana: Rehearsal day! :dancing_banana: <!channel> \n' +
     `*Today's rehearsal:* ${mainSong}\n` +

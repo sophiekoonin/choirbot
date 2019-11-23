@@ -7,10 +7,25 @@
   "parserOptions": {
     "ecmaVersion": 2018
   },
-  "extends":[ "eslint:recommended", "plugin:jest/recommended" ],
-  "plugins": ["jest"],
+  "parser": "@typescript-eslint/parser",
+  "extends": [
+    "eslint:recommended",
+    "plugin:jest/recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "plugins": [
+    "jest",
+    "@typescript-eslint"
+  ],
   "rules": {
-    "comma-dangle": ["error", "never"],
-    "semi": ["error", "never"]
+    "comma-dangle": [
+      "error",
+      "never"
+    ],
+    "semi": [
+      "error",
+      "never"
+    ],
+    "@typescript-eslint/rule-name": "error"
   }
 }

@@ -1,4 +1,4 @@
-const express = require('express')
+const express, { Request, Response} = require('express')
 const bodyParser = require('body-parser')
 
 const {
@@ -16,12 +16,12 @@ const {
 } = require('./google/google')
 const { checkForJobsToday, processAttendance } = require('./cron')
 
-const app = express()
+const app: Express.Application = express()
 
 app.use(bodyParser.json()) // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true }))
 
-app.get('/', (req, res) => {
+app.get('/', (req: Request, res: Response) => {
   res.send('Hello world! SHEbot v1.2')
 })
 
