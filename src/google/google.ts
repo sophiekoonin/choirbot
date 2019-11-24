@@ -7,12 +7,6 @@ import { TeamId } from '../slack/types'
 import { Request, Response } from 'express'
 
 const sheets: sheets_v4.Sheets = google.sheets('v4')
-function getValuesAndFlatten(
-  response: GaxiosResponse<sheets_v4.Schema$ValueRange>
-) {
-  const { values } = response.data
-  return [].concat.apply([], values)
-}
 
 async function getRowNumberForDate(
   auth: GoogleAuth,
@@ -26,7 +20,8 @@ async function getRowNumberForDate(
   }
   try {
     const response = await sheets.spreadsheets.values.get(request)
-    const rowNumber = getValuesAndFlatten(response).indexOf(dateString) + 1
+    const values = [].concat.apply([], response.data.values)
+    const rowNumber = values.indexOf(dateString) + 1
     return rowNumber > 0 ? rowNumber : 1
   } catch (err) {
     console.error(`Error getting row number: ${err}`)
@@ -45,7 +40,7 @@ async function getSongDetailsFromSheet(
       spreadsheetId: sheetId,
       range: `B${rowNumber}:I${rowNumber}`
     })
-    const values = getValuesAndFlatten(response)
+    const values = [].concat.apply([], response.data.values)
     const mainSong = values[0]
     const runThrough = values[1]
     const notes = values[2]
