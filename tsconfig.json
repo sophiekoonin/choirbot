@@ -5,9 +5,15 @@
     "moduleResolution": "node",
     "noImplicitAny": true,
     "outDir": "dist",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "lib": [
+      "es2019"
+    ]
   },
   "include": [
     "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }

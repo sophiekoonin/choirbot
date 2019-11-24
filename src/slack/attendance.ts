@@ -6,12 +6,15 @@ import { SlackClient } from './client'
 import {
   ChatPostMessageResult,
   PostAttendanceMessageArgs,
-  MessageReactionsResult
+  MessageReactionsResult,
+  TeamId,
+  SlackAPIArgs
 } from './types'
+import { SongData } from '../google/types'
 
 const { NODE_ENV } = process.env
 
-export async function getAttendancePosts(team_id: string, limit?: number) {
+export async function getAttendancePosts(team_id: TeamId, limit?: number) {
   const result = await db.db
     .collection(`attendance-${team_id}`)
     .orderBy('created_at', 'desc')
@@ -84,7 +87,7 @@ export const processAttendanceForTeam = async function({
   teamId,
   token,
   channel
-}) {
+}: SlackAPIArgs) {
   const docs = await getAttendancePosts(teamId, 1)
   if (docs.length === 0) return
   const firstResult = docs[0]
@@ -118,7 +121,7 @@ function getAttendancePostMessage({
   mainSong = 'please check schedule for details!',
   runThrough,
   notes
-}): string {
+}: SongData): string {
   return (
     ':dancing_banana: Rehearsal day! :dancing_banana: <!channel> \n' +
     `*Today's rehearsal:* ${mainSong}\n` +

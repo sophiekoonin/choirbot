@@ -1,3 +1,5 @@
+import { Request, Response } from 'express'
+
 import * as db from '../db'
 import {
   respondToRehearsalDaySelected,
@@ -5,7 +7,10 @@ import {
 } from './config'
 import { Actions, ActionTypes } from './constants'
 
-export const handleInteractions = async (req, res) => {
+export async function handleInteractions(
+  req: Request,
+  res: Response
+): Promise<Response> {
   const { payload } = req.body
   const { response_url, actions, team } = JSON.parse(payload)
   const action = actions[0]
@@ -42,16 +47,5 @@ export const handleInteractions = async (req, res) => {
       break
   }
 
-  return res.sendStatus(200)
-}
-
-export const handleEvents = async (req, res) => {
-  const { type } = req.body
-  if (type === 'url_verification') {
-    return res.send(req.body.challenge)
-  }
-
-  const { event } = req.body
-  console.log({ event })
   return res.sendStatus(200)
 }

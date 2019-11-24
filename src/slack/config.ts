@@ -196,6 +196,9 @@ async function postToResponseUrl(
 export const respondToRehearsalDaySelected = async ({
   responseUrl,
   selectedOptionText
+}: {
+  responseUrl: string
+  selectedOptionText: string
 }) => {
   const body: ActionResponseBody = {
     text: 'Continue SHEbot setup!',
@@ -209,6 +212,9 @@ export const respondToRehearsalDaySelected = async ({
 export const respondToYesNoRehearsalReminders = ({
   responseUrl,
   selectedOption
+}: {
+  responseUrl: string
+  selectedOption: string
 }) => {
   const wantsRehearsalReminders = selectedOption === 'true' ? true : false
   if (wantsRehearsalReminders) {
