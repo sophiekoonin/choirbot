@@ -1,13 +1,13 @@
-const moment = require('moment')
-const utils = require('./utils')
-const {
+import moment from 'moment'
+import * as utils from './utils'
+import {
   postAttendanceMessage,
   processAttendanceForTeam
-} = require('./slack/attendance')
-const { postRehearsalMusic } = require('./slack/rehearsals')
-const { db, getQueryResults } = require('./db')
+} from './slack/attendance'
+import { postRehearsalMusic } from './slack/rehearsals'
+import { db, getQueryResults } from './db'
 
-exports.checkForJobsToday = async (req, res) => {
+export const checkForJobsToday = async (req, res) => {
   const date = moment()
 
   await checkForAttendancePostJobs(date)
@@ -68,7 +68,7 @@ async function checkForRehearsalReminderJobs(date) {
   return
 }
 
-exports.processAttendance = async (req, res) => {
+export const processAttendance = async (req, res) => {
   const allTeams = await getQueryResults(await db.collection('teams'))
 
   allTeams.forEach(async team => {

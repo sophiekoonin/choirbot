@@ -1,7 +1,7 @@
-const slack = require('slack')
-const utils = require('../utils')
+import slack from 'slack'
+import * as utils from '../utils'
 
-exports.testSlackIntegration = async (req, res) => {
+export const testSlackIntegration = async (req, res) => {
   try {
     const { team_id: teamId } = req.query
     if (!teamId || teamId === '') {

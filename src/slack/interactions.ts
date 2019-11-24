@@ -1,11 +1,11 @@
-const db = require('../db')
-const {
+import * as db from '../db'
+import {
   respondToRehearsalDaySelected,
   respondToYesNoRehearsalReminders
-} = require('./config')
-const { Actions, ActionTypes } = require('./constants')
+} from './config'
+import { Actions, ActionTypes } from './constants'
 
-exports.handleInteractions = async (req, res) => {
+export const handleInteractions = async (req, res) => {
   const { payload } = req.body
   const { response_url, actions, team } = JSON.parse(payload)
   const action = actions[0]
@@ -45,7 +45,7 @@ exports.handleInteractions = async (req, res) => {
   return res.sendStatus(200)
 }
 
-exports.handleEvents = async (req, res) => {
+export const handleEvents = async (req, res) => {
   const { type } = req.body
   if (type === 'url_verification') {
     return res.send(req.body.challenge)

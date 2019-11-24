@@ -1,13 +1,13 @@
-const { addAttendancePost, processAttendance } = require('./attendance')
-const { testSlackIntegration } = require('./test')
-const { postRehearsalMusic } = require('./rehearsals')
-const { handleInteractions, handleEvents } = require('./interactions')
-const { oauth_redirect, oauth_error, oauth_success } = require('./oauth')
-const { getAttendanceReport } = require('./reports')
-const { startConfigFlow } = require('./config')
-const { handleSlashCommands } = require('./slash-commands')
+import { addAttendancePost, processAttendance } from './attendance'
+import { testSlackIntegration } from './test'
+import { postRehearsalMusic } from './rehearsals'
+import { handleInteractions, handleEvents } from './interactions'
+import { oauth_redirect, oauth_error, oauth_success } from './oauth'
+import { getAttendanceReport } from './reports'
+import { startConfigFlow } from './config'
+import { handleSlashCommands } from './slash-commands'
 
-module.exports = {
+export {
   addAttendancePost,
   processAttendance,
   testSlackIntegration,

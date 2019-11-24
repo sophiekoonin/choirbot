@@ -1,7 +1,4 @@
-const {
-  getAttendancePostMessage,
-  getRehearsalMusicMessage
-} = require('./utils')
+import { getAttendancePostMessage, getRehearsalMusicMessage } from './utils'
 
 describe('utils', () => {
   describe('getAttendancePostMessage', () => {

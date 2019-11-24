@@ -1,6 +1,6 @@
-const slack = require('slack')
-const { getAttendancePosts } = require('./attendance')
-const { getToken } = require('./auth')
+import slack from 'slack'
+import { getAttendancePosts } from './attendance'
+import { getToken } from './auth'
 
 function flattenDeep(arr1) {
   return arr1.reduce(
@@ -46,7 +46,7 @@ function getAttendanceValue(attendance, user_id) {
   return 'unknown'
 }
 
-exports.getAttendanceReport = async function(teamId) {
+export const getAttendanceReport = async function(teamId) {
   const allUsers = await getSlackUsers(teamId)
   const attendanceRecords = await getAttendancePosts(teamId, 10)
   const allAttendance = mapAttendance(attendanceRecords)
@@ -75,7 +75,7 @@ exports.getAttendanceReport = async function(teamId) {
 2. Filter list of users against attending/not attending 
 3. Show who hasn't responded
  */
-exports.reportAttendance = async function(teamId) {
+export const reportAttendance = async function(teamId) {
   const lastFourWeeks = await getAttendancePosts(teamId, 4)
   const allUsers = await getSlackUserIds(teamId)
   const postData = mapAttendance(lastFourWeeks)
@@ -88,7 +88,7 @@ exports.reportAttendance = async function(teamId) {
     .join('\n')}`
 }
 
-exports.getStats = async function getStats(teamId) {
+export const getStats = async function getStats(teamId) {
   const allPosts = await getAttendancePosts(teamId)
   const allUsers = await getSlackUserIds(teamId)
   const attendanceData = mapAttendance(allPosts)

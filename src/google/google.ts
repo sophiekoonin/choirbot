@@ -1,6 +1,6 @@
-const { google } = require('googleapis')
-const utils = require('../utils')
-const db = require('../db')
+import { google } from 'googleapis'
+import * as utils from '../utils'
+import * as db from '../db'
 
 const sheets = google.sheets('v4')
 function getValuesAndFlatten(response) {
@@ -55,7 +55,7 @@ async function getSongDetailsFromSheet(auth, sheetId, rowNumber) {
   }
 }
 
-exports.getNextSongs = async function(dateString, teamId) {
+export async function getNextSongs(dateString, teamId) {
   const credentials = await getGoogleCreds()
   const auth = await google.auth.getClient({
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
@@ -70,7 +70,7 @@ exports.getNextSongs = async function(dateString, teamId) {
   return await getSongDetailsFromSheet(auth, sheetId, rowNumber)
 }
 
-exports.putGoogleCredentials = async function(req, res) {
+export async function putGoogleCredentials(req, res) {
   const { credentials } = req.body
   try {
     await db.updateDbValue('tokens', 'google', credentials)
@@ -81,7 +81,7 @@ exports.putGoogleCredentials = async function(req, res) {
   }
 }
 
-exports.testGoogleIntegration = async function(req, res) {
+export async function testGoogleIntegration(req, res) {
   try {
     const sheetId = await utils.getDbOrConfigValue(
       'config',

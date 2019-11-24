@@ -1,5 +1,5 @@
-const slack = require('slack')
-const google = require('../google/google')
+import slack from 'slack'
+import * as google from '../google/google'
 
 function getRehearsalMusicMessage(
   { mainSong, mainSongLink, runThrough, runThroughLink, notes },
@@ -15,7 +15,7 @@ function getRehearsalMusicMessage(
   Please give the recordings a listen! :sparkles:`
 }
 
-exports.postRehearsalMusic = async function({
+export const postRehearsalMusic = async function({
   channel,
   teamId,
   token,

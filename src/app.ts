@@ -1,7 +1,7 @@
-const express, { Request, Response} = require('express')
-const bodyParser = require('body-parser')
+import express from 'express'
+import bodyParser from 'body-parser'
 
-const {
+import {
   testSlackIntegration,
   handleInteractions,
   handleEvents,
@@ -9,19 +9,19 @@ const {
   oauth_error,
   oauth_success,
   handleSlashCommands
-} = require('./slack')
-const {
+} from './slack'
+
+import {
   testGoogleIntegration,
   putGoogleCredentials
-} = require('./google/google')
-const { checkForJobsToday, processAttendance } = require('./cron')
+} from './google/google'
+import { checkForJobsToday, processAttendance } from './cron'
 
-const app: Express.Application = express()
-
+let app: express.Application = express()
 app.use(bodyParser.json()) // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true }))
 
-app.get('/', (req: Request, res: Response) => {
+app.get('/', (req: express.Request, res: express.Response) => {
   res.send('Hello world! SHEbot v1.2')
 })
 
@@ -37,7 +37,7 @@ app.get('/oauth_error', oauth_error)
 app.post('/slash-commands', handleSlashCommands)
 app.get('/cron', checkForJobsToday)
 
-const PORT = process.env.PORT || 6060
+const PORT: number = parseInt(process.env.PORT) || 6060
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`)
   console.log('Press Ctrl+C to quit.')

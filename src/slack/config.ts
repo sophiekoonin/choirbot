@@ -1,10 +1,10 @@
-const slack = require('slack')
-const fetch = require('node-fetch')
+import slack from 'slack'
+import fetch from 'node-fetch'
 
-const { getDbOrConfigValues } = require('../utils')
-const { Actions } = require('./constants')
+import { getDbOrConfigValues } from '../utils'
+import { Actions } from './constants'
 
-exports.onSlackInstall = async ({ token, userId }) => {
+export const onSlackInstall = async ({ token, userId }) => {
   await slack.chat.postMessage({
     token,
     channel: userId,
@@ -25,7 +25,7 @@ const configureRehearsalDay = async ({ token, userId }) =>
     blocks: rehearsalDayBlocks
   })
 
-exports.startConfigFlow = async function(teamId) {
+export const startConfigFlow = async function(teamId) {
   const [user_id, bot_access_token] = await getDbOrConfigValues(
     'teams',
     teamId,
@@ -172,7 +172,7 @@ const postToResponseUrl = async (responseUrl, body) => {
   }
 }
 
-exports.respondToRehearsalDaySelected = async ({
+export const respondToRehearsalDaySelected = async ({
   responseUrl,
   selectedOptionText
 }) => {
@@ -184,7 +184,7 @@ exports.respondToRehearsalDaySelected = async ({
   postToResponseUrl(responseUrl, body)
 }
 
-exports.respondToYesNoRehearsalReminders = ({
+export const respondToYesNoRehearsalReminders = ({
   responseUrl,
   selectedOption
 }) => {

@@ -1,8 +1,8 @@
-const slack = require('slack')
-const Firestore = require('@google-cloud/firestore')
+import slack from 'slack'
+import Firestore from '@google-cloud/firestore'
 
-const google = require('../google/google')
-const db = require('../db')
+import google from '../google/google'
+import db from '../db'
 
 const { NODE_ENV } = process.env
 
@@ -20,7 +20,7 @@ async function getAttendancePosts(team_id: string, limit: string) {
   return snapshot.docs
 }
 
-exports.postAttendanceMessage = async ({ channel, token, teamId, date }) => {
+export const postAttendanceMessage = async ({ channel, token, teamId, date }) => {
   const songs = await google.getNextSongs(date, teamId)
   if (songs.mainSong.toLowerCase().includes('no rehearsal')) {
     return
@@ -65,7 +65,7 @@ exports.postAttendanceMessage = async ({ channel, token, teamId, date }) => {
   return
 }
 
-exports.processAttendanceForTeam = async function({ teamId, token, channel }) {
+export const processAttendanceForTeam = async function({ teamId, token, channel }) {
   const docs = await getAttendancePosts(teamId, 1)
   if (docs.length === 0) return
   const firstResult = docs[0]
@@ -95,7 +95,7 @@ exports.processAttendanceForTeam = async function({ teamId, token, channel }) {
   return
 }
 
-exports.getAttendancePosts = getAttendancePosts
+export const getAttendancePosts = getAttendancePosts
 
 function getAttendancePostMessage({
   mainSong = 'please check schedule for details!',

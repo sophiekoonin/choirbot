@@ -1,8 +1,8 @@
-const db = require('../db')
-const { reportAttendance, getStats } = require('./reports')
-const { startConfigFlow } = require('./config')
+import * as db from '../db'
+import  { reportAttendance, getStats } from './reports'
+import { startConfigFlow } from './config'
 
-exports.handleSlashCommands = async (req, res) => {
+export const handleSlashCommands = async (req, res) => {
   const { text, team_id: teamId } = req.body
   const textAsArray = text.split(' ')
   const command = textAsArray[0]

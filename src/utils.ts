@@ -1,12 +1,12 @@
-const moment = require('moment')
-const fetch = require('node-fetch')
-const memcache = require('memory-cache')
-const db = require('./db')
+import moment from 'moment'
+import fetch from 'node-fetch'
+import memcache from 'memory-cache'
+import * as db from './db'
 
 const { NODE_ENV } = process.env
 const config = NODE_ENV === 'dev' ? require('../config.json') : {}
 
-exports.getNextMonday = function() {
+export const getNextMonday = function() {
   const today = moment().day()
   const monday = today > 1 ? 8 : 1 //set day of week according to whether today is before sunday or not - see Moment.js docs
   return moment()
@@ -14,7 +14,7 @@ exports.getNextMonday = function() {
     .format('DD/MM/YYYY')
 }
 
-exports.isBankHoliday = async function(date) {
+export const isBankHoliday = async function(date) {
   let allBankHols
   allBankHols = memcache.get('bank-holidays')
   if (!allBankHols) {
@@ -27,7 +27,7 @@ exports.isBankHoliday = async function(date) {
   return allDates.includes(date)
 }
 
-exports.getDbOrConfigValue = async function(collection, docName, key) {
+export const getDbOrConfigValue = async function(collection, docName, key) {
   if (NODE_ENV !== 'prod') {
     return config[docName][key]
   } else {
@@ -35,7 +35,7 @@ exports.getDbOrConfigValue = async function(collection, docName, key) {
   }
 }
 
-exports.getDbOrConfigValues = async function(collection, docName, keys) {
+export const getDbOrConfigValues = async function(collection, docName, keys) {
   if (NODE_ENV !== 'prod') {
     return keys.map(key => config[docName][key])
   } else {
@@ -43,7 +43,7 @@ exports.getDbOrConfigValues = async function(collection, docName, keys) {
   }
 }
 
-exports.dayNumberToString = {
+export const dayNumberToString = {
   0: 'Sunday',
   1: 'Monday',
   2: 'Tuesday',
