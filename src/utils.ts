@@ -1,11 +1,14 @@
 import moment from 'moment'
-import fetch from 'node-fetch'
-import memcache from 'memory-cache'
 import * as db from './db'
+import {
+  BankHolidayCache,
+  BankHolidaysResponse,
+  BankHolidayEvent
+} from './DataCache'
 
 const { NODE_ENV } = process.env
 const config = NODE_ENV === 'dev' ? require('../config.json') : {}
-
+const BankHolCache = new BankHolidayCache(43830) // 1 month
 export function getNextMonday(): string {
   const today = moment().day()
   const monday = today > 1 ? 8 : 1 //set day of week according to whether today is before sunday or not - see Moment.js docs
@@ -14,25 +17,8 @@ export function getNextMonday(): string {
     .format('DD/MM/YYYY')
 }
 
-interface BankHolidayEvent {
-  title: string
-  date: string
-  notes: string
-  bunting: boolean
-}
-interface BankHolidaysResponse {
-  [region: string]: {
-    events: Array<BankHolidayEvent>
-  }
-}
 export async function isBankHoliday(date: string): Promise<boolean> {
-  let allBankHols: BankHolidaysResponse
-  allBankHols = memcache.get('bank-holidays')
-  if (!allBankHols) {
-    const response = await fetch('https://www.gov.uk/bank-holidays.json')
-    allBankHols = await response.json()
-    memcache.put('bank-holidays', allBankHols)
-  }
+  let allBankHols = await BankHolCache.getData()
   const { events }: { events: Array<BankHolidayEvent> } = allBankHols[
     'england-and-wales'
   ]
