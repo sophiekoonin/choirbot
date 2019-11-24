@@ -1,6 +1,7 @@
 import { google } from 'googleapis'
 import * as utils from '../utils'
 import * as db from '../db'
+import { SongData } from './types'
 
 const sheets = google.sheets('v4')
 function getValuesAndFlatten(response) {
@@ -24,7 +25,7 @@ async function getRowNumberForDate(auth, sheetId, dateString) {
   }
 }
 
-async function getSongDetailsFromSheet(auth, sheetId, rowNumber) {
+async function getSongDetailsFromSheet(auth, sheetId, rowNumber): Promise<SongData> {
   try {
     const response = await sheets.spreadsheets.values.get({
       auth,
