@@ -4,12 +4,12 @@
   "description": "",
   "main": "app.js",
   "engines": {
-    "node": "10"
+    "node": "12"
   },
   "scripts": {
     "deploy": "gcloud app deploy --quiet app.yaml cron.yaml",
-    "start": "NODE_ENV=prod node src/app.js",
-    "dev": "NODE_ENV=dev nodemon src/app.js",
+    "start": "NODE_ENV=prod ts-node src/app.ts",
+    "dev": "NODE_ENV=dev nodemon ts-node src/app.ts",
     "test": "jest"
   },
   "author": "",
@@ -25,7 +25,9 @@
     "memory-cache": "0.2.0",
     "moment": "^2.22.2",
     "node-fetch": "^2.6.0",
-    "slack": "^11.0.2"
+    "slack": "^11.0.2",
+    "ts-node": "8.5.2",
+    "typescript": "3.7.2"
   },
   "devDependencies": {
     "@types/node-fetch": "2.5.4",
