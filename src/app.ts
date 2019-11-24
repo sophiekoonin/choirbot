@@ -4,17 +4,13 @@ import bodyParser from 'body-parser'
 import {
   testSlackIntegration,
   handleInteractions,
-  handleEvents,
   oauth_redirect,
   oauth_error,
   oauth_success,
   handleSlashCommands
 } from './slack'
 
-import {
-  testGoogleIntegration,
-  putGoogleCredentials
-} from './google/google'
+import { testGoogleIntegration, putGoogleCredentials } from './google/google'
 import { checkForJobsToday, processAttendance } from './cron'
 
 let app: express.Application = express()
@@ -29,7 +25,6 @@ app.get('/test-slack', testSlackIntegration)
 app.get('/test-google', testGoogleIntegration)
 app.put('/google-creds', putGoogleCredentials)
 app.post('/interactions', handleInteractions)
-app.post('/events', handleEvents)
 app.get('/process-attendance', processAttendance)
 app.get('/oauth_redirect', oauth_redirect)
 app.get('/oauth_success', oauth_success)
