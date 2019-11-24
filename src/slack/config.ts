@@ -1,11 +1,18 @@
-import slack from 'slack'
 import fetch from 'node-fetch'
-
 import { getDbOrConfigValues } from '../utils'
 import { Actions } from './constants'
+import { SlackClient } from './client'
+import { SectionBlock, ActionsBlock } from '@slack/types'
+import { ActionResponseBody } from './types'
 
-export async function onSlackInstall({ token, userId }: { token: string, userId: string }): Promise<void> {
-  await slack.chat.postMessage({
+export async function onSlackInstall({
+  token,
+  userId
+}: {
+  token: string
+  userId: string
+}): Promise<void> {
+  await SlackClient.chat.postMessage({
     token,
     channel: userId,
     as_user: true,
@@ -15,8 +22,14 @@ export async function onSlackInstall({ token, userId }: { token: string, userId:
   await configureRehearsalDay({ token, userId })
 }
 
-async function configureRehearsalDay({ token, userId }: { token: string, userId: string }): Promise<void> {
-  await slack.chat.postMessage({
+async function configureRehearsalDay({
+  token,
+  userId
+}: {
+  token: string
+  userId: string
+}): Promise<void> {
+  await SlackClient.chat.postMessage({
     token,
     channel: userId,
     as_user: true,
@@ -39,7 +52,7 @@ export async function startConfigFlow(teamId: string) {
   return
 }
 
-const rehearsalDayBlocks = [
+const rehearsalDayBlocks: Array<SectionBlock> = [
   {
     type: 'section',
     block_id: Actions.SELECT_REHEARSAL_DAY,
@@ -117,47 +130,54 @@ const rehearsalDayBlocks = [
   }
 ]
 
-const yesNoRehearsalRemindersBlocks = (selectedOptionText: string) => [
-  {
-    type: 'section',
-    text: {
-      type: 'mrkdwn',
-      text: `Attendance posts will be posted on ${selectedOptionText}s at 9:30am!`
-    }
-  },
-  {
-    type: 'section',
-    text: {
-      type: 'mrkdwn',
-      text:
-        "Do you want to enable rehearsal reminders? You'll need a Google Sheet set up with your schedule."
-    }
-  },
-  {
-    type: 'actions',
-    block_id: Actions.YES_NO_REMINDERS,
-    elements: [
-      {
-        type: 'button',
-        text: {
-          type: 'plain_text',
-          text: 'Yes'
-        },
-        value: 'true'
-      },
-      {
-        type: 'button',
-        text: {
-          type: 'plain_text',
-          text: 'No'
-        },
-        value: 'false'
+function yesNoRehearsalRemindersBlocks(
+  selectedOptionText: string
+): Array<SectionBlock | ActionsBlock> {
+  return [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `Attendance posts will be posted on ${selectedOptionText}s at 9:30am!`
       }
-    ]
-  }
-]
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text:
+          "Do you want to enable rehearsal reminders? You'll need a Google Sheet set up with your schedule."
+      }
+    },
+    {
+      type: 'actions',
+      block_id: Actions.YES_NO_REMINDERS,
+      elements: [
+        {
+          type: 'button',
+          text: {
+            type: 'plain_text',
+            text: 'Yes'
+          },
+          value: 'true'
+        },
+        {
+          type: 'button',
+          text: {
+            type: 'plain_text',
+            text: 'No'
+          },
+          value: 'false'
+        }
+      ]
+    }
+  ]
+}
 
-const postToResponseUrl = async (responseUrl, body) => {
+async function postToResponseUrl(
+  responseUrl: string,
+  body: ActionResponseBody
+) {
   const options = {
     method: 'POST',
     headers: {
@@ -177,7 +197,8 @@ export const respondToRehearsalDaySelected = async ({
   responseUrl,
   selectedOptionText
 }) => {
-  const body = {
+  const body: ActionResponseBody = {
+    text: 'Continue SHEbot setup!',
     replace_original: true,
     blocks: yesNoRehearsalRemindersBlocks(selectedOptionText)
   }
@@ -190,7 +211,6 @@ export const respondToYesNoRehearsalReminders = ({
   selectedOption
 }) => {
   const wantsRehearsalReminders = selectedOption === 'true' ? true : false
-  const body = { replace_original: true }
   if (wantsRehearsalReminders) {
     const text =
       "I'll post rehearsal reminders! But first, I'll need the ID of your Google Sheet." +
@@ -199,13 +219,16 @@ export const respondToYesNoRehearsalReminders = ({
       "\n\nDon't have a schedule in Google Sheets? <https://docs.google.com/spreadsheets/d/1ngSxEdAuhdJTEb_pFE5nq1avNjzEjdMY8r-Z1QQL-v0/edit#gid=0|Here's the template>" +
       ' - you can go to `File > Make a copy` to get your own.'
 
-    body['text'] = text
+    const body: ActionResponseBody = { text, replace_original: true }
     return postToResponseUrl(responseUrl, body)
   }
 
   const text =
     "No problem, I won't post any rehearsal reminders. You're all set! :+1:"
-  body['text'] = text
-  body['response_type'] = 'ephemeral'
+  const body: ActionResponseBody = {
+    replace_original: true,
+    response_type: 'ephemeral',
+    text
+  }
   return postToResponseUrl(responseUrl, body)
 }

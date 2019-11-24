@@ -27,6 +27,7 @@
     "slack": "^11.0.2"
   },
   "devDependencies": {
+    "@types/node-fetch": "2.5.4",
     "@typescript-eslint/eslint-plugin": "2.8.0",
     "chai": "4.2.0",
     "eslint": "^6.1.0",

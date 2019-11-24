@@ -2,12 +2,16 @@ import Firestore from '@google-cloud/firestore'
 
 import * as google from '../google/google'
 import * as db from '../db'
-import { SlackClient } from './client';
-import { ChatPostMessageResult, PostAttendanceMessageArgs, MessageReactionsResult } from './types';
+import { SlackClient } from './client'
+import {
+  ChatPostMessageResult,
+  PostAttendanceMessageArgs,
+  MessageReactionsResult
+} from './types'
 
 const { NODE_ENV } = process.env
 
-export async function getAttendancePosts(team_id: string, limit: number) {
+export async function getAttendancePosts(team_id: string, limit?: number) {
   const result = await db.db
     .collection(`attendance-${team_id}`)
     .orderBy('created_at', 'desc')
@@ -21,21 +25,26 @@ export async function getAttendancePosts(team_id: string, limit: number) {
   return snapshot.docs
 }
 
-export const postAttendanceMessage = async ({ channel, token, teamId, date }: PostAttendanceMessageArgs) => {
+export const postAttendanceMessage = async ({
+  channel,
+  token,
+  teamId,
+  date
+}: PostAttendanceMessageArgs) => {
   const songs = await google.getNextSongs(date, teamId)
   if (songs.mainSong.toLowerCase().includes('no rehearsal')) {
     return
   }
   const text = getAttendancePostMessage(songs)
   try {
-    const postMsgRsp = await SlackClient.chat.postMessage({
+    const postMsgRsp = (await SlackClient.chat.postMessage({
       token,
       channel,
       as_user: false,
       username: 'Attendance Bot',
       text
-    }) as ChatPostMessageResult
-    
+    })) as ChatPostMessageResult
+
     if (!postMsgRsp.ok) {
       console.error('Unable to post attendance message', postMsgRsp.error)
       return
@@ -71,16 +80,20 @@ export const postAttendanceMessage = async ({ channel, token, teamId, date }: Po
   return
 }
 
-export const processAttendanceForTeam = async function({ teamId, token, channel }) {
+export const processAttendanceForTeam = async function({
+  teamId,
+  token,
+  channel
+}) {
   const docs = await getAttendancePosts(teamId, 1)
   if (docs.length === 0) return
   const firstResult = docs[0]
   try {
-    const response = await SlackClient.reactions.get({
+    const response = (await SlackClient.reactions.get({
       token,
       timestamp: firstResult.get('ts'),
       channel
-    }) as MessageReactionsResult
+    })) as MessageReactionsResult
     if (!response.ok) {
       throw new Error('Something went wrong!')
     }
@@ -100,7 +113,6 @@ export const processAttendanceForTeam = async function({ teamId, token, channel 
   }
   return
 }
-
 
 function getAttendancePostMessage({
   mainSong = 'please check schedule for details!',
