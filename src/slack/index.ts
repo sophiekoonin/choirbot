@@ -1,4 +1,3 @@
-import { addAttendancePost, processAttendance } from './attendance'
 import { testSlackIntegration } from './test'
 import { postRehearsalMusic } from './rehearsals'
 import { handleInteractions, handleEvents } from './interactions'
@@ -8,8 +7,6 @@ import { startConfigFlow } from './config'
 import { handleSlashCommands } from './slash-commands'
 
 export {
-  addAttendancePost,
-  processAttendance,
   testSlackIntegration,
   postRehearsalMusic,
   handleEvents,

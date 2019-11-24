@@ -1,12 +1,12 @@
 import slack from 'slack'
 import Firestore from '@google-cloud/firestore'
 
-import google from '../google/google'
-import db from '../db'
+import * as google from '../google/google'
+import * as db from '../db'
 
 const { NODE_ENV } = process.env
 
-async function getAttendancePosts(team_id: string, limit: string) {
+export async function getAttendancePosts(team_id: string, limit: number) {
   const result = await db.db
     .collection(`attendance-${team_id}`)
     .orderBy('created_at', 'desc')
@@ -51,7 +51,7 @@ export const postAttendanceMessage = async ({ channel, token, teamId, date }) =>
     if (NODE_ENV === 'prod') {
       await db.setDbValue(`attendance-${teamId}`, date, {
         rehearsal_date: date,
-        created_at: Firestore.Timestamp.now()._seconds,
+        created_at: Firestore.Timestamp.now().seconds,
         ts: ts,
         channel: channel,
         attending: [],
@@ -95,7 +95,6 @@ export const processAttendanceForTeam = async function({ teamId, token, channel 
   return
 }
 
-export const getAttendancePosts = getAttendancePosts
 
 function getAttendancePostMessage({
   mainSong = 'please check schedule for details!',

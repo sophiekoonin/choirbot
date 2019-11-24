@@ -6,7 +6,7 @@ import * as db from './db'
 const { NODE_ENV } = process.env
 const config = NODE_ENV === 'dev' ? require('../config.json') : {}
 
-export const getNextMonday = function() {
+export function getNextMonday(): string {
   const today = moment().day()
   const monday = today > 1 ? 8 : 1 //set day of week according to whether today is before sunday or not - see Moment.js docs
   return moment()
@@ -14,7 +14,7 @@ export const getNextMonday = function() {
     .format('DD/MM/YYYY')
 }
 
-export const isBankHoliday = async function(date) {
+export async function isBankHoliday(date: string): Promise<boolean> {
   let allBankHols
   allBankHols = memcache.get('bank-holidays')
   if (!allBankHols) {
@@ -27,7 +27,7 @@ export const isBankHoliday = async function(date) {
   return allDates.includes(date)
 }
 
-export const getDbOrConfigValue = async function(collection, docName, key) {
+export async function getDbOrConfigValue(collection: string, docName: string, key: string): Promise<string> {
   if (NODE_ENV !== 'prod') {
     return config[docName][key]
   } else {
@@ -35,7 +35,7 @@ export const getDbOrConfigValue = async function(collection, docName, key) {
   }
 }
 
-export const getDbOrConfigValues = async function(collection, docName, keys) {
+export async function getDbOrConfigValues(collection: string, docName: string, keys: Array<string>): Promise<Array<string>> {
   if (NODE_ENV !== 'prod') {
     return keys.map(key => config[docName][key])
   } else {

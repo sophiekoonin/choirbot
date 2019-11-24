@@ -4,7 +4,7 @@ import fetch from 'node-fetch'
 import { getDbOrConfigValues } from '../utils'
 import { Actions } from './constants'
 
-export const onSlackInstall = async ({ token, userId }) => {
+export async function onSlackInstall({ token, userId }: { token: string, userId: string }): Promise<void> {
   await slack.chat.postMessage({
     token,
     channel: userId,
@@ -15,7 +15,7 @@ export const onSlackInstall = async ({ token, userId }) => {
   await configureRehearsalDay({ token, userId })
 }
 
-const configureRehearsalDay = async ({ token, userId }) =>
+async function configureRehearsalDay({ token, userId }: { token: string, userId: string }): Promise<void> {
   await slack.chat.postMessage({
     token,
     channel: userId,
@@ -24,8 +24,9 @@ const configureRehearsalDay = async ({ token, userId }) =>
     text: 'Which day do you rehearse?',
     blocks: rehearsalDayBlocks
   })
+}
 
-export const startConfigFlow = async function(teamId) {
+export async function startConfigFlow(teamId: string) {
   const [user_id, bot_access_token] = await getDbOrConfigValues(
     'teams',
     teamId,
@@ -116,7 +117,7 @@ const rehearsalDayBlocks = [
   }
 ]
 
-const yesNoRehearsalRemindersBlocks = selectedOptionText => [
+const yesNoRehearsalRemindersBlocks = (selectedOptionText: string) => [
   {
     type: 'section',
     text: {
@@ -198,13 +199,13 @@ export const respondToYesNoRehearsalReminders = ({
       "\n\nDon't have a schedule in Google Sheets? <https://docs.google.com/spreadsheets/d/1ngSxEdAuhdJTEb_pFE5nq1avNjzEjdMY8r-Z1QQL-v0/edit#gid=0|Here's the template>" +
       ' - you can go to `File > Make a copy` to get your own.'
 
-    body.text = text
+    body['text'] = text
     return postToResponseUrl(responseUrl, body)
   }
 
   const text =
     "No problem, I won't post any rehearsal reminders. You're all set! :+1:"
-  body.text = text
-  body.response_type = 'ephemeral'
+  body['text'] = text
+  body['response_type'] = 'ephemeral'
   return postToResponseUrl(responseUrl, body)
 }

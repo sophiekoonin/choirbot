@@ -1,6 +1,7 @@
+import { Request, Response } from 'express'
 import fetch from 'node-fetch'
 import querystring from 'querystring'
-import * as db from '../db'
+import {db} from '../db'
 import { onSlackInstall } from './config'
 import * as utils from '../utils'
 
@@ -9,12 +10,8 @@ import * as utils from '../utils'
 const BASE_URL =
   process.env.BASE_URL ||
   `https://${process.env.GOOGLE_CLOUD_PROJECT}.appspot.com`
-export const oauth_redirect = async function(req, res) {
-  if (req.method !== 'GET') {
-    console.error(`Got unsupported ${req.method} request. Expected GET.`)
-    return res.send(405, 'Only GET requests are accepted')
-  }
-
+  
+export const oauth_redirect = async function(req: Request, res: Response): Promise<Response> {
   if (!req.query && !req.query.code) {
     return res.status(401).send("Missing query attribute 'code'")
   }
@@ -86,5 +83,5 @@ export const oauth_redirect = async function(req, res) {
     .sendStatus(302)
 }
 
-export const oauth_success = (req, res) => res.send('Hooray! All authenticated.')
-export const oauth_error = (req, res) => res.send('Unable to authenticate :(')
+export function oauth_success(_, res: Response): Response { return res.send('Hooray! All authenticated.') }
+export function oauth_error(_, res: Response): Response { return res.send('Unable to authenticate :(') }

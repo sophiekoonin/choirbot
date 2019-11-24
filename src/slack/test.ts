@@ -1,9 +1,10 @@
+import { Request, Response } from 'express'
 import slack from 'slack'
 import * as utils from '../utils'
 
-export const testSlackIntegration = async (req, res) => {
+export async function testSlackIntegration(req: Request, res: Response): Promise<Response> {
   try {
-    const { team_id: teamId } = req.query
+    const { team_id: teamId }: { team_id: string } = req.query
     if (!teamId || teamId === '') {
       return res.sendStatus(200)
     }
