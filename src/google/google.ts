@@ -1,30 +1,31 @@
-import { google, sheets_v4, GoogleApis } from 'googleapis'
+import { google, sheets_v4 } from 'googleapis'
+import { GaxiosResponse } from 'gaxios'
 import * as utils from '../utils'
 import * as db from '../db'
-import { SongData } from './types'
+import { SongData, GoogleAuth } from './types'
 import { TeamId } from '../slack/types'
 import { Request, Response } from 'express'
 
 const sheets: sheets_v4.Sheets = google.sheets('v4')
-function getValuesAndFlatten(response: sheets_v4.Schema$ValueRange) {
+function getValuesAndFlatten(
+  response: GaxiosResponse<sheets_v4.Schema$ValueRange>
+) {
   const { values } = response.data
   return [].concat.apply([], values)
 }
 
 async function getRowNumberForDate(
-  auth: GoogleApis.AuthPlus,
+  auth: GoogleAuth,
   sheetId: string,
   dateString: string
 ) {
-  const request = {
+  const request: sheets_v4.Params$Resource$Spreadsheets$Values$Get = {
     auth,
     spreadsheetId: sheetId,
     range: 'A:A'
   }
   try {
-    const response = (await sheets.spreadsheets.values.get(
-      request
-    )) as sheets_v4.Schema$ValueRange
+    const response = await sheets.spreadsheets.values.get(request)
     const rowNumber = getValuesAndFlatten(response).indexOf(dateString) + 1
     return rowNumber > 0 ? rowNumber : 1
   } catch (err) {
@@ -34,7 +35,7 @@ async function getRowNumberForDate(
 }
 
 async function getSongDetailsFromSheet(
-  auth: GoogleApis.AuthPlus,
+  auth: GoogleAuth,
   sheetId: string,
   rowNumber: string
 ): Promise<SongData> {
@@ -102,10 +103,10 @@ export async function testGoogleIntegration(req: Request, res: Response) {
       'sheet_id'
     )
     const credentials = await getGoogleCreds()
-    const auth = (await google.auth.getClient({
+    const auth = await google.auth.getClient({
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
       credentials
-    })) as GoogleApis.AuthPlus
+    })
     const testDate = '04/02/2019'
     const rowNumber = await getRowNumberForDate(auth, sheetId, testDate)
     res.status(200).send(`Row number is ${rowNumber}`)

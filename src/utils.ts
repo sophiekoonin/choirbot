@@ -14,20 +14,37 @@ export function getNextMonday(): string {
     .format('DD/MM/YYYY')
 }
 
+interface BankHolidayEvent {
+  title: string
+  date: string
+  notes: string
+  bunting: boolean
+}
+interface BankHolidaysResponse {
+  [region: string]: {
+    events: Array<BankHolidayEvent>
+  }
+}
 export async function isBankHoliday(date: string): Promise<boolean> {
-  let allBankHols
+  let allBankHols: BankHolidaysResponse
   allBankHols = memcache.get('bank-holidays')
   if (!allBankHols) {
     const response = await fetch('https://www.gov.uk/bank-holidays.json')
     allBankHols = await response.json()
     memcache.put('bank-holidays', allBankHols)
   }
-  const { events } = allBankHols['england-and-wales']
+  const { events }: { events: Array<BankHolidayEvent> } = allBankHols[
+    'england-and-wales'
+  ]
   const allDates = events.map(evt => evt.date)
   return allDates.includes(date)
 }
 
-export async function getDbOrConfigValue(collection: string, docName: string, key: string): Promise<string> {
+export async function getDbOrConfigValue(
+  collection: string,
+  docName: string,
+  key: string
+): Promise<string> {
   if (NODE_ENV !== 'prod') {
     return config[docName][key]
   } else {
@@ -35,7 +52,11 @@ export async function getDbOrConfigValue(collection: string, docName: string, ke
   }
 }
 
-export async function getDbOrConfigValues(collection: string, docName: string, keys: Array<string>): Promise<Array<string>> {
+export async function getDbOrConfigValues(
+  collection: string,
+  docName: string,
+  keys: Array<string>
+): Promise<Array<string>> {
   if (NODE_ENV !== 'prod') {
     return keys.map(key => config[docName][key])
   } else {
