@@ -5,42 +5,56 @@ export const db = new Firestore({
   keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS
 })
 
-export const setDbValue = async (collection, docName, value) =>
+export const setDbValue = async (
+  collection: string,
+  docName: string,
+  value: FirebaseFirestore.DocumentData
+) =>
   await db
     .collection(collection)
     .doc(docName)
     .set(value)
 
-export const updateDbValue = async (collection, docName, value) =>
+export const updateDbValue = async (
+  collection: string,
+  docName: string,
+  value: FirebaseFirestore.DocumentData
+) =>
   await db
     .collection(collection)
     .doc(docName)
     .update(value)
 
-export const addDocument = async (collection, document) =>
-  await db.collection(collection).add(document)
-
-export const getDbDoc = async function(collection, docName) {
+export const getDbDoc = async function(collection: string, docName: string) {
   return await db
     .collection(collection)
     .doc(docName)
     .get()
 }
 
-export const getQueryResults = async query => {
+interface QueryResult {
+  id: string
+  [key: string]: string | number
+}
+
+export async function getQueryResults(query: FirebaseFirestore.Query) {
   const snapshot = await query.get()
-  const results = []
+  const results: QueryResult[] = []
 
   snapshot.forEach(doc => results.push({ id: doc.id, ...doc.data() }))
   return results
 }
 
-export const getDocData = async function(collection, docName) {
+export const getDocData = async function(collection: string, docName: string) {
   const doc = await getDbDoc(collection, docName)
-  return await doc.data()
+  return doc.data()
 }
 
-export const getValue = async (collection, docName, key) => {
+export const getValue = async (
+  collection: string,
+  docName: string,
+  key: string
+) => {
   const doc = await getDbDoc(collection, docName)
   if (!doc.exists) {
     throw new Error(`Value not found for ${docName}-${key}`)
@@ -49,7 +63,11 @@ export const getValue = async (collection, docName, key) => {
   }
 }
 
-export const getValues = async (collection, docName, keys) => {
+export const getValues = async (
+  collection: string,
+  docName: string,
+  keys: string[]
+) => {
   const doc = await getDbDoc(collection, docName)
   if (!doc.exists) {
     throw new Error(`Config not found for ${docName}`)
