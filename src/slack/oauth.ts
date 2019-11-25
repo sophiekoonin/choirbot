@@ -4,7 +4,9 @@ import querystring from 'querystring'
 import { db } from '../db'
 import { onSlackInstall } from './config'
 import * as utils from '../utils'
+import { OAuthResponse, OAuthError } from './types'
 
+const { SLACK_CLIENT_ID, SLACK_CLIENT_SECRET, SLACK_APP_ID } = process.env
 // With thanks to Dennis Alund https://medium.com/evenbit/building-a-slack-app-with-firebase-as-a-backend-151c1c98641d
 
 const BASE_URL =
@@ -19,16 +21,10 @@ export const oauth_redirect = async function(
     return res.status(401).send("Missing query attribute 'code'")
   }
 
-  const [id, secret, app_id] = await utils.getDbOrConfigValues(
-    'config',
-    'slack',
-    ['id', 'secret', 'app_id']
-  )
-
   const queryParams = {
     code: req.query.code,
-    client_id: id,
-    client_secret: secret,
+    client_id: SLACK_CLIENT_ID,
+    client_secret: SLACK_CLIENT_SECRET,
     redirect_uri: `${BASE_URL}/oauth_redirect`
   }
 
@@ -45,8 +41,8 @@ export const oauth_redirect = async function(
     options
   )
 
-  const responseJson = await response.json()
-  if (!responseJson.ok) {
+  const responseJson = (await response.json()) as OAuthResponse | OAuthError
+  if (response.ok != null && response.ok === false) {
     console.error('Error: ' + JSON.stringify(responseJson))
     return res.header('Location', `${BASE_URL}/oauth_error`).sendStatus(302)
   }
@@ -58,14 +54,14 @@ export const oauth_redirect = async function(
     user_id,
     access_token,
     bot
-  } = responseJson
+  } = responseJson as OAuthResponse
 
   const { bot_user_id, bot_access_token } = bot
   const { channel_id, channel } = incoming_webhook
 
   await db
     .collection('teams')
-    .doc(responseJson.team_id)
+    .doc(team_id)
     .set({
       team_name,
       user_id,
@@ -81,7 +77,7 @@ export const oauth_redirect = async function(
   return res
     .header(
       'Location',
-      `https://slack.com/app_redirect?app=${app_id}&team=${team_id}`
+      `https://slack.com/app_redirect?app=${SLACK_APP_ID}&team=${team_id}`
     )
     .sendStatus(302)
 }

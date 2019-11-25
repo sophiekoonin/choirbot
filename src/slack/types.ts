@@ -72,3 +72,24 @@ export interface SingleUserAttendance {
   name: string
   attendance: AttendanceData
 }
+
+export interface OAuthError {
+  ok: boolean
+  error: string
+}
+export interface OAuthResponse {
+  team_id: TeamId
+  team_name: string
+  user_id: UserId
+  access_token: string
+  incoming_webhook: {
+    url: string
+    channel_id: string
+    channel: string
+    configuration_url: string
+  }
+  bot: {
+    bot_user_id: UserId
+    bot_access_token: string
+  }
+}
