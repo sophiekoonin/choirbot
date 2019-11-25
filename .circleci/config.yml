@@ -13,11 +13,11 @@ jobs:
           name: Copy across app.yaml config
           command: ./app.yaml.sh > ./app.yaml
       - run:
-        name: Set up gcloud config
-        command: |
-          echo $GCLOUD_KEY | base64 --decode | gcloud auth activate-service-account --key-file=-
-          gcloud --quiet config set project ${GCLOUD_PROJECT}
-          gcloud --quiet config set compute/zone europe-west2
+          name: Set up gcloud config
+          command: |
+            echo $GCLOUD_KEY | base64 --decode | gcloud auth activate-service-account --key-file=-
+            gcloud --quiet config set project ${GCLOUD_PROJECT}
+            gcloud --quiet config set compute/zone europe-west2
       - deploy:
           name: Deploying to App Engine
           command: gcloud app deploy app.yaml cron.yaml
@@ -26,10 +26,10 @@ workflows:
   deploy:
     jobs:
       - deploy:
-        name: deploy-staging
-        filters:
-          branches:
-            only: master
+          name: deploy-staging
+          filters:
+            branches:
+              only: master
       - approve-prod-deployment:
           type: approval
           requires:
