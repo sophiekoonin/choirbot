@@ -1,8 +1,7 @@
 const Firestore = require('@google-cloud/firestore')
 
 const db = new Firestore({
-  projectId: process.env.GOOGLE_CLOUD_PROJECT,
-  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS
+  projectId: process.env.GOOGLE_CLOUD_PROJECT
 })
 
 const setDbValue = async (collection, docName, value) =>
