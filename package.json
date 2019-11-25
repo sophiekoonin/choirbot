@@ -24,7 +24,6 @@
     "googleapis": "^45.0.0",
     "moment": "^2.22.2",
     "node-fetch": "^2.6.0",
-    "slack": "^11.0.2",
     "ts-node": "8.5.2",
     "typescript": "3.7.2"
   },

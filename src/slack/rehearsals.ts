@@ -1,6 +1,6 @@
-import slack from 'slack'
 import * as google from '../google/google'
 import { SongData } from '../google/types'
+import { SlackClient } from './client'
 
 function getRehearsalMusicMessage(
   { mainSong, mainSongLink, runThrough, runThroughLink, notes }: SongData,
@@ -50,7 +50,7 @@ export async function postRehearsalMusic({
       }
     }
 
-    await slack.chat.postMessage({
+    await SlackClient.chat.postMessage({
       token,
       text,
       username: 'Schedule Bot',

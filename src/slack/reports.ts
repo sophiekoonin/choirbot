@@ -1,4 +1,3 @@
-import slack from 'slack'
 import { getAttendancePosts } from './attendance'
 import { getToken } from './auth'
 import {
@@ -35,7 +34,9 @@ async function getSlackUsers(teamId: TeamId): Promise<Array<SlackUser>> {
 
 async function getSlackUserIds(team_id: TeamId): Promise<Array<UserId>> {
   const token = await getToken(team_id)
-  const { members } = (await slack.users.list({ token })) as ListUsersResult
+  const { members } = (await SlackClient.users.list({
+    token
+  })) as ListUsersResult
   return members
     .filter(member => !member.deleted)
     .filter(member => !member.is_bot)

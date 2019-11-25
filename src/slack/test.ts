@@ -1,8 +1,11 @@
 import { Request, Response } from 'express'
-import slack from 'slack'
 import * as utils from '../utils'
+import { SlackClient } from './client'
 
-export async function testSlackIntegration(req: Request, res: Response): Promise<Response> {
+export async function testSlackIntegration(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
     const { team_id: teamId }: { team_id: string } = req.query
     if (!teamId || teamId === '') {
@@ -13,7 +16,7 @@ export async function testSlackIntegration(req: Request, res: Response): Promise
       'bot_access_token'
     ])
 
-    await slack.chat.postMessage({
+    await SlackClient.chat.postMessage({
       token,
       text: 'Test post, please ignore!',
       username: 'Attendance Bot Test',

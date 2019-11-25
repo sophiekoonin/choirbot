@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import fetch from 'node-fetch'
 import querystring from 'querystring'
-import {db} from '../db'
+import { db } from '../db'
 import { onSlackInstall } from './config'
 import * as utils from '../utils'
 
@@ -10,8 +10,11 @@ import * as utils from '../utils'
 const BASE_URL =
   process.env.BASE_URL ||
   `https://${process.env.GOOGLE_CLOUD_PROJECT}.appspot.com`
-  
-export const oauth_redirect = async function(req: Request, res: Response): Promise<Response> {
+
+export const oauth_redirect = async function(
+  req: Request,
+  res: Response
+): Promise<Response> {
   if (!req.query && !req.query.code) {
     return res.status(401).send("Missing query attribute 'code'")
   }
@@ -83,5 +86,9 @@ export const oauth_redirect = async function(req: Request, res: Response): Promi
     .sendStatus(302)
 }
 
-export function oauth_success(_, res: Response): Response { return res.send('Hooray! All authenticated.') }
-export function oauth_error(_, res: Response): Response { return res.send('Unable to authenticate :(') }
+export function oauth_success(_: Request, res: Response): Response {
+  return res.send('Hooray! All authenticated.')
+}
+export function oauth_error(_: Request, res: Response): Response {
+  return res.send('Unable to authenticate :(')
+}
