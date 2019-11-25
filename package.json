@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "engines": {
-    "node": "10"
+    "node": "12"
   },
   "scripts": {
     "deploy": "gcloud app deploy --quiet app.yaml cron.yaml",
