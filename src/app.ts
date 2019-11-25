@@ -18,7 +18,7 @@ app.use(bodyParser.json()) // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true }))
 
 app.get('/', (req: express.Request, res: express.Response) => {
-  res.send('Hello world! SHEbot v1.2')
+  res.send('Hello world! SHEbot v2.0')
 })
 
 app.get('/test-slack', testSlackIntegration)
