@@ -1,12 +1,20 @@
-const slack = require('slack')
-const Firestore = require('@google-cloud/firestore')
+import Firestore from '@google-cloud/firestore'
 
-const google = require('../google/google')
-const db = require('../db')
+import * as google from '../google/google'
+import * as db from '../db'
+import { SlackClient } from './client'
+import {
+  ChatPostMessageResult,
+  PostAttendanceMessageArgs,
+  MessageReactionsResult,
+  TeamId,
+  SlackAPIArgs
+} from './types'
+import { SongData } from '../google/types'
 
 const { NODE_ENV } = process.env
 
-async function getAttendancePosts(team_id, limit) {
+export async function getAttendancePosts(team_id: TeamId, limit?: number) {
   const result = await db.db
     .collection(`attendance-${team_id}`)
     .orderBy('created_at', 'desc')
@@ -20,30 +28,40 @@ async function getAttendancePosts(team_id, limit) {
   return snapshot.docs
 }
 
-exports.postAttendanceMessage = async ({ channel, token, teamId, date }) => {
+export const postAttendanceMessage = async ({
+  channel,
+  token,
+  teamId,
+  date
+}: PostAttendanceMessageArgs) => {
   const songs = await google.getNextSongs(date, teamId)
   if (songs.mainSong.toLowerCase().includes('no rehearsal')) {
     return
   }
   const text = getAttendancePostMessage(songs)
   try {
-    const { ts } = await slack.chat.postMessage({
+    const postMsgRsp = (await SlackClient.chat.postMessage({
       token,
       channel,
       as_user: false,
       username: 'Attendance Bot',
       text
-    })
+    })) as ChatPostMessageResult
 
-    await slack.reactions.add({
+    if (!postMsgRsp.ok) {
+      console.error('Unable to post attendance message', postMsgRsp.error)
+      return
+    }
+
+    await SlackClient.reactions.add({
       token,
-      timestamp: ts,
+      timestamp: postMsgRsp.ts,
       channel,
       name: 'thumbsdown'
     })
-    await slack.reactions.add({
+    await SlackClient.reactions.add({
       token,
-      timestamp: ts,
+      timestamp: postMsgRsp.ts,
       channel,
       name: 'thumbsup'
     })
@@ -51,8 +69,8 @@ exports.postAttendanceMessage = async ({ channel, token, teamId, date }) => {
     if (NODE_ENV === 'prod') {
       await db.setDbValue(`attendance-${teamId}`, date, {
         rehearsal_date: date,
-        created_at: Firestore.Timestamp.now()._seconds,
-        ts: ts,
+        created_at: Firestore.Timestamp.now().seconds,
+        ts: postMsgRsp.ts,
         channel: channel,
         attending: [],
         notAttending: []
@@ -65,16 +83,20 @@ exports.postAttendanceMessage = async ({ channel, token, teamId, date }) => {
   return
 }
 
-exports.processAttendanceForTeam = async function({ teamId, token, channel }) {
+export const processAttendanceForTeam = async function({
+  teamId,
+  token,
+  channel
+}: SlackAPIArgs) {
   const docs = await getAttendancePosts(teamId, 1)
   if (docs.length === 0) return
   const firstResult = docs[0]
   try {
-    const response = await slack.reactions.get({
+    const response = (await SlackClient.reactions.get({
       token,
       timestamp: firstResult.get('ts'),
       channel
-    })
+    })) as MessageReactionsResult
     if (!response.ok) {
       throw new Error('Something went wrong!')
     }
@@ -95,13 +117,11 @@ exports.processAttendanceForTeam = async function({ teamId, token, channel }) {
   return
 }
 
-exports.getAttendancePosts = getAttendancePosts
-
 function getAttendancePostMessage({
   mainSong = 'please check schedule for details!',
   runThrough,
   notes
-}) {
+}: SongData): string {
   return (
     ':dancing_banana: Rehearsal day! :dancing_banana: <!channel> \n' +
     `*Today's rehearsal:* ${mainSong}\n` +

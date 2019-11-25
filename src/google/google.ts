@@ -1,22 +1,27 @@
-const { google } = require('googleapis')
-const utils = require('../utils')
-const db = require('../db')
+import { google, sheets_v4 } from 'googleapis'
+import { GaxiosResponse } from 'gaxios'
+import * as utils from '../utils'
+import * as db from '../db'
+import { SongData, GoogleAuth } from './types'
+import { TeamId } from '../slack/types'
+import { Request, Response } from 'express'
 
-const sheets = google.sheets('v4')
-function getValuesAndFlatten(response) {
-  const { values } = response.data
-  return [].concat.apply([], values)
-}
+const sheets: sheets_v4.Sheets = google.sheets('v4')
 
-async function getRowNumberForDate(auth, sheetId, dateString) {
-  const request = {
+async function getRowNumberForDate(
+  auth: GoogleAuth,
+  sheetId: string,
+  dateString: string
+) {
+  const request: sheets_v4.Params$Resource$Spreadsheets$Values$Get = {
     auth,
     spreadsheetId: sheetId,
     range: 'A:A'
   }
   try {
     const response = await sheets.spreadsheets.values.get(request)
-    const rowNumber = getValuesAndFlatten(response).indexOf(dateString) + 1
+    const values = [].concat.apply([], response.data.values)
+    const rowNumber = values.indexOf(dateString) + 1
     return rowNumber > 0 ? rowNumber : 1
   } catch (err) {
     console.error(`Error getting row number: ${err}`)
@@ -24,14 +29,18 @@ async function getRowNumberForDate(auth, sheetId, dateString) {
   }
 }
 
-async function getSongDetailsFromSheet(auth, sheetId, rowNumber) {
+async function getSongDetailsFromSheet(
+  auth: GoogleAuth,
+  sheetId: string,
+  rowNumber: string
+): Promise<SongData> {
   try {
     const response = await sheets.spreadsheets.values.get({
       auth,
       spreadsheetId: sheetId,
       range: `B${rowNumber}:I${rowNumber}`
     })
-    const values = getValuesAndFlatten(response)
+    const values = [].concat.apply([], response.data.values)
     const mainSong = values[0]
     const runThrough = values[1]
     const notes = values[2]
@@ -55,7 +64,7 @@ async function getSongDetailsFromSheet(auth, sheetId, rowNumber) {
   }
 }
 
-exports.getNextSongs = async function(dateString, teamId) {
+export async function getNextSongs(dateString: string, teamId: TeamId) {
   const credentials = await getGoogleCreds()
   const auth = await google.auth.getClient({
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
@@ -70,18 +79,18 @@ exports.getNextSongs = async function(dateString, teamId) {
   return await getSongDetailsFromSheet(auth, sheetId, rowNumber)
 }
 
-exports.putGoogleCredentials = async function(req, res) {
+export async function putGoogleCredentials(req: Request, res: Response) {
   const { credentials } = req.body
   try {
     await db.updateDbValue('tokens', 'google', credentials)
     res.status(201).send('Successfully set!')
   } catch (err) {
     console.error(err)
-    res.status(500).send('Error setting google credentials', err)
+    res.status(500).send(`Error setting google credentials: ${err}`)
   }
 }
 
-exports.testGoogleIntegration = async function(req, res) {
+export async function testGoogleIntegration(req: Request, res: Response) {
   try {
     const sheetId = await utils.getDbOrConfigValue(
       'config',

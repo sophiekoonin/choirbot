@@ -1,16 +1,19 @@
-const slack = require('slack')
-const { getAttendancePosts } = require('./attendance')
-const { getToken } = require('./auth')
+import { getAttendancePosts } from './attendance'
+import { getToken } from './auth'
+import {
+  RehearsalAttendanceData,
+  UserId,
+  ListUsersResult,
+  SlackUser,
+  SingleUserAttendance,
+  TeamId,
+  AttendanceData
+} from './types'
+import { SlackClient } from './client'
 
-function flattenDeep(arr1) {
-  return arr1.reduce(
-    (acc, val) =>
-      Array.isArray(val) ? acc.concat(flattenDeep(val)) : acc.concat(val),
-    []
-  )
-}
-
-function mapAttendance(posts) {
+function mapAttendance(
+  posts: Array<FirebaseFirestore.QueryDocumentSnapshot>
+): Array<RehearsalAttendanceData> {
   return posts.map(post => ({
     attending: post.get('attending'),
     notAttending: post.get('notAttending'),
@@ -18,18 +21,22 @@ function mapAttendance(posts) {
   }))
 }
 
-async function getSlackUsers(teamId) {
+async function getSlackUsers(teamId: TeamId): Promise<Array<SlackUser>> {
   const token = await getToken(teamId)
-  const { members } = await slack.users.list({ token })
+  const { members } = (await SlackClient.users.list({
+    token
+  })) as ListUsersResult
   return members
     .filter(member => !member.deleted)
     .filter(member => !member.is_bot)
     .filter(member => member.id !== 'USLACKBOT')
 }
 
-async function getSlackUserIds(team_id) {
+async function getSlackUserIds(team_id: TeamId): Promise<Array<UserId>> {
   const token = await getToken(team_id)
-  const { members } = await slack.users.list({ token })
+  const { members } = (await SlackClient.users.list({
+    token
+  })) as ListUsersResult
   return members
     .filter(member => !member.deleted)
     .filter(member => !member.is_bot)
@@ -37,7 +44,10 @@ async function getSlackUserIds(team_id) {
     .filter(id => id !== 'USLACKBOT')
 }
 
-function getAttendanceValue(attendance, user_id) {
+function getAttendanceValue(
+  attendance: RehearsalAttendanceData,
+  user_id: UserId
+): string {
   if (attendance.attending.includes(user_id)) {
     return 'present'
   } else if (attendance.notAttending.includes(user_id)) {
@@ -46,21 +56,24 @@ function getAttendanceValue(attendance, user_id) {
   return 'unknown'
 }
 
-exports.getAttendanceReport = async function(teamId) {
+export async function getAttendanceReport(teamId: TeamId) {
   const allUsers = await getSlackUsers(teamId)
   const attendanceRecords = await getAttendancePosts(teamId, 10)
   const allAttendance = mapAttendance(attendanceRecords)
 
   const allDates = allAttendance.map(record => record.date).sort()
 
-  const usersWithAttendance = allUsers.map(user => {
-    const attendance = allAttendance.reduce((acc, curr) => {
-      acc[curr.date] = getAttendanceValue(curr, user.id)
-      return acc
-    }, {})
+  const usersWithAttendance = allUsers.map((user: SlackUser) => {
+    const attendance = allAttendance.reduce(
+      (acc: AttendanceData, curr: RehearsalAttendanceData) => {
+        acc[curr.date] = getAttendanceValue(curr, user.id)
+        return acc
+      },
+      {}
+    )
 
     return {
-      name: user.profile['real_name'],
+      name: user.real_name,
       attendance: attendance
     }
   })
@@ -75,20 +88,20 @@ exports.getAttendanceReport = async function(teamId) {
 2. Filter list of users against attending/not attending 
 3. Show who hasn't responded
  */
-exports.reportAttendance = async function(teamId) {
+export async function reportAttendance(teamId: TeamId) {
   const lastFourWeeks = await getAttendancePosts(teamId, 4)
   const allUsers = await getSlackUserIds(teamId)
   const postData = mapAttendance(lastFourWeeks)
-  const responded = flattenDeep(
-    postData.map(post => [post.attending, post.notAttending])
-  )
+  const responded = postData
+    .map(post => [post.attending, post.notAttending])
+    .flat(2)
   const notResponded = allUsers.filter(user => !responded.includes(user))
   return `*Not responded in last 4 weeks:* \n${notResponded
     .map(uid => `<@${uid}>`)
     .join('\n')}`
 }
 
-exports.getStats = async function getStats(teamId) {
+export async function getStats(teamId: TeamId) {
   const allPosts = await getAttendancePosts(teamId)
   const allUsers = await getSlackUserIds(teamId)
   const attendanceData = mapAttendance(allPosts)

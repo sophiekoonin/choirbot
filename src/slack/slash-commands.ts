@@ -1,8 +1,10 @@
-const db = require('../db')
-const { reportAttendance, getStats } = require('./reports')
-const { startConfigFlow } = require('./config')
+import * as db from '../db'
+import { reportAttendance, getStats } from './reports'
+import { startConfigFlow } from './config'
+import { Request, Response } from 'express'
+import { TeamId } from './types'
 
-exports.handleSlashCommands = async (req, res) => {
+export const handleSlashCommands = async (req: Request, res: Response) => {
   const { text, team_id: teamId } = req.body
   const textAsArray = text.split(' ')
   const command = textAsArray[0]
@@ -14,9 +16,7 @@ exports.handleSlashCommands = async (req, res) => {
     case 'sheet':
       setGoogleSheetId(teamId, textAsArray[1])
       return res.send(
-        `I've set your Google Sheets ID to \`${
-          textAsArray[1]
-        }\` - if that's not right, you can do this again to reset it.`
+        `I've set your Google Sheets ID to \`${textAsArray[1]}\` - if that's not right, you can do this again to reset it.`
       )
     case 'config':
       res.send('SHEBot Configuration')
@@ -27,16 +27,16 @@ exports.handleSlashCommands = async (req, res) => {
   }
 }
 
-async function setGoogleSheetId(teamId, sheetId) {
+async function setGoogleSheetId(teamId: TeamId, sheetId: string) {
   await db.updateDbValue('teams', teamId, { google_sheet_id: sheetId })
 }
 
-async function sendReport(res, teamId) {
+async function sendReport(res: Response, teamId: TeamId) {
   const report = await reportAttendance(teamId)
   res.send(report)
 }
 
-async function sendStats(res, teamId) {
+async function sendStats(res: Response, teamId: TeamId) {
   const statsMsg = await getStats(teamId)
   res.send(statsMsg)
 }

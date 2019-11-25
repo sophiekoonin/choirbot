@@ -1,20 +1,20 @@
-const fetch = require('node-fetch')
-const querystring = require('querystring')
-const db = require('../db')
-const { onSlackInstall } = require('./config')
-const utils = require('../utils')
+import { Request, Response } from 'express'
+import fetch from 'node-fetch'
+import querystring from 'querystring'
+import { db } from '../db'
+import { onSlackInstall } from './config'
+import * as utils from '../utils'
 
 // With thanks to Dennis Alund https://medium.com/evenbit/building-a-slack-app-with-firebase-as-a-backend-151c1c98641d
 
 const BASE_URL =
   process.env.BASE_URL ||
   `https://${process.env.GOOGLE_CLOUD_PROJECT}.appspot.com`
-exports.oauth_redirect = async function(req, res) {
-  if (req.method !== 'GET') {
-    console.error(`Got unsupported ${req.method} request. Expected GET.`)
-    return res.send(405, 'Only GET requests are accepted')
-  }
 
+export const oauth_redirect = async function(
+  req: Request,
+  res: Response
+): Promise<Response> {
   if (!req.query && !req.query.code) {
     return res.status(401).send("Missing query attribute 'code'")
   }
@@ -86,5 +86,9 @@ exports.oauth_redirect = async function(req, res) {
     .sendStatus(302)
 }
 
-exports.oauth_success = (req, res) => res.send('Hooray! All authenticated.')
-exports.oauth_error = (req, res) => res.send('Unable to authenticate :(')
+export function oauth_success(_: Request, res: Response): Response {
+  return res.send('Hooray! All authenticated.')
+}
+export function oauth_error(_: Request, res: Response): Response {
+  return res.send('Unable to authenticate :(')
+}

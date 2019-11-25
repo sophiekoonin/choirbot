@@ -1,10 +1,11 @@
-const slack = require('slack')
-const google = require('../google/google')
+import * as google from '../google/google'
+import { SongData } from '../google/types'
+import { SlackClient } from './client'
 
 function getRehearsalMusicMessage(
-  { mainSong, mainSongLink, runThrough, runThroughLink, notes },
-  dayOfWeek
-) {
+  { mainSong, mainSongLink, runThrough, runThroughLink, notes }: SongData,
+  dayOfWeek: string
+): string {
   return `<!channel> Here's the plan for ${dayOfWeek}'s rehearsal! \n
   ${notes && notes !== '' ? `${notes}\n` : ''}
   We'll be doing ${mainSong} - ${mainSongLink ||
@@ -15,14 +16,21 @@ function getRehearsalMusicMessage(
   Please give the recordings a listen! :sparkles:`
 }
 
-exports.postRehearsalMusic = async function({
+export async function postRehearsalMusic({
   channel,
   teamId,
   token,
   dayOfWeek,
   date,
   isBankHoliday
-}) {
+}: {
+  channel: string
+  teamId: string
+  token: string
+  dayOfWeek: string
+  date: string
+  isBankHoliday: boolean
+}): Promise<void> {
   try {
     let text
     if (isBankHoliday) {
@@ -42,7 +50,7 @@ exports.postRehearsalMusic = async function({
       }
     }
 
-    await slack.chat.postMessage({
+    await SlackClient.chat.postMessage({
       token,
       text,
       username: 'Schedule Bot',

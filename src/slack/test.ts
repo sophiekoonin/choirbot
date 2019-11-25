@@ -1,9 +1,13 @@
-const slack = require('slack')
-const utils = require('../utils')
+import { Request, Response } from 'express'
+import * as utils from '../utils'
+import { SlackClient } from './client'
 
-exports.testSlackIntegration = async (req, res) => {
+export async function testSlackIntegration(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
-    const { team_id: teamId } = req.query
+    const { team_id: teamId }: { team_id: string } = req.query
     if (!teamId || teamId === '') {
       return res.sendStatus(200)
     }
@@ -12,7 +16,7 @@ exports.testSlackIntegration = async (req, res) => {
       'bot_access_token'
     ])
 
-    await slack.chat.postMessage({
+    await SlackClient.chat.postMessage({
       token,
       text: 'Test post, please ignore!',
       username: 'Attendance Bot Test',
