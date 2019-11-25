@@ -1,6 +1,6 @@
 import { Firestore } from '@google-cloud/firestore'
 
-const db = new Firestore({
+export const db = new Firestore({
   projectId: process.env.GOOGLE_CLOUD_PROJECT
 })
 
