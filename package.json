@@ -8,8 +8,9 @@
   },
   "scripts": {
     "deploy": "gcloud app deploy --quiet app.yaml cron.yaml",
-    "start": "NODE_ENV=prod ts-node src/app.ts",
-    "dev": "NODE_ENV=dev nodemon ts-node src/app.ts",
+    "gcp-build": "tsc -p .",
+    "start": "NODE_ENV=prod node src/app.js",
+    "dev": "tsc -p . && NODE_ENV=dev nodemon src/app.js",
     "test": "jest"
   },
   "author": "",
@@ -24,7 +25,6 @@
     "googleapis": "^45.0.0",
     "moment": "^2.22.2",
     "node-fetch": "^2.6.0",
-    "ts-node": "8.5.2",
     "typescript": "3.7.2"
   },
   "devDependencies": {
