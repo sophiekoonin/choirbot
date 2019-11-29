@@ -1,13 +1,6 @@
 import moment from 'moment'
-import * as db from './db'
-import {
-  BankHolidayCache,
-  BankHolidaysResponse,
-  BankHolidayEvent
-} from './DataCache'
+import { BankHolidayCache, BankHolidayEvent } from './DataCache'
 
-const { NODE_ENV } = process.env
-const config = NODE_ENV === 'dev' ? require('../config.json') : {}
 const BankHolCache = new BankHolidayCache(43830) // 1 month
 export function getNextMonday(): string {
   const today = moment().day()
@@ -24,28 +17,4 @@ export async function isBankHoliday(date: string): Promise<boolean> {
   ]
   const allDates = events.map(evt => evt.date)
   return allDates.includes(date)
-}
-
-export async function getDbOrConfigValue(
-  collection: string,
-  docName: string,
-  key: string
-): Promise<string> {
-  if (NODE_ENV !== 'prod') {
-    return config[docName][key]
-  } else {
-    return await db.getValue(collection, docName, key)
-  }
-}
-
-export async function getDbOrConfigValues(
-  collection: string,
-  docName: string,
-  keys: Array<string>
-): Promise<Array<string>> {
-  if (NODE_ENV !== 'prod') {
-    return keys.map(key => config[docName][key])
-  } else {
-    return await db.getValues(collection, docName, keys)
-  }
 }

@@ -1,9 +1,10 @@
 import fetch from 'node-fetch'
-import { getDbOrConfigValues } from '../utils'
+import { SectionBlock, ActionsBlock } from '@slack/types'
+
 import { Actions } from './constants'
 import { SlackClient } from './client'
-import { SectionBlock, ActionsBlock } from '@slack/types'
 import { ActionResponseBody } from './types'
+import { getValues } from '../db'
 
 export async function onSlackInstall({
   token,
@@ -40,11 +41,10 @@ async function configureRehearsalDay({
 }
 
 export async function startConfigFlow(teamId: string) {
-  const [user_id, bot_access_token] = await getDbOrConfigValues(
-    'teams',
-    teamId,
-    ['user_id', 'bot_access_token']
-  )
+  const [user_id, bot_access_token] = await getValues('teams', teamId, [
+    'user_id',
+    'bot_access_token'
+  ])
   configureRehearsalDay({
     token: bot_access_token,
     userId: user_id

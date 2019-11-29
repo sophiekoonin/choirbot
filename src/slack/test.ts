@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import * as utils from '../utils'
 import { SlackClient } from './client'
+import { getValues } from '../db'
 
 export async function testSlackIntegration(
   req: Request,
@@ -11,7 +11,7 @@ export async function testSlackIntegration(
     if (!teamId || teamId === '') {
       return res.sendStatus(200)
     }
-    const [userId, token] = await utils.getDbOrConfigValues('teams', teamId, [
+    const [userId, token] = await getValues('teams', teamId, [
       'user_id',
       'bot_access_token'
     ])

@@ -3,7 +3,6 @@ import fetch from 'node-fetch'
 import querystring from 'querystring'
 import { db } from '../db'
 import { onSlackInstall } from './config'
-import * as utils from '../utils'
 import { OAuthResponse, OAuthError } from './types'
 
 const { SLACK_CLIENT_ID, SLACK_CLIENT_SECRET, SLACK_APP_ID } = process.env
@@ -20,7 +19,6 @@ export const oauth_redirect = async function(
   if (!req.query && !req.query.code) {
     return res.status(401).send("Missing query attribute 'code'")
   }
-
   const queryParams = {
     code: req.query.code,
     client_id: SLACK_CLIENT_ID,
@@ -71,7 +69,6 @@ export const oauth_redirect = async function(
       bot_access_token,
       token: access_token
     })
-
   onSlackInstall({ token: bot_access_token, userId: user_id })
 
   return res

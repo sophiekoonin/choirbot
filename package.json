@@ -10,7 +10,7 @@
     "deploy": "gcloud app deploy --quiet app.yaml cron.yaml",
     "gcp-build": "tsc -p .",
     "start": "NODE_ENV=prod node dist/app.js",
-    "dev": "NODE_ENV=dev nodemon node-ts app.ts",
+    "dev": "NODE_ENV=dev ts-node -r dotenv/config src/app.ts",
     "test": "jest"
   },
   "author": "",
@@ -20,6 +20,7 @@
     "@slack/interactive-messages": "1.4.0",
     "@slack/web-api": "5.6.0",
     "@types/express": "4.17.2",
+    "dotenv": "8.2.0",
     "express": "^4.17.1",
     "google-auth-library": "^5.5.1",
     "googleapis": "^45.0.0",

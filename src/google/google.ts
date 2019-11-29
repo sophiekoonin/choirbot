@@ -1,6 +1,4 @@
 import { google, sheets_v4 } from 'googleapis'
-import { GaxiosResponse } from 'gaxios'
-import * as utils from '../utils'
 import * as db from '../db'
 import { SongData, GoogleAuth } from './types'
 import { TeamId } from '../slack/types'
@@ -70,11 +68,7 @@ export async function getNextSongs(dateString: string, teamId: TeamId) {
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     credentials
   })
-  const sheetId = await utils.getDbOrConfigValue(
-    'teams',
-    teamId,
-    'google_sheet_id'
-  )
+  const sheetId = await db.getValue('teams', teamId, 'google_sheet_id')
   const rowNumber = await getRowNumberForDate(auth, sheetId, dateString)
   return await getSongDetailsFromSheet(auth, sheetId, rowNumber)
 }
@@ -92,11 +86,7 @@ export async function putGoogleCredentials(req: Request, res: Response) {
 
 export async function testGoogleIntegration(req: Request, res: Response) {
   try {
-    const sheetId = await utils.getDbOrConfigValue(
-      'config',
-      'google',
-      'sheet_id'
-    )
+    const sheetId = await db.getValue('config', 'google', 'sheet_id')
     const credentials = await getGoogleCreds()
     const auth = await google.auth.getClient({
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
@@ -113,11 +103,7 @@ export async function testGoogleIntegration(req: Request, res: Response) {
 
 async function getGoogleCreds() {
   const credentials = await db.getDocData('tokens', 'google')
-  const privateKey = await utils.getDbOrConfigValue(
-    'tokens',
-    'google',
-    'private_key'
-  )
+  const privateKey = await db.getValue('tokens', 'google', 'private_key')
   return {
     ...credentials,
     private_key: privateKey.replace(/\\n/g, '\n')
