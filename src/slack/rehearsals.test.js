@@ -1,4 +1,4 @@
-import { getAttendancePostMessage, getRehearsalMusicMessage } from './utils'
+import { getAttendancePostMessage, getRehearsalMusicMessage } from '../utils'
 
 describe('utils', () => {
   describe('getAttendancePostMessage', () => {

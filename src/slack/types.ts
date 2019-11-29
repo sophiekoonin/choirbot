@@ -77,7 +77,7 @@ export interface OAuthError {
   ok: boolean
   error: string
 }
-export interface OAuthResponse {
+export interface OAuthResponse extends WebAPICallResult {
   team_id: TeamId
   team_name: string
   user_id: UserId

@@ -1,9 +1,11 @@
 import { Request, Response } from 'express'
 import fetch from 'node-fetch'
 import querystring from 'querystring'
+
 import { db } from '../db'
 import { onSlackInstall } from './config'
 import { OAuthResponse, OAuthError } from './types'
+import { SlackClient } from './client'
 
 const { SLACK_CLIENT_ID, SLACK_CLIENT_SECRET, SLACK_APP_ID } = process.env
 // With thanks to Dennis Alund https://medium.com/evenbit/building-a-slack-app-with-firebase-as-a-backend-151c1c98641d
@@ -19,29 +21,15 @@ export const oauth_redirect = async function(
   if (!req.query && !req.query.code) {
     return res.status(401).send("Missing query attribute 'code'")
   }
-  const queryParams = {
-    code: req.query.code,
+
+  const result = await SlackClient.oauth.access({
     client_id: SLACK_CLIENT_ID,
     client_secret: SLACK_CLIENT_SECRET,
-    redirect_uri: `${BASE_URL}/oauth_redirect`
-  }
+    code: req.query.code
+  })
 
-  const encodedQueryString = querystring.stringify(queryParams)
-  const options = {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json; charset=utf8'
-    }
-  }
-
-  const response = await fetch(
-    `https://slack.com/api/oauth.access?${encodedQueryString}`,
-    options
-  )
-
-  const responseJson = (await response.json()) as OAuthResponse | OAuthError
-  if (response.ok != null && response.ok === false) {
-    console.error('Error: ' + JSON.stringify(responseJson))
+  if (result.ok != null && result.ok === false) {
+    console.error('Error getting OAuth access token: ' + result.error)
     return res.header('Location', `${BASE_URL}/oauth_error`).sendStatus(302)
   }
 
@@ -52,7 +40,7 @@ export const oauth_redirect = async function(
     user_id,
     access_token,
     bot
-  } = responseJson as OAuthResponse
+  } = result as OAuthResponse
 
   const { bot_user_id, bot_access_token } = bot
   const { channel_id, channel } = incoming_webhook
