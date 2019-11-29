@@ -1,5 +1,5 @@
-import { Request } from 'express'
+import { Request as ExpressReq } from 'express'
 
-export interface Request extends Request {
+export interface Request extends ExpressReq {
   text: string
 }
