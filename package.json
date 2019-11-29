@@ -20,12 +20,14 @@
     "@slack/interactive-messages": "1.4.0",
     "@slack/web-api": "5.6.0",
     "@types/express": "4.17.2",
+    "@types/tsscmp": "1.0.0",
     "dotenv": "8.2.0",
     "express": "^4.17.1",
     "google-auth-library": "^5.5.1",
     "googleapis": "^45.0.0",
     "moment": "^2.22.2",
     "node-fetch": "^2.6.0",
+    "tsscmp": "1.0.6",
     "typescript": "3.7.2"
   },
   "devDependencies": {

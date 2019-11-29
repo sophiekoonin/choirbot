@@ -5,6 +5,7 @@ import { oauth_redirect, oauth_error, oauth_success } from './oauth'
 import { getAttendanceReport } from './reports'
 import { startConfigFlow } from './config'
 import { handleSlashCommands } from './slash-commands'
+import { verifyRequestSignature } from './auth'
 
 export {
   testSlackIntegration,
@@ -15,5 +16,6 @@ export {
   oauth_success,
   getAttendanceReport,
   startConfigFlow,
-  handleSlashCommands
+  handleSlashCommands,
+  verifyRequestSignature
 }

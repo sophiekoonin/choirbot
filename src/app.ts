@@ -1,5 +1,8 @@
-import express from 'express'
+import express, { Response, NextFunction } from 'express'
+// @ts-ignore
+import contentType from 'content-type'
 import bodyParser from 'body-parser'
+import getRawBody from 'raw-body'
 
 import {
   testSlackIntegration,
@@ -7,29 +10,38 @@ import {
   oauth_redirect,
   oauth_error,
   oauth_success,
-  handleSlashCommands
+  handleSlashCommands,
+  verifyRequestSignature
 } from './slack'
 
-import { testGoogleIntegration, putGoogleCredentials } from './google/google'
+import { testGoogleIntegration } from './google/google'
 import { checkForJobsToday, processAttendance } from './cron'
+import { Request } from './types'
 
 let app: express.Application = express()
-app.use(bodyParser.json()) // for parsing application/json
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+    verify: function(req: Request, _: Response, buf: Buffer) {
+      // get text body and add it as a field for signature verification
+      req.text = buf.toString()
+    }
+  })
+)
 
 app.get('/', (req: express.Request, res: express.Response) => {
-  res.send('Hello world! SHEbot v2.0')
+  res.send('Hello world! SHEbot v2.1')
 })
 
 app.get('/test-slack', testSlackIntegration)
 app.get('/test-google', testGoogleIntegration)
-app.put('/google-creds', putGoogleCredentials)
-app.post('/interactions', handleInteractions)
+app.post('/interactions', verifyRequestSignature, handleInteractions)
 app.get('/process-attendance', processAttendance)
-app.get('/oauth_redirect', oauth_redirect)
+app.get('/oauth_redirect', verifyRequestSignature, oauth_redirect)
 app.get('/oauth_success', oauth_success)
 app.get('/oauth_error', oauth_error)
-app.post('/slash-commands', handleSlashCommands)
+app.post('/slash-commands', verifyRequestSignature, handleSlashCommands)
 app.get('/cron', checkForJobsToday)
 
 const PORT: number = parseInt(process.env.PORT) || 6060

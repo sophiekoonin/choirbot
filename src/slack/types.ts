@@ -1,9 +1,14 @@
 import { WebAPICallResult, Block } from '@slack/web-api'
+import { IncomingHttpHeaders } from 'http'
 
 export interface SlackAPIArgs {
   channel: string
   token: string
   teamId: string
+}
+export interface VerificationHeaders extends IncomingHttpHeaders {
+  'x-slack-signature': string
+  'x-slack-request-timestamp': string
 }
 
 export interface PostAttendanceMessageArgs extends SlackAPIArgs {
