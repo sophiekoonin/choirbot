@@ -18,10 +18,13 @@ Slack permissions needed:
 
 ## TODO
 
-[] verify signing signature
-[] set up CI
+[x] verify signing signature
+[x] set up CI
 [] allow messages to be customised
-[] schedule template spreadsheet
+[x] schedule template spreadsheet
+[] get tests working with typescript
+[] better report info
+[] pubsub
 
 ## To test
 
