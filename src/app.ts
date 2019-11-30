@@ -34,8 +34,6 @@ app.get('/', (req: express.Request, res: express.Response) => {
   res.send('Hello world! SHEbot v2.1')
 })
 
-app.get('/test-slack', testSlackIntegration)
-app.get('/test-google', testGoogleIntegration)
 app.post('/interactions', verifyRequestSignature, handleInteractions)
 app.get('/process-attendance', processAttendance)
 app.get('/oauth_redirect', verifyRequestSignature, oauth_redirect)

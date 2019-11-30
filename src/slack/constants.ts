@@ -1,6 +1,7 @@
 export const Actions = {
   SELECT_REHEARSAL_DAY: 'rehearsal_day',
   YES_NO_REMINDERS: 'rehearsal_reminders',
+  POST_CANCEL: 'post_cancel',
   EMOJI: 'emoji'
 }
 

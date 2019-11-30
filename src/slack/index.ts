@@ -1,6 +1,6 @@
 import { testSlackIntegration } from './test'
 import { postRehearsalMusic } from './rehearsals'
-import { handleInteractions } from './interactions'
+import { handleInteractions } from './interactions/interactions'
 import { oauth_redirect, oauth_error, oauth_success } from './oauth'
 import { getAttendanceReport } from './reports'
 import { startConfigFlow } from './config'

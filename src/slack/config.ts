@@ -1,7 +1,7 @@
-import fetch from 'node-fetch'
 import { SectionBlock, ActionsBlock } from '@slack/types'
 
 import { Actions } from './constants'
+import { postToResponseUrl } from './interactions/interactions'
 import { SlackClient } from './client'
 import { ActionResponseBody } from './types'
 import { getValues } from '../db'
@@ -172,25 +172,6 @@ function yesNoRehearsalRemindersBlocks(
       ]
     }
   ]
-}
-
-async function postToResponseUrl(
-  responseUrl: string,
-  body: ActionResponseBody
-) {
-  const options = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json; charset=utf8'
-    },
-    body: JSON.stringify(body)
-  }
-
-  const res = await fetch(responseUrl, options)
-  const resJson = await res.json()
-  if (!resJson.ok) {
-    console.error('error', { resJson })
-  }
 }
 
 export const respondToRehearsalDaySelected = async ({
