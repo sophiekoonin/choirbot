@@ -15,6 +15,11 @@ export const checkForJobsToday = async (req: Request, res: Response) => {
   }
   const date = moment()
 
+  // Process attendance on Sundays
+  if (date.day() === 0) {
+    await processAttendance()
+  }
+
   await checkForAttendancePostJobs(date)
   await checkForRehearsalReminderJobs(date)
 
@@ -73,7 +78,7 @@ async function checkForRehearsalReminderJobs(date: moment.Moment) {
   return
 }
 
-export const processAttendance = async (req: Request, res: Response) => {
+export const processAttendance = async () => {
   const allTeams = await getQueryResults(await db.collection('teams'))
 
   allTeams.forEach(async team => {
@@ -84,6 +89,4 @@ export const processAttendance = async (req: Request, res: Response) => {
       teamId: id
     })
   })
-
-  return res.sendStatus(200)
 }
