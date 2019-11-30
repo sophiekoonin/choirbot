@@ -1,8 +1,9 @@
 import { google, sheets_v4 } from 'googleapis'
+import { Request, Response } from 'express'
+
 import * as db from '../db'
 import { SongData, GoogleAuth } from './types'
 import { TeamId } from '../slack/types'
-import { Request, Response } from 'express'
 
 const sheets: sheets_v4.Sheets = google.sheets('v4')
 
@@ -63,10 +64,9 @@ async function getSongDetailsFromSheet(
 }
 
 export async function getNextSongs(dateString: string, teamId: TeamId) {
-  const credentials = await getGoogleCreds()
   const auth = await google.auth.getClient({
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-    credentials
+    keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS
   })
   const sheetId = await db.getValue('teams', teamId, 'google_sheet_id')
   const rowNumber = await getRowNumberForDate(auth, sheetId, dateString)
@@ -86,26 +86,16 @@ export async function putGoogleCredentials(req: Request, res: Response) {
 
 export async function testGoogleIntegration(req: Request, res: Response) {
   try {
-    const sheetId = await db.getValue('config', 'google', 'sheet_id')
-    const credentials = await getGoogleCreds()
+    const sheetId = process.env.TEST_SHEET_ID
     const auth = await google.auth.getClient({
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-      credentials
+      keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS
     })
-    const testDate = '04/02/2019'
+    const testDate = '18/03/2019'
     const rowNumber = await getRowNumberForDate(auth, sheetId, testDate)
     res.status(200).send(`Row number is ${rowNumber}`)
   } catch (err) {
     console.error(err)
     res.status(500).send(err)
-  }
-}
-
-async function getGoogleCreds() {
-  const credentials = await db.getDocData('tokens', 'google')
-  const privateKey = await db.getValue('tokens', 'google', 'private_key')
-  return {
-    ...credentials,
-    private_key: privateKey.replace(/\\n/g, '\n')
   }
 }
