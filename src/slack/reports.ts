@@ -5,7 +5,6 @@ import {
   UserId,
   ListUsersResult,
   SlackUser,
-  SingleUserAttendance,
   TeamId,
   AttendanceData
 } from './types'

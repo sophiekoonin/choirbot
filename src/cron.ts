@@ -79,7 +79,7 @@ async function checkForRehearsalReminderJobs(date: moment.Moment) {
 }
 
 export const processAttendance = async () => {
-  const allTeams = await getQueryResults(await db.collection('teams'))
+  const allTeams = await getQueryResults(db.collection('teams'))
 
   allTeams.forEach(async team => {
     const { id, bot_access_token: token, channel_id: channel } = team

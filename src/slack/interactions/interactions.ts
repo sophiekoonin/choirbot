@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import moment from 'moment'
+import fetch from 'node-fetch'
 
 import * as db from '../../db'
 import {
@@ -9,7 +10,6 @@ import {
 import { Actions, ActionTypes } from '../constants'
 import { ActionResponseBody, TeamId } from '../types'
 import { postAttendanceMessage } from '../attendance'
-import fetch from 'node-fetch'
 import { postRehearsalMusic } from '..'
 
 export async function handleInteractions(

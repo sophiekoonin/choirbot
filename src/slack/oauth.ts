@@ -1,10 +1,8 @@
 import { Request, Response } from 'express'
-import fetch from 'node-fetch'
-import querystring from 'querystring'
 
 import { db } from '../db'
 import { onSlackInstall } from './config'
-import { OAuthResponse, OAuthError } from './types'
+import { OAuthResponse } from './types'
 import { SlackClient } from './client'
 
 const { SLACK_CLIENT_ID, SLACK_CLIENT_SECRET, SLACK_APP_ID } = process.env

@@ -5,7 +5,6 @@ import { getValue } from '../db'
 import { VerificationHeaders } from './types'
 import { Response, NextFunction } from 'express'
 import { Request } from '../types'
-import { ConsoleLogger } from '@slack/logger'
 
 export async function getToken(team_id: string) {
   return await getValue('teams', team_id, 'token')

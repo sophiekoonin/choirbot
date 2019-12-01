@@ -1,11 +1,7 @@
-import express, { Response, NextFunction } from 'express'
-// @ts-ignore
-import contentType from 'content-type'
+import express, { Response } from 'express'
 import bodyParser from 'body-parser'
-import getRawBody from 'raw-body'
 
 import {
-  testSlackIntegration,
   handleInteractions,
   oauth_redirect,
   oauth_error,
@@ -14,8 +10,7 @@ import {
   verifyRequestSignature
 } from './slack'
 
-import { testGoogleIntegration } from './google/google'
-import { checkForJobsToday, processAttendance } from './cron'
+import { checkForJobsToday } from './cron'
 import { Request } from './types'
 
 let app: express.Application = express()
@@ -35,7 +30,6 @@ app.get('/', (req: express.Request, res: express.Response) => {
 })
 
 app.post('/interactions', verifyRequestSignature, handleInteractions)
-app.get('/process-attendance', processAttendance)
 app.get('/oauth_redirect', verifyRequestSignature, oauth_redirect)
 app.get('/oauth_success', oauth_success)
 app.get('/oauth_error', oauth_error)
