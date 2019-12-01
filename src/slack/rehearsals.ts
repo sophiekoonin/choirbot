@@ -37,9 +37,9 @@ export async function postRehearsalMusic({
       text = `<!channel> It's a bank holiday next ${dayOfWeek}, so no rehearsal! Have a lovely day off!`
     } else {
       const nextWeekSongs = await google.getNextSongs(date, teamId)
-      if (!nextWeekSongs || !nextWeekSongs.mainSong) {
+      if (nextWeekSongs == null || !nextWeekSongs.mainSong) {
         throw new Error(
-          `Couldn't fetch next week's songs! Next week's songs were missing`
+          `Couldn't fetch songs for rehearsal reminder, check the schedule has the correct date`
         )
       } else if (
         nextWeekSongs.mainSong.toLowerCase().includes('no rehearsal')
@@ -59,5 +59,6 @@ export async function postRehearsalMusic({
     })
   } catch (err) {
     console.error(teamId, err)
+    return
   }
 }

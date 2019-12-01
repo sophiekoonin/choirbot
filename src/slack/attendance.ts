@@ -35,7 +35,7 @@ export const postAttendanceMessage = async ({
   date
 }: PostAttendanceMessageArgs) => {
   const songs = await google.getNextSongs(date, teamId)
-  if (songs.mainSong.toLowerCase().includes('no rehearsal')) {
+  if (songs != null && songs.mainSong.toLowerCase().includes('no rehearsal')) {
     return
   }
   const text = getAttendancePostMessage(songs)
@@ -117,24 +117,23 @@ export const processAttendanceForTeam = async function({
   return
 }
 
-function getAttendancePostMessage({
-  mainSong = 'please check schedule for details!',
-  runThrough,
-  notes
-}: SongData): string {
-  return (
-    ':dancing_banana: Rehearsal day! :dancing_banana: <!channel> \n' +
-    `*Today's rehearsal:* ${mainSong}\n` +
-    ` ${runThrough ? `*Run through:* ${runThrough}\n\n` : ''}` +
-    ` ${
-      notes.toLowerCase().includes('team updates')
-        ? '*Team updates meeting at 6:30! All welcome* :tada:\n'
-        : ''
-    }` +
-    'Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup: ' +
-    '(present) or :thumbsdown: (absent).\n' +
-    'Facilitator please respond with :raised_hands:!\n' +
-    'To volunteer for Physical warm up, respond with :muscle: ' +
-    'For Musical warm up, respond with :musical_note:.'
-  )
+function getAttendancePostMessage(songData: SongData): string {
+  const { mainSong, runThrough, notes } = songData
+  return `:dancing_banana: Rehearsal day! :dancing_banana: <!channel> \n
+  ${
+    songData != null
+      ? `*Today's rehearsal:* ${mainSong}\n
+  ${runThrough ? `*Run through:* ${runThrough}\n\n` : ''} 
+  ${
+    notes.toLowerCase().includes('team updates')
+      ? '*Team updates meeting at 6:30! All welcome* :tada:\n'
+      : ''
+  }`
+      : null
+  }
+    Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup:
+    (present) or :thumbsdown: (absent).\n
+    Facilitator please respond with :raised_hands:!\n
+    To volunteer for Physical warm up, respond with :muscle:
+    For Musical warm up, respond with :musical_note:.`
 }

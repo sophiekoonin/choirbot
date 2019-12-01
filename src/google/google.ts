@@ -63,14 +63,19 @@ async function getSongDetailsFromSheet(
   }
 }
 
-export async function getNextSongs(dateString: string, teamId: TeamId) {
+export async function getNextSongs(
+  dateString: string,
+  teamId: TeamId
+): Promise<SongData | null> {
   const auth = await google.auth.getClient({
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS
   })
   const sheetId = await db.getValue('teams', teamId, 'google_sheet_id')
   const rowNumber = await getRowNumberForDate(auth, sheetId, dateString)
-  return await getSongDetailsFromSheet(auth, sheetId, rowNumber)
+  return rowNumber > 1
+    ? await getSongDetailsFromSheet(auth, sheetId, rowNumber)
+    : null
 }
 
 export async function putGoogleCredentials(req: Request, res: Response) {
