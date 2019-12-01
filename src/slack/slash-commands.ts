@@ -15,6 +15,8 @@ export const handleSlashCommands = async (req: Request, res: Response) => {
   const textAsArray = text.split(' ')
   const command = textAsArray[0]
   switch (command) {
+    case 'help':
+      return await sendHelp(res)
     case 'report':
       return await sendReport(res, teamId)
     case 'stats':
@@ -31,8 +33,23 @@ export const handleSlashCommands = async (req: Request, res: Response) => {
     case 'post':
       return await triggerRehearsalPost(res, teamId)
     default:
-      return res.send("Sorry, I didn't understand that!")
+      return res.send(
+        "Sorry, I didn't understand that! Type `/shebot help` for a list of available commands."
+      )
   }
+}
+
+async function sendHelp(res: Response) {
+  const msg = `
+  *SHEBot Slash Commands*\n
+  Type \`/shebot\` followed by one of these commands.\n\n
+  \`config\` - configure rehearsal day and rehearsal reminders\n
+  \`post\` - manual failsafe to post attendance/rehearsal reminder messages\n
+  \`report\` - see who hasn't responded to the bot for a while
+  \`sheet <sheet ID>\` - set the Google Sheets ID for your schedule spreadsheet\n
+  \`stats\` - see attendance statistics
+  `
+  res.send(msg)
 }
 
 async function setGoogleSheetId(teamId: TeamId, sheetId: string) {
