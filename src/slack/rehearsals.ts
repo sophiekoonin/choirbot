@@ -1,6 +1,7 @@
 import * as google from '../google/google'
 import { SongData } from '../google/types'
 import { SlackClient } from './client'
+import { getValue } from '../db'
 
 function getRehearsalMusicMessage(
   { mainSong, mainSongLink, runThrough, runThroughLink, notes }: SongData,
@@ -33,14 +34,16 @@ export async function postRehearsalMusic({
 }): Promise<void> {
   try {
     let text
+    let destination = channel
+    let as_user = false
     if (isBankHoliday) {
       text = `<!channel> It's a bank holiday next ${dayOfWeek}, so no rehearsal! Have a lovely day off!`
     } else {
       const nextWeekSongs = await google.getNextSongs(date, teamId)
       if (nextWeekSongs == null || !nextWeekSongs.mainSong) {
-        throw new Error(
-          `Couldn't fetch songs for rehearsal reminder, check the schedule has the correct date`
-        )
+        text = `I tried to post a rehearsal reminder, but I couldn't find a row for ${date} in the schedule. Please make sure the dates are correct!`
+        as_user = true
+        destination = await getValue('teams', teamId, 'user_id')
       } else if (
         nextWeekSongs.mainSong.toLowerCase().includes('no rehearsal')
       ) {
@@ -54,8 +57,8 @@ export async function postRehearsalMusic({
       token,
       text,
       username: 'Schedule Bot',
-      as_user: false,
-      channel
+      as_user,
+      channel: destination
     })
   } catch (err) {
     console.error(teamId, err)

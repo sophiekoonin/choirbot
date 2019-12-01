@@ -66,7 +66,7 @@ async function triggerRehearsalPost(res: Response, teamId: TeamId) {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: 'Are you sure you want to trigger a rehearsal post?'
+          text: 'What kind of message do you want me to post?'
         }
       },
       {

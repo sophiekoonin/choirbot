@@ -51,7 +51,7 @@ async function checkForAttendancePostJobs(date: moment.Moment) {
 async function checkForRehearsalReminderJobs(date: moment.Moment) {
   const rehearsalDay = date.add(4, 'days')
   const rehearsalDayNumber = rehearsalDay.day().toString()
-  const dateString = rehearsalDay.format('DD/MM/YY')
+  const dateString = rehearsalDay.format('DD/MM/YYYY')
   const isBankHoliday = await utils.isBankHoliday(
     rehearsalDay.format('YYYY-MM-DD')
   )

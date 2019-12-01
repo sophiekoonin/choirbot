@@ -122,7 +122,7 @@ export async function respondToManualPostOrCancel({
         channel,
         teamId,
         dayOfWeek: date.format('dddd'),
-        date: date.format('DD/MM/YY'),
+        date: date.format('DD/MM/YYYY'),
         isBankHoliday: false
       })
     default:
