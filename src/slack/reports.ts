@@ -91,11 +91,17 @@ export async function reportAttendance(teamId: TeamId) {
   const lastFourWeeks = await getAttendancePosts(teamId, 4)
   const allUsers = await getSlackUserIds(teamId)
   const postData = mapAttendance(lastFourWeeks)
+  const lastFourWeeksAttending = postData.map(
+    post =>
+      `${post.date}: :+1: ${post.attending.length} :-1: ${post.notAttending.length}`
+  )
   const responded = postData
     .map(post => [post.attending, post.notAttending])
     .flat(2)
   const notResponded = allUsers.filter(user => !responded.includes(user))
-  return `*Not responded in last 4 weeks:* \n${notResponded
+  return `*Responses for last 4 rehearsals:*\n
+  ${lastFourWeeksAttending.join('\n')}\n
+  *Not responded in last 4 weeks:* \n${notResponded
     .map(uid => `<@${uid}>`)
     .join('\n')}`
 }

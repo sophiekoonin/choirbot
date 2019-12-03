@@ -40,10 +40,10 @@ export interface SlackUser {
 export interface ListUsersResult extends WebAPICallResult {
   members: Array<SlackUser>
 }
-interface ReactionResult {
+export interface ReactionResult {
   count: number
   name: string
-  users: Array<string>
+  users: Array<UserId>
 }
 export interface MessageReactionsResult extends WebAPICallResult {
   message: {

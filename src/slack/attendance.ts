@@ -8,12 +8,25 @@ import {
   PostAttendanceMessageArgs,
   MessageReactionsResult,
   TeamId,
-  SlackAPIArgs
+  SlackAPIArgs,
+  UserId,
+  ReactionResult
 } from './types'
 import { SongData } from '../google/types'
 
-const { NODE_ENV } = process.env
-
+function getUserReactionsForEmoji({
+  reactions,
+  emoji,
+  botId
+}: {
+  reactions: ReactionResult[]
+  emoji: string
+  botId: UserId
+}): UserId[] {
+  return (reactions.find(group => group.name === emoji)['users'] || []).filter(
+    user => user !== botId
+  )
+}
 export async function getAttendancePosts(team_id: TeamId, limit?: number) {
   const result = await db.db
     .collection(`attendance-${team_id}`)
@@ -66,16 +79,14 @@ export const postAttendanceMessage = async ({
       name: 'thumbsup'
     })
 
-    if (NODE_ENV === 'prod') {
-      await db.setDbValue(`attendance-${teamId}`, date, {
-        rehearsal_date: date,
-        created_at: Firestore.Timestamp.now().seconds,
-        ts: postMsgRsp.ts,
-        channel: channel,
-        attending: [],
-        notAttending: []
-      })
-    }
+    await db.setDbValue(`attendance-${teamId}`, date, {
+      rehearsal_date: date,
+      created_at: Firestore.Timestamp.now().seconds,
+      ts: postMsgRsp.ts,
+      channel: channel,
+      attending: [],
+      notAttending: []
+    })
   } catch (err) {
     console.error(err)
   }
@@ -88,6 +99,7 @@ export const processAttendanceForTeam = async function({
   token,
   channel
 }: SlackAPIArgs) {
+  const botId = await db.getValue('teams', teamId, 'bot_user_id')
   const docs = await getAttendancePosts(teamId, 1)
   if (docs.length === 0) return
   const firstResult = docs[0]
@@ -102,17 +114,22 @@ export const processAttendanceForTeam = async function({
     }
     const id = firstResult.id
     const { reactions } = response.message
-    const attending =
-      reactions.find(group => group.name === '+1')['users'] || []
-    const notAttending =
-      reactions.find(group => group.name === '-1')['users'] || []
+    const attending = getUserReactionsForEmoji({
+      reactions,
+      emoji: '+1',
+      botId
+    })
+    const notAttending = getUserReactionsForEmoji({
+      reactions,
+      emoji: '-1',
+      botId
+    })
     await db.updateDbValue(`attendance-${teamId}`, id, {
       attending,
       notAttending
     })
   } catch (err) {
     console.error(err)
-    return
   }
   return
 }
