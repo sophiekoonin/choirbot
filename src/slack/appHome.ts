@@ -154,6 +154,23 @@ async function updateView(team: TeamId): Promise<View> {
           }
         ]
       }
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: 'Set the ID of your spreadsheet Google Sheet'
+      },
+      accessory: {
+        type: 'button',
+        action_id: Actions.SHOW_SHEET_MODAL,
+        text: {
+          type: 'plain_text',
+          text: 'Click to set',
+          emoji: true
+        },
+        value: 'click_me_123'
+      }
     }
   ]
 

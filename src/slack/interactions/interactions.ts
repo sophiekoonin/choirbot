@@ -3,23 +3,24 @@ import moment from 'moment'
 import fetch from 'node-fetch'
 
 import * as db from '../../db'
-import {
-  respondToRehearsalDaySelected,
-  respondToYesNoRehearsalReminders
-} from '../config'
+
 import { Actions, ActionTypes } from '../constants'
 import { ActionResponseBody, TeamId } from '../types'
 import { postAttendanceMessage } from '../attendance'
 import { postRehearsalMusic } from '..'
+import { SlackClient } from '../client'
+import { setSheetIdView } from '../views'
 
 export async function handleInteractions(
   req: Request,
   res: Response
 ): Promise<Response> {
   const { payload } = req.body
-  const { response_url, actions, team } = JSON.parse(payload)
+  const { response_url, actions, team, trigger_id } = JSON.parse(payload)
   const action = actions[0]
-  const { block_id, type } = action
+  console.log({ action })
+  const { action_id, type } = action
+  const token = await db.getValue('teams', team.id, 'bot_access_token')
 
   let value, text
   switch (type) {
@@ -33,7 +34,7 @@ export async function handleInteractions(
       break
   }
 
-  switch (block_id) {
+  switch (action_id) {
     case Actions.POST_CANCEL:
       respondToManualPostOrCancel({
         responseUrl: response_url,
@@ -42,18 +43,21 @@ export async function handleInteractions(
       })
       break
     case Actions.SELECT_REHEARSAL_DAY:
-      db.updateDbValue('teams', team.id, { [block_id]: value })
-      respondToRehearsalDaySelected({
-        responseUrl: response_url,
-        selectedOptionText: text
-      })
+      db.updateDbValue('teams', team.id, { [action_id]: value })
+      // respondToRehearsalDaySelected({
+      //   responseUrl: response_url,
+      //   selectedOptionText: text
+      // })
       break
     case Actions.YES_NO_REMINDERS:
-      db.updateDbValue('teams', team.id, { [block_id]: value === 'true' })
-      respondToYesNoRehearsalReminders({
-        responseUrl: response_url,
-        selectedOption: value
-      })
+      db.updateDbValue('teams', team.id, { [action_id]: value === 'true' })
+      // respondToYesNoRehearsalReminders({
+      //   responseUrl: response_url,
+      //   selectedOption: value
+      // })
+      break
+    case Actions.SHOW_SHEET_MODAL:
+      SlackClient.views.open({ view: setSheetIdView, token, trigger_id })
       break
     default:
       break

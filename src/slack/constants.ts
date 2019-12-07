@@ -2,8 +2,9 @@ export const Actions = {
   SELECT_REHEARSAL_DAY: 'rehearsal_day',
   YES_NO_REMINDERS: 'rehearsal_reminders',
   POST_CANCEL: 'post_cancel',
-  SHEET_ID: 'sheet_id',
-  EMOJI: 'emoji'
+  SHOW_SHEET_MODAL: 'show_sheet_modal',
+  SET_SHEET_ID: 'set_sheet_id',
+  SET_BLOCKS: 'set_blocks'
 }
 
 export const ActionTypes = {
