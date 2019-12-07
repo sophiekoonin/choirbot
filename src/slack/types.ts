@@ -98,3 +98,18 @@ export interface OAuthResponse extends WebAPICallResult {
     bot_access_token: string
   }
 }
+
+export interface Event {
+  type: string
+  event_ts: number
+  // user
+}
+export interface EventResponse {
+  token: string
+  team_id: TeamId
+  api_app_id: string
+  event: Event
+  type: string
+  event_id: string
+  event_time: number
+}

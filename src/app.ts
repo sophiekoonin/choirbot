@@ -7,7 +7,8 @@ import {
   oauth_error,
   oauth_success,
   handleSlashCommands,
-  verifyRequestSignature
+  verifyRequestSignature,
+  handleEvents
 } from './slack'
 
 import { checkForJobsToday } from './cron'
@@ -31,9 +32,10 @@ app.get('/', (req: express.Request, res: express.Response) => {
 
 app.post('/interactions', verifyRequestSignature, handleInteractions)
 app.get('/oauth_redirect', verifyRequestSignature, oauth_redirect)
+app.post('/slash-commands', verifyRequestSignature, handleSlashCommands)
+app.post('/events', handleEvents)
 app.get('/oauth_success', oauth_success)
 app.get('/oauth_error', oauth_error)
-app.post('/slash-commands', verifyRequestSignature, handleSlashCommands)
 app.get('/cron', checkForJobsToday)
 
 const PORT: number = parseInt(process.env.PORT) || 6060

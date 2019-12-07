@@ -49,7 +49,7 @@ export async function handleInteractions(
       })
       break
     case Actions.YES_NO_REMINDERS:
-      db.updateDbValue('teams', team.id, { [block_id]: value })
+      db.updateDbValue('teams', team.id, { [block_id]: value === 'true' })
       respondToYesNoRehearsalReminders({
         responseUrl: response_url,
         selectedOption: value
@@ -129,3 +129,5 @@ export async function respondToManualPostOrCancel({
       return
   }
 }
+
+// export async function chooseAttendanceMessageBlocks(responseUrl: string)
