@@ -202,7 +202,7 @@ export const respondToYesNoRehearsalReminders = ({
     const text =
       "I'll post rehearsal reminders! But first, I'll need the ID of your Google Sheet." +
       '\nYou can find it by getting the URL of your sheet and copying the string of letters and numbers that comes *after /d/* at the end of the URL.' +
-      '\nThen, send me a message with the word `sheet` and the ID . \nFor example, `sheet 1ASGA89789GD0Qg7U5URu4gssyJwiw_DSGJ35ssfF`.' +
+      '\nThen, use the command `/shebot sheet` with the spreadsheet ID . \nFor example, `/shebot sheet 1ASGA89789GD0Qg7U5URu4gssyJwiw_DSGJ35ssfF`.' +
       "\n\nDon't have a schedule in Google Sheets? <https://docs.google.com/spreadsheets/d/1ngSxEdAuhdJTEb_pFE5nq1avNjzEjdMY8r-Z1QQL-v0/edit#gid=0|Here's the template>" +
       ' - you can go to `File > Make a copy` to get your own.'
 

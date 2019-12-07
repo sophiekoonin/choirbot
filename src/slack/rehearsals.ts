@@ -9,11 +9,15 @@ function getRehearsalMusicMessage(
 ): string {
   return `<!channel> Here's the plan for ${dayOfWeek}'s rehearsal! \n
   ${notes && notes !== '' ? `${notes}\n` : ''}
-  We'll be doing ${mainSong} - ${mainSongLink ||
+  We'll be doing *${mainSong}* - ${mainSongLink ||
     "I can't find a link for this - please check the Arrangements Folder!"} \n
-  *Run through*: ${
-    runThrough ? runThrough : 'Please check the schedule for more info.'
-  } ${runThroughLink ? ' - ' + runThroughLink : ''} \n
+  ${
+    runThrough != null && runThrough != ''
+      ? `*Run through*: ${runThrough}${
+          runThroughLink ? ' - ' + runThroughLink : ''
+        } \n`
+      : ''
+  }
   Please give the recordings a listen! :sparkles:`
 }
 

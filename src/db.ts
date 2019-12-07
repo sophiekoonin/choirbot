@@ -70,7 +70,7 @@ export const getValues = async (
 ) => {
   const doc = await getDbDoc(collection, docName)
   if (!doc.exists) {
-    throw new Error(`Config not found for ${docName}`)
+    throw new Error(`Doc not found for ${docName}`)
   } else {
     const data = doc.data()
     return keys.map(key => data[key])

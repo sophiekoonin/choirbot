@@ -10,7 +10,7 @@ import { Request, Response } from 'express'
 
 export const checkForJobsToday = async (req: Request, res: Response) => {
   // Prevent illegitimate cron requests
-  if (!req.headers['X-Appengine-Cron']) {
+  if (!req.headers['x-appengine-cron']) {
     return res.sendStatus(400)
   }
   const date = moment()

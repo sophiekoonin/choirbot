@@ -1,4 +1,5 @@
 import Firestore from '@google-cloud/firestore'
+import { SectionBlock } from '@slack/types'
 
 import * as google from '../google/google'
 import * as db from '../db'
@@ -51,14 +52,14 @@ export const postAttendanceMessage = async ({
   if (songs != null && songs.mainSong.toLowerCase().includes('no rehearsal')) {
     return
   }
-  const text = getAttendancePostMessage(songs)
   try {
     const postMsgRsp = (await SlackClient.chat.postMessage({
       token,
       channel,
       as_user: false,
       username: 'Attendance Bot',
-      text
+      text: `It's rehearsal day!`,
+      blocks: getAttendancePostBlocks(songs)
     })) as ChatPostMessageResult
 
     if (!postMsgRsp.ok) {
@@ -134,23 +135,59 @@ export const processAttendanceForTeam = async function({
   return
 }
 
-function getAttendancePostMessage(songData: SongData): string {
+function getAttendancePostBlocks(songData: SongData): Array<SectionBlock> {
   const { mainSong, runThrough, notes } = songData
-  return `:dancing_banana: Rehearsal day! :dancing_banana: <!channel> \n
-  ${
-    songData != null
-      ? `*Today's rehearsal:* ${mainSong}\n
-  ${runThrough ? `*Run through:* ${runThrough}\n\n` : ''} 
-  ${
-    notes.toLowerCase().includes('team updates')
-      ? '*Team updates meeting at 6:30! All welcome* :tada:\n'
-      : ''
-  }`
-      : null
-  }
-    Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup:
-    (present) or :thumbsdown: (absent).\n
-    Facilitator please respond with :raised_hands:!\n
-    To volunteer for Physical warm up, respond with :muscle:
-    For Musical warm up, respond with :musical_note:.`
+
+  return [
+    {
+      type: 'section',
+      block_id: 'intro',
+      text: {
+        type: 'mrkdwn',
+        text: '*Rehearsal day!* <!channel>'
+      }
+    },
+    {
+      type: 'section',
+      block_id: 'main_song',
+      text: {
+        type: 'mrkdwn',
+        text: `*Today's rehearsal:* ${mainSong}`
+      }
+    },
+    {
+      type: 'section',
+      block_id: 'run_through',
+      text: {
+        type: 'mrkdwn',
+        text: `*Run through*: ${runThrough}`
+      }
+    },
+    {
+      type: 'section',
+      block_id: 'thumbs',
+      text: {
+        type: 'mrkdwn',
+        text:
+          'Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup: (present) or :thumbsdown: (absent).'
+      }
+    },
+    {
+      type: 'section',
+      block_id: 'facilitator',
+      text: {
+        type: 'mrkdwn',
+        text: 'Facilitator please respond with :raised_hands:!'
+      }
+    },
+    {
+      type: 'section',
+      block_id: 'warmup',
+      text: {
+        type: 'mrkdwn',
+        text:
+          'To volunteer for physical warmup, respond with :muscle:. \nFor musical warmup, respond with :musical_note:.'
+      }
+    }
+  ]
 }
