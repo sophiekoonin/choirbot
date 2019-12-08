@@ -9,7 +9,7 @@ import { ActionResponseBody, TeamId } from '../types'
 import { postAttendanceMessage } from '../attendance'
 import { postRehearsalMusic } from '..'
 import { SlackClient } from '../client'
-import { setSheetIdView } from '../views'
+import { setSheetIdView, chooseAttendancePostBlocks } from '../views'
 
 export async function handleInteractions(
   req: Request,
@@ -18,7 +18,6 @@ export async function handleInteractions(
   const { payload } = req.body
   const { response_url, actions, team, trigger_id } = JSON.parse(payload)
   const action = actions[0]
-  console.log({ action })
   const { action_id, type } = action
   const token = await db.getValue('teams', team.id, 'bot_access_token')
 
@@ -58,6 +57,13 @@ export async function handleInteractions(
       break
     case Actions.SHOW_SHEET_MODAL:
       SlackClient.views.open({ view: setSheetIdView, token, trigger_id })
+      break
+    case Actions.SET_ATTENDANCE_BLOCKS:
+      SlackClient.views.open({
+        view: chooseAttendancePostBlocks,
+        token,
+        trigger_id
+      })
       break
     default:
       break

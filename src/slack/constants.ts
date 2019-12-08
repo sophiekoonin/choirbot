@@ -4,7 +4,7 @@ export const Actions = {
   POST_CANCEL: 'post_cancel',
   SHOW_SHEET_MODAL: 'show_sheet_modal',
   SET_SHEET_ID: 'set_sheet_id',
-  SET_BLOCKS: 'set_blocks'
+  SET_ATTENDANCE_BLOCKS: 'set_attendance_blocks'
 }
 
 export const ActionTypes = {
@@ -24,4 +24,15 @@ export const DaysOfWeek: { [key: string]: string } = {
   '5': 'Friday',
   '6': 'Saturday',
   '7': 'Sunday'
+}
+
+export const AttendancePostSections = {
+  INTRODUCTION: 'introduction',
+  MAIN_SONG: 'main_song',
+  RUN_THROUGH: 'run_through',
+  TEAM_UPDATES: 'team_updates',
+  ATTENDANCE_EMOJI: 'attendance_emoji',
+  PHYSICAL_WARMUP: 'physical_warmup',
+  MUSICAL_WARMUP: 'musical_warmup',
+  FACILITATOR: 'facilitator'
 }

@@ -171,6 +171,23 @@ async function updateView(team: TeamId): Promise<View> {
         },
         value: 'click_me_123'
       }
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: 'Configure what your attendance posts will look like'
+      },
+      accessory: {
+        type: 'button',
+        action_id: Actions.SET_ATTENDANCE_BLOCKS,
+        text: {
+          type: 'plain_text',
+          text: 'Click to configure',
+          emoji: true
+        },
+        value: 'click_me_123'
+      }
     }
   ]
 

@@ -1,5 +1,5 @@
 import { View } from '@slack/types'
-import { Actions } from './constants'
+import { Actions, AttendancePostSections } from './constants'
 
 export const setSheetIdView: View = {
   type: 'modal',
@@ -47,6 +47,117 @@ export const setSheetIdView: View = {
         multiline: false
       },
       optional: false
+    }
+  ],
+  submit: {
+    type: 'plain_text',
+    text: 'Save'
+  }
+}
+
+export const chooseAttendancePostBlocks: View = {
+  type: 'modal',
+  title: {
+    type: 'plain_text',
+    text: 'Attendance posts'
+  },
+  blocks: [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        verbatim: true,
+        text:
+          'This is where you can compose the parts of the message that will be sent on *the day of* your rehearsal.'
+      }
+    },
+    {
+      type: 'input',
+      label: {
+        type: 'plain_text',
+        text: 'Introduction - this bit will always come first.'
+      },
+      element: {
+        type: 'plain_text_input',
+        action_id: 'intro_input',
+        placeholder: {
+          type: 'plain_text',
+          text: 'Rehearsal day!'
+        },
+        multiline: true
+      },
+      optional: false
+    },
+    {
+      type: 'input',
+      label: {
+        type: 'plain_text',
+        text:
+          "Choose the sections that come next in the order that you want them. Leave out any you don't want."
+      },
+      element: {
+        type: 'multi_static_select',
+        action_id: 'attendance_content_blocks',
+        placeholder: {
+          type: 'plain_text',
+          text: 'Please choose'
+        },
+        options: [
+          {
+            text: {
+              type: 'plain_text',
+              text: 'Team updates meeting'
+            },
+            value: AttendancePostSections.TEAM_UPDATES
+          },
+          {
+            text: {
+              type: 'plain_text',
+              text: 'React with 👍👎 if attending/not attending',
+              emoji: true
+            },
+            value: AttendancePostSections.ATTENDANCE_EMOJI
+          },
+          {
+            text: {
+              type: 'plain_text',
+              text: 'Main song'
+            },
+            value: AttendancePostSections.MAIN_SONG
+          },
+          {
+            text: {
+              type: 'plain_text',
+              text: 'Run through song'
+            },
+            value: AttendancePostSections.RUN_THROUGH
+          },
+          {
+            text: {
+              type: 'plain_text',
+              emoji: true,
+              text: 'Volunteer for physical warmup with 💪'
+            },
+            value: AttendancePostSections.PHYSICAL_WARMUP
+          },
+          {
+            text: {
+              type: 'plain_text',
+              emoji: true,
+              text: 'Volunteer for musical warmup with 🎵'
+            },
+            value: AttendancePostSections.MUSICAL_WARMUP
+          },
+          {
+            text: {
+              type: 'plain_text',
+              emoji: true,
+              text: 'Volunteer to facilitate with 🙌'
+            },
+            value: AttendancePostSections.FACILITATOR
+          }
+        ]
+      }
     }
   ],
   submit: {
