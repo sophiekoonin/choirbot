@@ -17,7 +17,8 @@ export async function handleInteractions(
 ): Promise<Response> {
   const { payload } = req.body
   const { response_url, actions, team, trigger_id } = JSON.parse(payload)
-  const action = actions[0]
+  console.log(JSON.parse(payload))
+  const action = actions != null ? actions[0] : null
   const { action_id, type } = action
   const token = await db.getValue('teams', team.id, 'bot_access_token')
 
@@ -43,17 +44,9 @@ export async function handleInteractions(
       break
     case Actions.SELECT_REHEARSAL_DAY:
       db.updateDbValue('teams', team.id, { [action_id]: value })
-      // respondToRehearsalDaySelected({
-      //   responseUrl: response_url,
-      //   selectedOptionText: text
-      // })
       break
     case Actions.YES_NO_REMINDERS:
       db.updateDbValue('teams', team.id, { [action_id]: value === 'true' })
-      // respondToYesNoRehearsalReminders({
-      //   responseUrl: response_url,
-      //   selectedOption: value
-      // })
       break
     case Actions.SHOW_SHEET_MODAL:
       SlackClient.views.open({ view: setSheetIdView, token, trigger_id })
@@ -140,4 +133,4 @@ export async function respondToManualPostOrCancel({
   }
 }
 
-// export async function chooseAttendanceMessageBlocks(responseUrl: string)
+// export async function handleViewSubmission(view: View)

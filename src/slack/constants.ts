@@ -13,7 +13,8 @@ export const ActionTypes = {
 }
 
 export const EventTypes = {
-  APP_HOME_OPENED: 'app_home_opened'
+  APP_HOME_OPENED: 'app_home_opened',
+  VIEW_SUBMISSION: 'view_submission'
 }
 
 export const DaysOfWeek: { [key: string]: string } = {

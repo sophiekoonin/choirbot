@@ -113,3 +113,19 @@ export interface EventResponse {
   event_id: string
   event_time: number
 }
+
+export interface ViewSubmissionDetails {
+  id: string
+  team_id: TeamId
+  type: string
+  blocks: [Block]
+  callback_id: string | null
+  state: { values: [Object] }
+  hash: string
+  clear_on_close: boolean
+  notify_on_close: boolean
+  root_view_id: string
+  app_id: string
+  bot_id: string
+}
+export interface InteractionResponse {}
