@@ -20,13 +20,13 @@ Slack permissions needed:
 
 [x] verify signing signature
 [x] set up CI
-[] allow messages to be customised
+[x] allow messages to be customised
 [x] schedule template spreadsheet
 [] get tests working with typescript
 [] better report info
-[] pubsub
+[] handle modals better
 
 ## To test
 
-[] new workspace setup
-[] dynamic cron
+[x] new workspace setup
+[x] dynamic cron
