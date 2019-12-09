@@ -168,8 +168,7 @@ async function updateView(team: TeamId): Promise<View> {
           type: 'plain_text',
           text: 'Click to set',
           emoji: true
-        },
-        value: 'click_me_123'
+        }
       }
     },
     {
@@ -185,8 +184,80 @@ async function updateView(team: TeamId): Promise<View> {
           type: 'plain_text',
           text: 'Click to configure',
           emoji: true
+        }
+      }
+    },
+    {
+      type: 'divider'
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text:
+          "*Post an attendance message*\nIn case the message didn't automatically post for any reason."
+      },
+      accessory: {
+        type: 'button',
+        action_id: Actions.POST_ATTENDANCE_MESSAGE,
+        text: {
+          type: 'plain_text',
+          text: 'Post message',
+          emoji: true
         },
-        value: 'click_me_123'
+        confirm: {
+          title: {
+            type: 'plain_text',
+            text: 'Post attendance message'
+          },
+          text: {
+            type: 'plain_text',
+            text: 'Are you sure you want to post an attendance message?'
+          },
+          confirm: {
+            type: 'plain_text',
+            text: 'Post message'
+          },
+          deny: {
+            type: 'plain_text',
+            text: 'Cancel'
+          }
+        }
+      }
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text:
+          "*Post a rehearsal reminder message*\nIn case the message didn't automatically post for any reason."
+      },
+      accessory: {
+        type: 'button',
+        action_id: Actions.POST_REHEARSAL_MESSAGE,
+        text: {
+          type: 'plain_text',
+          text: 'Post message',
+          emoji: true
+        },
+        confirm: {
+          title: {
+            type: 'plain_text',
+            text: 'Post rehearsal message'
+          },
+          text: {
+            type: 'plain_text',
+            text: 'Are you sure you want to post a rehearsal reminder message?'
+          },
+          confirm: {
+            type: 'plain_text',
+            text: 'Post message'
+          },
+          deny: {
+            type: 'plain_text',
+            text: 'Cancel'
+          }
+        }
       }
     }
   ]

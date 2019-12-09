@@ -4,6 +4,8 @@ export const Actions = {
   POST_CANCEL: 'post_cancel',
   SHOW_SHEET_MODAL: 'show_sheet_modal',
   SET_SHEET_ID: 'set_sheet_id',
+  POST_ATTENDANCE_MESSAGE: 'post_attendance_message',
+  POST_REHEARSAL_MESSAGE: 'post_rehearsal_message',
   SET_ATTENDANCE_BLOCKS: 'set_attendance_blocks'
 }
 
