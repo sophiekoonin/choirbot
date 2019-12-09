@@ -1,4 +1,10 @@
-import { WebAPICallResult, Block } from '@slack/web-api'
+import {
+  WebAPICallResult,
+  Block,
+  Action,
+  Option,
+  PlainTextElement
+} from '@slack/web-api'
 import { IncomingHttpHeaders } from 'http'
 
 export interface SlackAPIArgs {
@@ -13,6 +19,8 @@ export interface VerificationHeaders extends IncomingHttpHeaders {
 
 export interface PostAttendanceMessageArgs extends SlackAPIArgs {
   date: string
+  introText: string
+  blocks: string[]
 }
 
 export interface ChatPostMessageResult extends WebAPICallResult {
@@ -114,13 +122,26 @@ export interface EventResponse {
   event_time: number
 }
 
+export interface SubmissionValue {
+  [action_id: string]: {
+    type: string
+    value?: string
+    selected_options?: [Option]
+  }
+}
+
+export interface SubmissionValues {
+  [block_id: string]: SubmissionValue
+}
 export interface ViewSubmissionDetails {
   id: string
   team_id: TeamId
   type: string
   blocks: [Block]
   callback_id: string | null
-  state: { values: [Object] }
+  state: {
+    values: SubmissionValues
+  }
   hash: string
   clear_on_close: boolean
   notify_on_close: boolean
@@ -128,4 +149,37 @@ export interface ViewSubmissionDetails {
   app_id: string
   bot_id: string
 }
-export interface InteractionResponse {}
+
+export interface ActionSubmission {
+  action_id: string
+  block_id: string
+  text?: PlainTextElement
+  value?: string
+  options: [Option]
+  selected_option: Option
+  type: string
+  action_ts: string
+}
+export interface InboundInteraction {
+  type: string
+  response_url?: string
+  team: {
+    id: TeamId
+    domain: string
+  }
+  user: {
+    id: UserId
+    username: string
+    name: string
+    team_id: TeamId
+  }
+  api_app_id: string
+  token: string
+  container: {
+    type: string
+    view_id: string
+  }
+  trigger_id: string
+  view: ViewSubmissionDetails | null
+  actions?: [ActionSubmission]
+}

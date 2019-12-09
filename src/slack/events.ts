@@ -4,12 +4,7 @@ import { EventTypes } from './constants'
 import { showAppHome } from './appHome'
 
 export async function handleEvents(req: Request, res: Response) {
-  const {
-    team_id: team,
-    api_app_id,
-    challenge,
-    event: { type, user }
-  } = req.body
+  const { team_id: team, api_app_id, challenge, event } = req.body
 
   // Verification handshake
   if (challenge != null) {
@@ -20,6 +15,7 @@ export async function handleEvents(req: Request, res: Response) {
   }
 
   res.sendStatus(200)
+  const { type, user } = event
 
   switch (type) {
     case EventTypes.APP_HOME_OPENED:

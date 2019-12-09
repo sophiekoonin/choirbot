@@ -34,7 +34,7 @@ export const getDbDoc = async function(collection: string, docName: string) {
 
 interface QueryResult {
   id: string
-  [key: string]: string | number
+  [key: string]: string | number | string[]
 }
 
 export async function getQueryResults(query: FirebaseFirestore.Query) {

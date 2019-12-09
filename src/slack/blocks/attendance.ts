@@ -1,5 +1,25 @@
 import { SectionBlock } from '@slack/types'
 import { AttendancePostSections } from '../constants'
+import { SongData } from '../../google/types'
+
+export const introductionBlock = (text: string): SectionBlock => ({
+  type: 'section',
+  block_id: AttendancePostSections.INTRODUCTION,
+  text: {
+    type: 'mrkdwn',
+    text
+  }
+})
+
+export const attendanceEmojiBlock: SectionBlock = {
+  type: 'section',
+  block_id: 'thumbs',
+  text: {
+    type: 'mrkdwn',
+    text:
+      'Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup: (present) or :thumbsdown: (absent).'
+  }
+}
 
 export const musicalWarmupBlock: SectionBlock = {
   type: 'section',
@@ -10,7 +30,7 @@ export const musicalWarmupBlock: SectionBlock = {
   }
 }
 
-export function mainSongBlock(mainSong: string): SectionBlock {
+export function mainSongBlock({ mainSong }: SongData): SectionBlock {
   return {
     type: 'section',
     block_id: AttendancePostSections.MAIN_SONG,
@@ -21,7 +41,7 @@ export function mainSongBlock(mainSong: string): SectionBlock {
   }
 }
 
-export function runThroughBlock(runThrough: string): SectionBlock {
+export function runThroughBlock({ runThrough }: SongData): SectionBlock {
   return {
     type: 'section',
     block_id: AttendancePostSections.RUN_THROUGH,
@@ -58,4 +78,14 @@ export const facilitatorBlock: SectionBlock = {
     type: 'mrkdwn',
     text: 'Facilitator please respond with :raised_hands:!'
   }
+}
+
+export const AttendanceBlocks = {
+  [AttendancePostSections.TEAM_UPDATES]: teamUpdatesBlock,
+  [AttendancePostSections.MUSICAL_WARMUP]: musicalWarmupBlock,
+  [AttendancePostSections.PHYSICAL_WARMUP]: physicalWarmupBlock,
+  [AttendancePostSections.FACILITATOR]: facilitatorBlock,
+  [AttendancePostSections.MAIN_SONG]: mainSongBlock,
+  [AttendancePostSections.RUN_THROUGH]: runThroughBlock,
+  [AttendancePostSections.ATTENDANCE_EMOJI]: attendanceEmojiBlock
 }

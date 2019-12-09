@@ -7,14 +7,26 @@ export const Actions = {
   SET_ATTENDANCE_BLOCKS: 'set_attendance_blocks'
 }
 
+export const Interactions = {
+  VIEW_SUBMISSION: 'view_submission'
+}
 export const ActionTypes = {
   STATIC_SELECT: 'static_select',
   BUTTON: 'button'
 }
 
+export const Blocks = {
+  INTRO_TEXT: 'intro_text',
+  ATTENDANCE_BLOCKS: 'attendance_blocks'
+}
+
 export const EventTypes = {
-  APP_HOME_OPENED: 'app_home_opened',
-  VIEW_SUBMISSION: 'view_submission'
+  APP_HOME_OPENED: 'app_home_opened'
+}
+
+export const BlockTypes = {
+  PLAIN_TEXT_INPUT: 'plain_text_input',
+  MULTI_STATIC_SELECT: 'multi_static_select'
 }
 
 export const DaysOfWeek: { [key: string]: string } = {

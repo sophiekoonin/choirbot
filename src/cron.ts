@@ -38,12 +38,20 @@ async function checkForAttendancePostJobs(date: moment.Moment) {
   if (teams.length === 0) return
 
   teams.forEach(async team => {
-    const { id, bot_access_token: token, channel_id: channel } = team
+    const {
+      id,
+      bot_access_token: token,
+      channel_id: channel,
+      attendance_blocks: blocks,
+      intro_text: introText
+    } = team
     return await postAttendanceMessage({
       token: token as string,
       channel: channel as string,
       date: dateString,
-      teamId: id
+      teamId: id,
+      introText: introText as string,
+      blocks: blocks as string[]
     })
   })
 }

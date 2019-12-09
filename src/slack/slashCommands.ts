@@ -1,6 +1,5 @@
 import * as db from '../db'
 import { reportAttendance, getStats } from './reports'
-import { startConfigFlow } from './config'
 import { Request, Response } from 'express'
 import { TeamId } from './types'
 import { Actions } from './constants'
@@ -26,10 +25,6 @@ export const handleSlashCommands = async (req: Request, res: Response) => {
       return res.send(
         `I've set your Google Sheets ID to \`${textAsArray[1]}\` - if that's not right, you can do this again to reset it.`
       )
-    case 'config':
-      res.send('SHEBot Configuration')
-      startConfigFlow(teamId)
-      break
     case 'post':
       return await triggerRehearsalPost(res, teamId)
     default:

@@ -1,5 +1,5 @@
 import { View } from '@slack/types'
-import { Actions, AttendancePostSections } from './constants'
+import { Actions, AttendancePostSections, Blocks } from './constants'
 
 export const setSheetIdView: View = {
   type: 'modal',
@@ -73,13 +73,14 @@ export const chooseAttendancePostBlocks: View = {
     },
     {
       type: 'input',
+      block_id: Blocks.INTRO_TEXT,
       label: {
         type: 'plain_text',
         text: 'Introduction - this bit will always come first.'
       },
       element: {
         type: 'plain_text_input',
-        action_id: 'intro_input',
+        action_id: Blocks.INTRO_TEXT,
         placeholder: {
           type: 'plain_text',
           text: 'Rehearsal day!'
@@ -90,6 +91,7 @@ export const chooseAttendancePostBlocks: View = {
     },
     {
       type: 'input',
+      block_id: Blocks.ATTENDANCE_BLOCKS,
       label: {
         type: 'plain_text',
         text:
@@ -97,7 +99,7 @@ export const chooseAttendancePostBlocks: View = {
       },
       element: {
         type: 'multi_static_select',
-        action_id: 'attendance_content_blocks',
+        action_id: Blocks.ATTENDANCE_BLOCKS,
         placeholder: {
           type: 'plain_text',
           text: 'Please choose'

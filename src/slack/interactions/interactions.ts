@@ -4,62 +4,73 @@ import fetch from 'node-fetch'
 
 import * as db from '../../db'
 
-import { Actions, ActionTypes } from '../constants'
-import { ActionResponseBody, TeamId } from '../types'
+import { Actions, ActionTypes, Interactions } from '../constants'
+import { ActionResponseBody, TeamId, InboundInteraction } from '../types'
 import { postAttendanceMessage } from '../attendance'
 import { postRehearsalMusic } from '..'
 import { SlackClient } from '../client'
 import { setSheetIdView, chooseAttendancePostBlocks } from '../views'
+import { handleEvents } from '../events'
+import { processConfigSubmission } from '../config'
 
 export async function handleInteractions(
   req: Request,
   res: Response
 ): Promise<Response> {
-  const { payload } = req.body
-  const { response_url, actions, team, trigger_id } = JSON.parse(payload)
-  console.log(JSON.parse(payload))
-  const action = actions != null ? actions[0] : null
-  const { action_id, type } = action
+  const payload: InboundInteraction = JSON.parse(req.body.payload)
+  const { response_url, actions, team, trigger_id, view, type } = payload
   const token = await db.getValue('teams', team.id, 'bot_access_token')
 
-  let value, text
-  switch (type) {
-    case ActionTypes.STATIC_SELECT:
-      text = action.selected_option.text.text
-      value = action.selected_option.value
-      break
-    case ActionTypes.BUTTON:
-      text = action.text.text
-      value = action.value
-      break
+  if (view != null && type == Interactions.VIEW_SUBMISSION) {
+    await processConfigSubmission({
+      values: view.state.values,
+      teamId: team.id
+    })
   }
 
-  switch (action_id) {
-    case Actions.POST_CANCEL:
-      respondToManualPostOrCancel({
-        responseUrl: response_url,
-        selectedOption: value,
-        teamId: team.id
-      })
-      break
-    case Actions.SELECT_REHEARSAL_DAY:
-      db.updateDbValue('teams', team.id, { [action_id]: value })
-      break
-    case Actions.YES_NO_REMINDERS:
-      db.updateDbValue('teams', team.id, { [action_id]: value === 'true' })
-      break
-    case Actions.SHOW_SHEET_MODAL:
-      SlackClient.views.open({ view: setSheetIdView, token, trigger_id })
-      break
-    case Actions.SET_ATTENDANCE_BLOCKS:
-      SlackClient.views.open({
-        view: chooseAttendancePostBlocks,
-        token,
-        trigger_id
-      })
-      break
-    default:
-      break
+  if (actions != null) {
+    const action = actions[0]
+    const { action_id, type } = action
+
+    let value, text
+    switch (type) {
+      case ActionTypes.STATIC_SELECT:
+        text = action.selected_option.text.text
+        value = action.selected_option.value
+        break
+      case ActionTypes.BUTTON:
+        text = action.text.text
+        value = action.value
+        break
+    }
+
+    switch (action_id) {
+      case Actions.POST_CANCEL:
+        respondToManualPostOrCancel({
+          responseUrl: response_url,
+          selectedOption: value,
+          teamId: team.id
+        })
+        break
+      case Actions.SELECT_REHEARSAL_DAY:
+        db.updateDbValue('teams', team.id, { [action_id]: value })
+        break
+      case Actions.YES_NO_REMINDERS:
+        db.updateDbValue('teams', team.id, { [action_id]: value === 'true' })
+        break
+      case Actions.SHOW_SHEET_MODAL:
+        SlackClient.views.open({ view: setSheetIdView, token, trigger_id })
+        break
+      case Actions.SET_ATTENDANCE_BLOCKS:
+        SlackClient.views.open({
+          view: chooseAttendancePostBlocks,
+          token,
+          trigger_id
+        })
+        break
+      default:
+        break
+    }
   }
 
   return res.sendStatus(200)
@@ -100,10 +111,11 @@ export async function respondToManualPostOrCancel({
     })
     return
   }
-  const [token, channel] = await db.getValues('teams', teamId, [
-    'bot_access_token',
-    'channel_id'
-  ])
+  const [token, channel, blocks, introText] = await db.getValues(
+    'teams',
+    teamId,
+    ['bot_access_token', 'channel_id', 'attendance_blocks', 'intro_text']
+  )
   const date = moment()
 
   postToResponseUrl(responseUrl, {
@@ -117,6 +129,8 @@ export async function respondToManualPostOrCancel({
         channel,
         token,
         teamId,
+        blocks,
+        introText,
         date: date.format('DD/MM/YYYY')
       })
     case 'post_rehearsal':

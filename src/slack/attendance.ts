@@ -14,6 +14,7 @@ import {
   ReactionResult
 } from './types'
 import { SongData } from '../google/types'
+import { introductionBlock, AttendanceBlocks } from './blocks/attendance'
 
 function getUserReactionsForEmoji({
   reactions,
@@ -46,12 +47,19 @@ export const postAttendanceMessage = async ({
   channel,
   token,
   teamId,
-  date
+  date,
+  blocks,
+  introText
 }: PostAttendanceMessageArgs) => {
   const songs = await google.getNextSongs(date, teamId)
   if (songs != null && songs.mainSong.toLowerCase().includes('no rehearsal')) {
     return
   }
+  const messageBlocks = await getAttendancePostBlocks({
+    songs,
+    blocks,
+    introText
+  })
   try {
     const postMsgRsp = (await SlackClient.chat.postMessage({
       token,
@@ -59,7 +67,7 @@ export const postAttendanceMessage = async ({
       as_user: false,
       username: 'Attendance Bot',
       text: `It's rehearsal day!`,
-      blocks: getAttendancePostBlocks(songs)
+      blocks: messageBlocks
     })) as ChatPostMessageResult
 
     if (!postMsgRsp.ok) {
@@ -135,59 +143,22 @@ export const processAttendanceForTeam = async function({
   return
 }
 
-function getAttendancePostBlocks(songData: SongData): Array<SectionBlock> {
-  const { mainSong, runThrough, notes } = songData
+function getAttendancePostBlocks({
+  songs,
+  blocks,
+  introText
+}: {
+  songs: SongData
+  blocks: string[]
+  introText: string
+}): Array<SectionBlock> {
+  const { mainSong, runThrough, notes } = songs
 
   return [
-    {
-      type: 'section',
-      block_id: 'intro',
-      text: {
-        type: 'mrkdwn',
-        text: '*Rehearsal day!* <!channel>'
-      }
-    },
-    {
-      type: 'section',
-      block_id: 'main_song',
-      text: {
-        type: 'mrkdwn',
-        text: `*Today's rehearsal:* ${mainSong}`
-      }
-    },
-    {
-      type: 'section',
-      block_id: 'run_through',
-      text: {
-        type: 'mrkdwn',
-        text: `*Run through*: ${runThrough}`
-      }
-    },
-    {
-      type: 'section',
-      block_id: 'thumbs',
-      text: {
-        type: 'mrkdwn',
-        text:
-          'Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup: (present) or :thumbsdown: (absent).'
-      }
-    },
-    {
-      type: 'section',
-      block_id: 'facilitator',
-      text: {
-        type: 'mrkdwn',
-        text: 'Facilitator please respond with :raised_hands:!'
-      }
-    },
-    {
-      type: 'section',
-      block_id: 'warmup',
-      text: {
-        type: 'mrkdwn',
-        text:
-          'To volunteer for physical warmup, respond with :muscle:. \nFor musical warmup, respond with :musical_note:.'
-      }
-    }
+    introductionBlock(introText),
+    ...blocks.map(blockName => {
+      const block = AttendanceBlocks[blockName]
+      return typeof block === 'function' ? block(songs) : block
+    })
   ]
 }
