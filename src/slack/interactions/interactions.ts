@@ -4,7 +4,7 @@ import fetch from 'node-fetch'
 
 import * as db from '../../db'
 
-import { Actions, ActionTypes, Interactions } from '../constants'
+import { Actions, Interactions } from '../constants'
 import { ActionResponseBody, TeamId, InboundInteraction } from '../types'
 import { postAttendanceMessage } from '../attendance'
 import { postRehearsalMusic } from '..'
@@ -16,10 +16,10 @@ export async function handleInteractions(
   req: Request,
   res: Response
 ): Promise<void> {
-  res.sendStatus(200)
   const payload: InboundInteraction = JSON.parse(req.body.payload)
   const { actions, team, trigger_id, view, type } = payload
   const token = await db.getValue('teams', team.id, 'bot_access_token')
+  res.send()
 
   if (view != null && type == Interactions.VIEW_SUBMISSION) {
     await processConfigSubmission({
@@ -73,7 +73,7 @@ export async function handleInteractions(
 
 export async function postToResponseUrl(
   responseUrl: string,
-  body: ActionResponseBody
+  body?: ActionResponseBody
 ) {
   const options = {
     method: 'POST',

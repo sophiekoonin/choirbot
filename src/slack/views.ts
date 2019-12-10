@@ -108,9 +108,9 @@ export const chooseAttendancePostBlocks: View = {
           {
             text: {
               type: 'plain_text',
-              text: 'Team updates meeting'
+              text: 'Notes'
             },
-            value: AttendancePostSections.TEAM_UPDATES
+            value: AttendancePostSections.NOTES
           },
           {
             text: {

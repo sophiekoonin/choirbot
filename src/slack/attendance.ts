@@ -152,8 +152,6 @@ function getAttendancePostBlocks({
   blocks: string[]
   introText: string
 }): Array<SectionBlock> {
-  const { mainSong, runThrough, notes } = songs
-
   return [
     introductionBlock(introText),
     ...blocks.map(blockName => {

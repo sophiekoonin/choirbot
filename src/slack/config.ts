@@ -26,7 +26,6 @@ export async function processConfigSubmission({
   values: SubmissionValues
   teamId: TeamId
 }) {
-  console.log({ values })
   const valuesToUpdate = Object.keys(values).reduce((acc, curr) => {
     const item = values[curr][curr]
     if (item == null) return

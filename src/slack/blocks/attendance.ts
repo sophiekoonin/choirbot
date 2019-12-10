@@ -52,12 +52,14 @@ export function runThroughBlock({ runThrough }: SongData): SectionBlock {
   }
 }
 
-export const teamUpdatesBlock: SectionBlock = {
-  type: 'section',
-  block_id: AttendancePostSections.TEAM_UPDATES,
-  text: {
-    type: 'mrkdwn',
-    text: '*Team updates meeting at 6:30!* All welcome.'
+export function notesBlock({ notes }: SongData): SectionBlock {
+  return {
+    type: 'section',
+    block_id: AttendancePostSections.NOTES,
+    text: {
+      type: 'mrkdwn',
+      text: notes
+    }
   }
 }
 
@@ -81,7 +83,7 @@ export const facilitatorBlock: SectionBlock = {
 }
 
 export const AttendanceBlocks = {
-  [AttendancePostSections.TEAM_UPDATES]: teamUpdatesBlock,
+  [AttendancePostSections.NOTES]: notesBlock,
   [AttendancePostSections.MUSICAL_WARMUP]: musicalWarmupBlock,
   [AttendancePostSections.PHYSICAL_WARMUP]: physicalWarmupBlock,
   [AttendancePostSections.FACILITATOR]: facilitatorBlock,

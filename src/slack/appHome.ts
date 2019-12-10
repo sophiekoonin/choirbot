@@ -159,7 +159,7 @@ async function updateView(team: TeamId): Promise<View> {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: 'Set the ID of your spreadsheet Google Sheet'
+        text: 'Configure SHEbot to work with your schedule spreadsheet'
       },
       accessory: {
         type: 'button',
@@ -195,7 +195,14 @@ async function updateView(team: TeamId): Promise<View> {
       text: {
         type: 'mrkdwn',
         text:
-          "*Post an attendance message*\nIn case the message didn't automatically post for any reason."
+          "*Manually post messages*\nIn case the message didn't automatically post for any reason."
+      }
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: '*Post an attendance message*'
       },
       accessory: {
         type: 'button',
@@ -229,8 +236,7 @@ async function updateView(team: TeamId): Promise<View> {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text:
-          "*Post a rehearsal reminder message*\nIn case the message didn't automatically post for any reason."
+        text: '*Post a rehearsal reminder message*'
       },
       accessory: {
         type: 'button',
