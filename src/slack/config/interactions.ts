@@ -59,8 +59,9 @@ export async function handleInteractions(
         SlackClient.views.open({ view: setSheetIdView, token, trigger_id })
         break
       case Actions.SET_ATTENDANCE_BLOCKS:
+        const view = await chooseAttendancePostBlocks(team.id)
         SlackClient.views.open({
-          view: chooseAttendancePostBlocks,
+          view,
           token,
           trigger_id
         })

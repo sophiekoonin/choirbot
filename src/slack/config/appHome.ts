@@ -27,7 +27,6 @@ async function updateView(team: TeamId): Promise<View> {
 
   const blocks = [
     {
-      // Section with text and a button
       type: 'section',
       text: {
         type: 'mrkdwn',
@@ -35,7 +34,6 @@ async function updateView(team: TeamId): Promise<View> {
           '*Welcome!* \nThis is where you can configure SHEbot to fit your choir.'
       }
     },
-    // Horizontal divider line
     {
       type: 'divider'
     },

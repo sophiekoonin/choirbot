@@ -1,5 +1,16 @@
 import { View } from '@slack/types'
 import { Actions, AttendancePostSections, Blocks } from '../constants'
+import { getValues } from '../../db'
+import { TeamId } from '../types'
+import { getAttendancePostBlocks } from '../attendance'
+
+const exampleSongData = {
+  mainSong: 'Example Song',
+  mainSongLink: 'https://www.example.com',
+  runThrough: 'Example Song',
+  runThroughLink: 'https://www.example.com',
+  notes: 'Social after rehearsal!'
+}
 
 export const setSheetIdView: View = {
   type: 'modal',
@@ -55,115 +66,141 @@ export const setSheetIdView: View = {
   }
 }
 
-export const chooseAttendancePostBlocks: View = {
-  type: 'modal',
-  title: {
-    type: 'plain_text',
-    text: 'Attendance posts'
-  },
-  blocks: [
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        verbatim: true,
-        text:
-          'This is where you can compose the parts of the message that will be sent on *the day of* your rehearsal.'
-      }
+export async function chooseAttendancePostBlocks(
+  teamId: TeamId
+): Promise<View> {
+  const [currentBlocks, introText] = await getValues('teams', teamId, [
+    'attendance_blocks',
+    'intro_text'
+  ])
+  return {
+    type: 'modal',
+    title: {
+      type: 'plain_text',
+      text: 'Attendance posts'
     },
-    {
-      type: 'input',
-      block_id: Blocks.INTRO_TEXT,
-      label: {
-        type: 'plain_text',
-        text: 'Introduction - this bit will always come first.'
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          verbatim: true,
+          text:
+            'This is where you can compose the parts of the message that will be sent on *the day of* your rehearsal.'
+        }
       },
-      element: {
-        type: 'plain_text_input',
-        action_id: Blocks.INTRO_TEXT,
-        placeholder: {
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: "*Here's a preview of your current message:*"
+        }
+      },
+      {
+        type: 'divider'
+      },
+      ...getAttendancePostBlocks({
+        songs: exampleSongData,
+        blocks: currentBlocks,
+        introText
+      }),
+      {
+        type: 'divider'
+      },
+      {
+        type: 'input',
+        block_id: Blocks.INTRO_TEXT,
+        label: {
           type: 'plain_text',
-          text: 'Rehearsal day!'
+          text: 'Introduction - this bit will always come first.'
         },
-        multiline: true
+        element: {
+          type: 'plain_text_input',
+          action_id: Blocks.INTRO_TEXT,
+          placeholder: {
+            type: 'plain_text',
+            text: 'Rehearsal day!'
+          },
+          initial_value: introText
+        },
+        optional: false
       },
-      optional: false
-    },
-    {
-      type: 'input',
-      block_id: Blocks.ATTENDANCE_BLOCKS,
-      label: {
-        type: 'plain_text',
-        text:
-          "Choose the sections that come next in the order that you want them. Leave out any you don't want."
-      },
-      element: {
-        type: 'multi_static_select',
-        action_id: Blocks.ATTENDANCE_BLOCKS,
-        placeholder: {
+      {
+        type: 'input',
+        block_id: Blocks.ATTENDANCE_BLOCKS,
+        label: {
           type: 'plain_text',
-          text: 'Please choose'
+          text:
+            "Choose the sections that come next in the order that you want them. Leave out any you don't want."
         },
-        options: [
-          {
-            text: {
-              type: 'plain_text',
-              text: 'Notes'
-            },
-            value: AttendancePostSections.NOTES
+        element: {
+          type: 'multi_static_select',
+          action_id: Blocks.ATTENDANCE_BLOCKS,
+          placeholder: {
+            type: 'plain_text',
+            text: 'Please choose'
           },
-          {
-            text: {
-              type: 'plain_text',
-              text: 'React with 👍👎 if attending/not attending',
-              emoji: true
+          options: [
+            {
+              text: {
+                type: 'plain_text',
+                text: 'Notes'
+              },
+              value: AttendancePostSections.NOTES
             },
-            value: AttendancePostSections.ATTENDANCE_EMOJI
-          },
-          {
-            text: {
-              type: 'plain_text',
-              text: 'Main song'
+            {
+              text: {
+                type: 'plain_text',
+                text: 'React with 👍👎 if attending/not attending',
+                emoji: true
+              },
+              value: AttendancePostSections.ATTENDANCE_EMOJI
             },
-            value: AttendancePostSections.MAIN_SONG
-          },
-          {
-            text: {
-              type: 'plain_text',
-              text: 'Run through song'
+            {
+              text: {
+                type: 'plain_text',
+                text: 'Main song'
+              },
+              value: AttendancePostSections.MAIN_SONG
             },
-            value: AttendancePostSections.RUN_THROUGH
-          },
-          {
-            text: {
-              type: 'plain_text',
-              emoji: true,
-              text: 'Volunteer for physical warmup with 💪'
+            {
+              text: {
+                type: 'plain_text',
+                text: 'Run through song'
+              },
+              value: AttendancePostSections.RUN_THROUGH
             },
-            value: AttendancePostSections.PHYSICAL_WARMUP
-          },
-          {
-            text: {
-              type: 'plain_text',
-              emoji: true,
-              text: 'Volunteer for musical warmup with 🎵'
+            {
+              text: {
+                type: 'plain_text',
+                emoji: true,
+                text: 'Volunteer for physical warmup with 💪'
+              },
+              value: AttendancePostSections.PHYSICAL_WARMUP
             },
-            value: AttendancePostSections.MUSICAL_WARMUP
-          },
-          {
-            text: {
-              type: 'plain_text',
-              emoji: true,
-              text: 'Volunteer to facilitate with 🙌'
+            {
+              text: {
+                type: 'plain_text',
+                emoji: true,
+                text: 'Volunteer for musical warmup with 🎵'
+              },
+              value: AttendancePostSections.MUSICAL_WARMUP
             },
-            value: AttendancePostSections.FACILITATOR
-          }
-        ]
+            {
+              text: {
+                type: 'plain_text',
+                emoji: true,
+                text: 'Volunteer to facilitate with 🙌'
+              },
+              value: AttendancePostSections.FACILITATOR
+            }
+          ]
+        }
       }
+    ],
+    submit: {
+      type: 'plain_text',
+      text: 'Save'
     }
-  ],
-  submit: {
-    type: 'plain_text',
-    text: 'Save'
   }
 }

@@ -143,7 +143,7 @@ export const processAttendanceForTeam = async function({
   return
 }
 
-function getAttendancePostBlocks({
+export function getAttendancePostBlocks({
   songs,
   blocks,
   introText
