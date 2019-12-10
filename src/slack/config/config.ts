@@ -1,7 +1,7 @@
-import { BlockTypes } from './constants'
-import { SlackClient } from './client'
-import { TeamId, SubmissionValues } from './types'
-import { updateDbValue } from '../db'
+import { BlockTypes } from '../constants'
+import { SlackClient } from '../client'
+import { TeamId, SubmissionValues } from '../types'
+import { updateDbValue } from '../../db'
 
 export async function onSlackInstall({
   token,

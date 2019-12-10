@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 
 import { db } from '../db'
-import { onSlackInstall } from './config'
+import { onSlackInstall } from './config/config'
 import { OAuthResponse } from './types'
 import { SlackClient } from './client'
 

@@ -9,8 +9,8 @@ import { ActionResponseBody, TeamId, InboundInteraction } from '../types'
 import { postAttendanceMessage } from '../attendance'
 import { postRehearsalMusic } from '..'
 import { SlackClient } from '../client'
-import { setSheetIdView, chooseAttendancePostBlocks } from '../views'
-import { processConfigSubmission } from '../config'
+import { setSheetIdView, chooseAttendancePostBlocks } from '../config/views'
+import { processConfigSubmission } from '../config/config'
 
 export async function handleInteractions(
   req: Request,

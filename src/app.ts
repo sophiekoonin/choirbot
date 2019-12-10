@@ -6,7 +6,6 @@ import {
   oauth_redirect,
   oauth_error,
   oauth_success,
-  handleSlashCommands,
   verifyRequestSignature,
   handleEvents
 } from './slack'
@@ -32,7 +31,6 @@ app.get('/', (req: express.Request, res: express.Response) => {
 
 app.post('/interactions', verifyRequestSignature, handleInteractions)
 app.get('/oauth_redirect', verifyRequestSignature, oauth_redirect)
-app.post('/slash-commands', verifyRequestSignature, handleSlashCommands)
 app.post('/events', handleEvents)
 app.get('/oauth_success', oauth_success)
 app.get('/oauth_error', oauth_error)

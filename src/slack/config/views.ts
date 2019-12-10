@@ -1,5 +1,5 @@
 import { View } from '@slack/types'
-import { Actions, AttendancePostSections, Blocks } from './constants'
+import { Actions, AttendancePostSections, Blocks } from '../constants'
 
 export const setSheetIdView: View = {
   type: 'modal',
