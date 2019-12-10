@@ -1,8 +1,10 @@
 import { View } from '@slack/types'
-import { Actions, AttendancePostSections, Blocks } from '../constants'
+import { Actions, Blocks } from '../constants'
 import { getValues } from '../../db'
 import { TeamId } from '../types'
 import { getAttendancePostBlocks } from '../attendance'
+import { AttendanceBlockSelectors } from '../blocks/config'
+import { Option } from '@slack/web-api'
 
 const exampleSongData = {
   mainSong: 'Example Song',
@@ -140,61 +142,12 @@ export async function chooseAttendancePostBlocks(
             type: 'plain_text',
             text: 'Please choose'
           },
-          options: [
-            {
-              text: {
-                type: 'plain_text',
-                text: 'Notes'
-              },
-              value: AttendancePostSections.NOTES
-            },
-            {
-              text: {
-                type: 'plain_text',
-                text: 'React with 👍👎 if attending/not attending',
-                emoji: true
-              },
-              value: AttendancePostSections.ATTENDANCE_EMOJI
-            },
-            {
-              text: {
-                type: 'plain_text',
-                text: 'Main song'
-              },
-              value: AttendancePostSections.MAIN_SONG
-            },
-            {
-              text: {
-                type: 'plain_text',
-                text: 'Run through song'
-              },
-              value: AttendancePostSections.RUN_THROUGH
-            },
-            {
-              text: {
-                type: 'plain_text',
-                emoji: true,
-                text: 'Volunteer for physical warmup with 💪'
-              },
-              value: AttendancePostSections.PHYSICAL_WARMUP
-            },
-            {
-              text: {
-                type: 'plain_text',
-                emoji: true,
-                text: 'Volunteer for musical warmup with 🎵'
-              },
-              value: AttendancePostSections.MUSICAL_WARMUP
-            },
-            {
-              text: {
-                type: 'plain_text',
-                emoji: true,
-                text: 'Volunteer to facilitate with 🙌'
-              },
-              value: AttendancePostSections.FACILITATOR
-            }
-          ]
+          options: AttendanceBlockSelectors,
+          initial_options: currentBlocks
+            .map((block: string) =>
+              AttendanceBlockSelectors.find(b => b.value === block)
+            )
+            .filter((block: Option) => block != null)
         }
       }
     ],
