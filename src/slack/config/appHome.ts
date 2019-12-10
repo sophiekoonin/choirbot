@@ -1,8 +1,8 @@
-import { UserId, TeamId } from './types'
-import { SlackClient } from './client'
-import { getValue, getValues } from '../db'
+import { UserId, TeamId } from '../types'
+import { SlackClient } from '../client'
+import { getValue, getValues } from '../../db'
 import { View } from '@slack/types'
-import { Actions, DaysOfWeek } from './constants'
+import { Actions, DaysOfWeek } from '../constants'
 
 export async function showAppHome({
   user,

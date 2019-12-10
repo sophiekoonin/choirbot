@@ -1,6 +1,15 @@
 import { SectionBlock } from '@slack/types'
 import { AttendancePostSections } from '../constants'
-import { SongData } from '../../google/types'
+
+function getSongLink(songName: string, songLink: string): string {
+  if (songLink == null || songLink === '') {
+    return `${songName} - can't find a link for this - please check Arrangements Folder`
+  }
+  if (songLink.includes(',')) {
+    return `${songName} - ${songLink}`
+  }
+  return `<${songLink}|${songName}>`
+}
 
 export const introductionBlock = (text: string): SectionBlock => ({
   type: 'section',
@@ -30,35 +39,49 @@ export const musicalWarmupBlock: SectionBlock = {
   }
 }
 
-export function mainSongBlock({ mainSong }: SongData): SectionBlock {
+export function mainSongBlock({
+  mainSong,
+  mainSongLink
+}: {
+  mainSong: string
+  mainSongLink: string
+}): SectionBlock {
   return {
     type: 'section',
     block_id: AttendancePostSections.MAIN_SONG,
     text: {
       type: 'mrkdwn',
-      text: `*Today's rehearsal*: ${mainSong}`
+      text: `*We're singing*: ${getSongLink(mainSong, mainSongLink)}`
     }
   }
 }
 
-export function runThroughBlock({ runThrough }: SongData): SectionBlock {
+export function runThroughBlock({
+  runThrough,
+  runThroughLink
+}: {
+  runThrough: string
+  runThroughLink: string
+}): SectionBlock | null {
+  if (runThrough == null || runThrough === '') return
   return {
     type: 'section',
     block_id: AttendancePostSections.RUN_THROUGH,
     text: {
       type: 'mrkdwn',
-      text: `*Run through*: ${runThrough}`
+      text: `*Run through*: ${getSongLink(runThrough, runThroughLink)}`
     }
   }
 }
 
-export function notesBlock({ notes }: SongData): SectionBlock {
+export function notesBlock({ notes }: { notes: string }): SectionBlock | null {
+  if (notes == null || notes === '') return null
   return {
     type: 'section',
     block_id: AttendancePostSections.NOTES,
     text: {
       type: 'mrkdwn',
-      text: notes
+      text: `:information_source: ${notes}`
     }
   }
 }
@@ -68,8 +91,7 @@ export const physicalWarmupBlock: SectionBlock = {
   block_id: AttendancePostSections.PHYSICAL_WARMUP,
   text: {
     type: 'mrkdwn',
-    text:
-      'To volunteer for physical warmup, respond with :muscle:. \nFor musical warmup, respond with :musical_note:.'
+    text: 'To volunteer for physical warmup, respond with :muscle:.'
   }
 }
 

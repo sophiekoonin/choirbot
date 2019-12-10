@@ -1,5 +1,5 @@
 import { postRehearsalMusic } from './rehearsals'
-import { handleInteractions } from './interactions/interactions'
+import { handleInteractions } from './config/interactions'
 import { oauth_redirect, oauth_error, oauth_success } from './oauth'
 import { getAttendanceReport } from './reports'
 import { verifyRequestSignature } from './auth'

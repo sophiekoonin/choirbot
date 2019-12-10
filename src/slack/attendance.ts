@@ -154,9 +154,11 @@ function getAttendancePostBlocks({
 }): Array<SectionBlock> {
   return [
     introductionBlock(introText),
-    ...blocks.map(blockName => {
-      const block = AttendanceBlocks[blockName]
-      return typeof block === 'function' ? block(songs) : block
-    })
+    ...blocks
+      .map(blockName => {
+        const block = AttendanceBlocks[blockName]
+        return typeof block === 'function' ? block(songs) : block
+      })
+      .filter(block => block != null)
   ]
 }

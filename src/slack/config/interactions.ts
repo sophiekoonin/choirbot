@@ -9,8 +9,8 @@ import { ActionResponseBody, TeamId, InboundInteraction } from '../types'
 import { postAttendanceMessage } from '../attendance'
 import { postRehearsalMusic } from '..'
 import { SlackClient } from '../client'
-import { setSheetIdView, chooseAttendancePostBlocks } from '../config/views'
-import { processConfigSubmission } from '../config/config'
+import { setSheetIdView, chooseAttendancePostBlocks } from './views'
+import { processConfigSubmission } from './config'
 
 export async function handleInteractions(
   req: Request,
@@ -115,6 +115,7 @@ export async function postManually({
         date: date.format('DD/MM/YYYY')
       })
     case 'rehearsal':
+      date.add(4, 'days')
       return postRehearsalMusic({
         token,
         channel,
@@ -127,5 +128,3 @@ export async function postManually({
       return
   }
 }
-
-// export async function handleViewSubmission(view: View)

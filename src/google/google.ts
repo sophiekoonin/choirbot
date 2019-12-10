@@ -39,15 +39,13 @@ async function getSongDetailsFromSheet(
       spreadsheetId: sheetId,
       range: `B${rowNumber}:I${rowNumber}`
     })
-    const values = [].concat.apply([], response.data.values)
-    const mainSong = values[0]
-    const runThrough = values[1]
-    const notes = values[2]
-    const mainSongLink = values[6]
-    const runThroughLink =
-      values[1] === '' || values[1] === null
-        ? `https://docs.google.com/spreadsheets/d/${sheetId}`
-        : values[7]
+    const [
+      mainSong,
+      runThrough,
+      notes,
+      mainSongLink,
+      runThroughLink
+    ] = response.data.values.flat()
     return {
       mainSong,
       mainSongLink,

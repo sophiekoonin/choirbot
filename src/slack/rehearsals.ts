@@ -2,23 +2,33 @@ import * as google from '../google/google'
 import { SongData } from '../google/types'
 import { SlackClient } from './client'
 import { getValue } from '../db'
+import { SectionBlock } from '@slack/types'
+import { mainSongBlock, runThroughBlock, notesBlock } from './blocks/attendance'
 
-function getRehearsalMusicMessage(
+function getRehearsalMusicBlocks(
   { mainSong, mainSongLink, runThrough, runThroughLink, notes }: SongData,
   dayOfWeek: string
-): string {
-  return `<!channel> Here's the plan for ${dayOfWeek}'s rehearsal! \n
-  ${notes && notes !== '' ? `${notes}\n` : ''}
-  We'll be doing *${mainSong}* - ${mainSongLink ||
-    "I can't find a link for this - please check the Arrangements Folder!"} \n
-  ${
-    runThrough != null && runThrough != ''
-      ? `*Run through*: ${runThrough}${
-          runThroughLink ? ' - ' + runThroughLink : ''
-        } \n`
-      : ''
-  }
-  Please give the recordings a listen! :sparkles:`
+): SectionBlock[] {
+  return [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `<!channel> Here's the plan for ${dayOfWeek}'s rehearsal!`
+      }
+    },
+    notesBlock({ notes }),
+    mainSongBlock({ mainSong, mainSongLink }),
+    runThroughBlock({ runThrough, runThroughLink }),
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text:
+          ':musical_note: Please give the recordings a listen before rehearsal.'
+      }
+    }
+  ]
 }
 
 export async function postRehearsalMusic({
@@ -37,9 +47,11 @@ export async function postRehearsalMusic({
   isBankHoliday: boolean
 }): Promise<void> {
   try {
-    let text
+    let text = `:wave: Here's the plan for ${dayOfWeek}'s rehearsal!`
     let destination = channel
     let as_user = false
+    let blocks
+
     if (isBankHoliday) {
       text = `<!channel> It's a bank holiday next ${dayOfWeek}, so no rehearsal! Have a lovely day off!`
     } else {
@@ -48,12 +60,12 @@ export async function postRehearsalMusic({
         text = `I tried to post a rehearsal reminder, but I couldn't find a row for ${date} in the schedule. Please make sure the dates are correct!`
         as_user = true
         destination = await getValue('teams', teamId, 'user_id')
-      } else if (
-        nextWeekSongs.mainSong.toLowerCase().includes('no rehearsal')
-      ) {
+      } else if (nextWeekSongs.mainSong.match(/no rehearsal/gi)) {
         text = "<!channel> Reminder: there's no rehearsal next week!"
       } else {
-        text = getRehearsalMusicMessage(nextWeekSongs, dayOfWeek)
+        blocks = getRehearsalMusicBlocks(nextWeekSongs, dayOfWeek).filter(
+          block => block != null
+        )
       }
     }
 
@@ -62,7 +74,8 @@ export async function postRehearsalMusic({
       text,
       username: 'Schedule Bot',
       as_user,
-      channel: destination
+      channel: destination,
+      blocks
     })
   } catch (err) {
     console.error(teamId, err)
