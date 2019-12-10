@@ -113,3 +113,9 @@ export const AttendanceBlocks = {
   [AttendancePostSections.RUN_THROUGH]: runThroughBlock,
   [AttendancePostSections.ATTENDANCE_EMOJI]: attendanceEmojiBlock
 }
+
+export const initialIntroText = ':tada: Rehearsal day! :tada: <!channel>'
+export const initialBlocks = [
+  AttendancePostSections.MAIN_SONG,
+  AttendancePostSections.ATTENDANCE_EMOJI
+]

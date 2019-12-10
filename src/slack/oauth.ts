@@ -4,6 +4,7 @@ import { db } from '../db'
 import { onSlackInstall } from './config/config'
 import { OAuthResponse } from './types'
 import { SlackClient } from './client'
+import { initialIntroText, initialBlocks } from './blocks/attendance'
 
 const { SLACK_CLIENT_ID, SLACK_CLIENT_SECRET, SLACK_APP_ID } = process.env
 // With thanks to Dennis Alund https://medium.com/evenbit/building-a-slack-app-with-firebase-as-a-backend-151c1c98641d
@@ -53,7 +54,11 @@ export const oauth_redirect = async function(
       channel,
       bot_user_id,
       bot_access_token,
-      token: access_token
+      token: access_token,
+      intro_text: initialIntroText,
+      attendance_blocks: initialBlocks,
+      rehearsal_reminders: false,
+      rehearsal_day: '1'
     })
   onSlackInstall({ token: bot_access_token, userId: user_id })
 

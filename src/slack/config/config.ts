@@ -1,4 +1,4 @@
-import { BlockTypes } from '../constants'
+import { BlockTypes, AttendancePostSections } from '../constants'
 import { SlackClient } from '../client'
 import { TeamId, SubmissionValues } from '../types'
 import { updateDbValue } from '../../db'
