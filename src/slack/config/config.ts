@@ -1,23 +1,6 @@
-import { BlockTypes, AttendancePostSections } from '../constants'
-import { SlackClient } from '../client'
+import { BlockTypes } from '../constants'
 import { TeamId, SubmissionValues } from '../types'
 import { updateDbValue } from '../../db'
-
-export async function onSlackInstall({
-  token,
-  userId
-}: {
-  token: string
-  userId: string
-}): Promise<void> {
-  await SlackClient.chat.postMessage({
-    token,
-    channel: userId,
-    as_user: true,
-    username: 'SHE Bot',
-    text: 'Welcome to the SHE Bot!'
-  })
-}
 
 export async function processConfigSubmission({
   values,

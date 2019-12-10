@@ -23,7 +23,8 @@ export const Blocks = {
 }
 
 export const EventTypes = {
-  APP_HOME_OPENED: 'app_home_opened'
+  APP_HOME_OPENED: 'app_home_opened',
+  URL_VERIFICATION: 'url_verification'
 }
 
 export const BlockTypes = {

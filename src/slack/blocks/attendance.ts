@@ -3,7 +3,7 @@ import { AttendancePostSections } from '../constants'
 
 function getSongLink(songName: string, songLink: string): string {
   if (songLink == null || songLink === '') {
-    return `${songName} - can't find a link for this - please check Arrangements Folder`
+    return `${songName}`
   }
   if (songLink.includes(',')) {
     return `${songName} - ${songLink}`

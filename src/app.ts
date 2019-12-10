@@ -30,7 +30,7 @@ app.get('/', (req: express.Request, res: express.Response) => {
 })
 
 app.post('/interactions', verifyRequestSignature, handleInteractions)
-app.get('/oauth_redirect', verifyRequestSignature, oauth_redirect)
+app.get('/oauth_redirect', oauth_redirect)
 app.post('/events', handleEvents)
 app.get('/oauth_success', oauth_success)
 app.get('/oauth_error', oauth_error)

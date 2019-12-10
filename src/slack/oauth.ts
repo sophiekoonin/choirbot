@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 
-import { db } from '../db'
-import { onSlackInstall } from './config/config'
+import { db, getValues } from '../db'
+import { onSlackInstall } from './config/installation'
 import { OAuthResponse } from './types'
 import { SlackClient } from './client'
 import { initialIntroText, initialBlocks } from './blocks/attendance'
@@ -44,6 +44,26 @@ export const oauth_redirect = async function(
   const { bot_user_id, bot_access_token } = bot
   const { channel_id, channel } = incoming_webhook
 
+  let [
+    existingTeamName,
+    intro_text,
+    attendance_blocks,
+    rehearsal_reminders,
+    rehearsal_day
+  ] = await getValues('teams', team_id, [
+    'team_name',
+    'intro_text',
+    'attendance_blocks',
+    'rehearsal_reminders',
+    'rehearsal_day'
+  ])
+
+  if (existingTeamName == null || intro_text === '') {
+    intro_text = initialIntroText
+    attendance_blocks = initialBlocks
+    rehearsal_reminders = false
+    rehearsal_day = '1'
+  }
   await db
     .collection('teams')
     .doc(team_id)
@@ -55,12 +75,12 @@ export const oauth_redirect = async function(
       bot_user_id,
       bot_access_token,
       token: access_token,
-      intro_text: initialIntroText,
-      attendance_blocks: initialBlocks,
-      rehearsal_reminders: false,
-      rehearsal_day: '1'
+      intro_text,
+      attendance_blocks,
+      rehearsal_reminders,
+      rehearsal_day
     })
-  onSlackInstall({ token: bot_access_token, userId: user_id })
+  await onSlackInstall({ token: bot_access_token, userId: user_id })
 
   return res
     .header(
