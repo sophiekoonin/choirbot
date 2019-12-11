@@ -3,7 +3,7 @@ echo """
 runtime: nodejs12
 instance_class: F1
 automatic_scaling:
-  max_num_instances: 1
+  max_instances: 1
 env_variables:
   GCLOUD_PROJECT: $GCLOUD_PROJECT
   SLACK_CLIENT_ID: $SLACK_CLIENT_ID
