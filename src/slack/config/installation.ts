@@ -116,6 +116,42 @@ const installationMessageBlocks = [
       text:
         "There's also a section where you can trigger posts just in case they don't get automatically posted. Use with caution!"
     }
+  },
+  {
+    type: 'divider'
+  },
+  {
+    type: 'section',
+    text: {
+      type: 'mrkdwn',
+      text: '*Attendance reports*'
+    }
+  },
+  {
+    type: 'section',
+    text: {
+      type: 'mrkdwn',
+      text:
+        'You can view reports on the Home tab by clicking the `View Report` button.'
+    }
+  },
+  {
+    type: 'divider'
+  },
+  {
+    type: 'section',
+    text: {
+      type: 'mrkdwn',
+      text: '*Problems and feedback*'
+    }
+  },
+  {
+    type: 'section',
+    text: {
+      type: 'mrkdwn',
+      text:
+        "This app was developed by Sophie from SHE Choir London. If you're having any issues, or have ideas for new reports or new features, please send her an email at `london@shechoir.com`."
+    }
   }
 ]
 
