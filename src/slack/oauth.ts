@@ -21,6 +21,7 @@ export const oauth_redirect = async function(
     return res.status(401).send("Missing query attribute 'code'")
   }
 
+  console.log({ SLACK_CLIENT_ID })
   const result = await SlackClient.oauth.v2.access({
     client_id: SLACK_CLIENT_ID,
     client_secret: SLACK_CLIENT_SECRET,
