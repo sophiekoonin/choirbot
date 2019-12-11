@@ -11,7 +11,7 @@ export async function showAppHome({
   user: UserId
   team: TeamId
 }) {
-  const token = await getValue('teams', team, 'bot_access_token')
+  const token = await getValue('teams', team, 'access_token')
   SlackClient.views.publish({
     token,
     user_id: user,

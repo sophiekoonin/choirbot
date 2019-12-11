@@ -39,7 +39,7 @@ async function checkForAttendancePostJobs(date: moment.Moment) {
   teams.forEach(async team => {
     const {
       id,
-      bot_access_token: token,
+      access_token: token,
       channel_id: channel,
       attendance_blocks: blocks,
       intro_text: introText
@@ -71,7 +71,7 @@ async function checkForRehearsalReminderJobs(date: moment.Moment) {
   const teams = await getQueryResults(todayQuery)
   if (teams.length === 0) return
   teams.forEach(async team => {
-    const { id, bot_access_token: token, channel_id: channel } = team
+    const { id, access_token: token, channel_id: channel } = team
     return await postRehearsalMusic({
       token: token as string,
       teamId: id,
@@ -89,7 +89,7 @@ export const processAttendance = async () => {
   const allTeams = await getQueryResults(db.collection('teams'))
 
   allTeams.forEach(async team => {
-    const { id, bot_access_token: token, channel_id: channel } = team
+    const { id, access_token: token, channel_id: channel } = team
     return await processAttendanceForTeam({
       token: token as string,
       channel: channel as string,

@@ -92,9 +92,13 @@ export interface OAuthError {
   error: string
 }
 export interface OAuthResponse extends WebAPICallResult {
-  team_id: TeamId
-  team_name: string
-  user_id: UserId
+  team: {
+    id: TeamId
+    name: string
+  }
+  authed_user: {
+    id: UserId
+  }
   access_token: string
   incoming_webhook: {
     url: string
@@ -102,10 +106,7 @@ export interface OAuthResponse extends WebAPICallResult {
     channel: string
     configuration_url: string
   }
-  bot: {
-    bot_user_id: UserId
-    bot_access_token: string
-  }
+  bot_user_id: UserId
 }
 
 export interface Event {

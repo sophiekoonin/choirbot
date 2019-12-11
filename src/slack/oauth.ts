@@ -21,7 +21,7 @@ export const oauth_redirect = async function(
     return res.status(401).send("Missing query attribute 'code'")
   }
 
-  const result = await SlackClient.oauth.access({
+  const result = await SlackClient.oauth.v2.access({
     client_id: SLACK_CLIENT_ID,
     client_secret: SLACK_CLIENT_SECRET,
     code: req.query.code
@@ -34,14 +34,12 @@ export const oauth_redirect = async function(
 
   const {
     incoming_webhook,
-    team_id,
-    team_name,
-    user_id,
+    team: { id: team_id, name: team_name },
+    authed_user: { id: user_id },
     access_token,
-    bot
+    bot_user_id
   } = result as OAuthResponse
 
-  const { bot_user_id, bot_access_token } = bot
   const { channel_id, channel } = incoming_webhook
 
   let [
@@ -76,15 +74,14 @@ export const oauth_redirect = async function(
       channel_id,
       channel,
       bot_user_id,
-      bot_access_token,
-      token: access_token,
+      access_token,
       intro_text,
       attendance_blocks,
       rehearsal_reminders,
       rehearsal_day,
       google_sheet_id
     })
-  await onSlackInstall({ token: bot_access_token, userId: user_id })
+  await onSlackInstall({ token: access_token, userId: user_id })
 
   return res
     .header(

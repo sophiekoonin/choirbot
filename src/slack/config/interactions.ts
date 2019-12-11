@@ -18,7 +18,7 @@ export async function handleInteractions(
 ): Promise<void> {
   const payload: InboundInteraction = JSON.parse(req.body.payload)
   const { actions, team, trigger_id, view, type } = payload
-  const token = await db.getValue('teams', team.id, 'bot_access_token')
+  const token = await db.getValue('teams', team.id, 'access_token')
   res.send()
 
   if (view != null && type == Interactions.VIEW_SUBMISSION) {
@@ -109,7 +109,7 @@ export async function postManually({
   const [token, channel, blocks, introText] = await db.getValues(
     'teams',
     teamId,
-    ['bot_access_token', 'channel_id', 'attendance_blocks', 'intro_text']
+    ['access_token', 'channel_id', 'attendance_blocks', 'intro_text']
   )
   const date = moment()
 
