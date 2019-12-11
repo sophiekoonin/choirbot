@@ -91,7 +91,7 @@ export const postAttendanceMessage = async ({
     })
 
     await db.setDbValue(`attendance-${teamId}`, dateISO, {
-      rehearsal_date: date,
+      rehearsal_date: dateString,
       created_at: Firestore.Timestamp.now().seconds,
       ts: postMsgRsp.ts,
       channel: channel,

@@ -117,8 +117,9 @@ export async function reportAttendance(
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `*Not responded in last 4 weeks:*
-        ${notResponded.map(uid => `<@${uid}>`).join('\n')}`
+        text: `*Not responded in last 4 weeks:*\n${notResponded
+          .map(uid => `<@${uid}>`)
+          .join('\n')}`
       }
     }
   ]
