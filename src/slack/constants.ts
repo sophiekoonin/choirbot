@@ -3,10 +3,11 @@ export const Actions = {
   YES_NO_REMINDERS: 'rehearsal_reminders',
   POST_CANCEL: 'post_cancel',
   SHOW_SHEET_MODAL: 'show_sheet_modal',
-  SET_SHEET_ID: 'set_sheet_id',
+  GOOGLE_SHEET_ID: 'google_sheet_id',
   POST_ATTENDANCE_MESSAGE: 'post_attendance_message',
   POST_REHEARSAL_MESSAGE: 'post_rehearsal_message',
-  SET_ATTENDANCE_BLOCKS: 'set_attendance_blocks'
+  SET_ATTENDANCE_BLOCKS: 'set_attendance_blocks',
+  VIEW_REPORT: 'view_report'
 }
 
 export const Interactions = {

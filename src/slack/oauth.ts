@@ -49,13 +49,15 @@ export const oauth_redirect = async function(
     intro_text,
     attendance_blocks,
     rehearsal_reminders,
-    rehearsal_day
+    rehearsal_day,
+    google_sheet_id
   ] = await getValues('teams', team_id, [
     'team_name',
     'intro_text',
     'attendance_blocks',
     'rehearsal_reminders',
-    'rehearsal_day'
+    'rehearsal_day',
+    'google_sheet_id'
   ])
 
   if (existingTeamName == null || intro_text === '') {
@@ -63,6 +65,7 @@ export const oauth_redirect = async function(
     attendance_blocks = initialBlocks
     rehearsal_reminders = false
     rehearsal_day = '1'
+    google_sheet_id = ''
   }
   await db
     .collection('teams')
@@ -78,7 +81,8 @@ export const oauth_redirect = async function(
       intro_text,
       attendance_blocks,
       rehearsal_reminders,
-      rehearsal_day
+      rehearsal_day,
+      google_sheet_id
     })
   await onSlackInstall({ token: bot_access_token, userId: user_id })
 

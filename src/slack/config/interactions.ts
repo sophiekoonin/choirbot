@@ -9,7 +9,7 @@ import { ActionResponseBody, TeamId, InboundInteraction } from '../types'
 import { postAttendanceMessage } from '../attendance'
 import { postRehearsalMusic } from '..'
 import { SlackClient } from '../client'
-import { setSheetIdView, chooseAttendancePostBlocks } from './views'
+import { setSheetIdView, chooseAttendancePostBlocks, reportView } from './views'
 import { processConfigSubmission } from './config'
 
 export async function handleInteractions(
@@ -62,6 +62,14 @@ export async function handleInteractions(
         const view = await chooseAttendancePostBlocks(team.id)
         SlackClient.views.open({
           view,
+          token,
+          trigger_id
+        })
+        break
+      case Actions.VIEW_REPORT:
+        const repView = await reportView(team.id)
+        SlackClient.views.open({
+          view: repView,
           token,
           trigger_id
         })

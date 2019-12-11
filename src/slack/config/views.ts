@@ -5,6 +5,7 @@ import { TeamId } from '../types'
 import { getAttendancePostBlocks } from '../attendance'
 import { AttendanceBlockSelectors } from '../blocks/config'
 import { Option } from '@slack/web-api'
+import { getStats, reportAttendance } from '../reports'
 
 const exampleSongData = {
   mainSong: 'Example Song',
@@ -46,16 +47,17 @@ export const setSheetIdView: View = {
     },
     {
       type: 'input',
+      block_id: Actions.GOOGLE_SHEET_ID,
       label: {
         type: 'plain_text',
         text: 'Sheet ID'
       },
       element: {
         type: 'plain_text_input',
-        action_id: Actions.SET_SHEET_ID,
+        action_id: Actions.GOOGLE_SHEET_ID,
         placeholder: {
           type: 'plain_text',
-          text: 'Type in here'
+          text: 'Paste in here'
         },
         multiline: false
       },
@@ -65,6 +67,19 @@ export const setSheetIdView: View = {
   submit: {
     type: 'plain_text',
     text: 'Save'
+  }
+}
+
+export async function reportView(teamId: TeamId): Promise<View> {
+  const reportBlocks = await reportAttendance(teamId)
+  const statsBlocks = await getStats(teamId)
+  return {
+    type: 'modal',
+    title: {
+      type: 'plain_text',
+      text: 'Attendance report'
+    },
+    blocks: [...reportBlocks, ...statsBlocks]
   }
 }
 

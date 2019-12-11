@@ -9,6 +9,7 @@ import {
   AttendanceData
 } from './types'
 import { SlackClient } from './client'
+import { SectionBlock } from '@slack/types'
 
 function mapAttendance(
   posts: Array<FirebaseFirestore.QueryDocumentSnapshot>
@@ -87,7 +88,9 @@ export async function getAttendanceReport(teamId: TeamId) {
 2. Filter list of users against attending/not attending 
 3. Show who hasn't responded
  */
-export async function reportAttendance(teamId: TeamId) {
+export async function reportAttendance(
+  teamId: TeamId
+): Promise<SectionBlock[]> {
   const lastFourWeeks = await getAttendancePosts(teamId, 4)
   const allUsers = await getSlackUserIds(teamId)
   const postData = mapAttendance(lastFourWeeks)
@@ -99,14 +102,29 @@ export async function reportAttendance(teamId: TeamId) {
     .map(post => [post.attending, post.notAttending])
     .flat(2)
   const notResponded = allUsers.filter(user => !responded.includes(user))
-  return `*Responses for last 4 rehearsals:*\n
-  ${lastFourWeeksAttending.join('\n')}\n
-  *Not responded in last 4 weeks:* \n${notResponded
-    .map(uid => `<@${uid}>`)
-    .join('\n')}`
+
+  return [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `*Responses for last 4 rehearsals:*\n${lastFourWeeksAttending.join(
+          '\n'
+        )}`
+      }
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `*Not responded in last 4 weeks:*
+        ${notResponded.map(uid => `<@${uid}>`).join('\n')}`
+      }
+    }
+  ]
 }
 
-export async function getStats(teamId: TeamId) {
+export async function getStats(teamId: TeamId): Promise<SectionBlock[]> {
   const allPosts = await getAttendancePosts(teamId)
   const allUsers = await getSlackUserIds(teamId)
   const attendanceData = mapAttendance(allPosts)
@@ -123,30 +141,31 @@ export async function getStats(teamId: TeamId) {
     .filter(obj => obj.attending.length === highestAttendanceValue)
     .map(obj => obj.date)
 
-  const membersToTotalAttendance = allUsers.map(user => ({
-    id: user,
-    attended: attendanceData.reduce(
-      (acc, curr) => (curr.attending.includes(user) ? (acc += 1) : acc),
-      0
-    )
-  }))
-  const highestAttended = Math.max.apply(
-    Math,
-    membersToTotalAttendance.map(data => data.attended)
-  )
-  const highestAttendanceMembers = membersToTotalAttendance
-    .filter(m => m.attended === highestAttended)
-    .map(m => `<@${m.id}>`)
-    .join(',')
-
-  return `:chart_with_upwards_trend: *Attendance statistics* - ${
-    attendanceData.length
-  } rehearsals\n
-*Highest attendance*: ${highestAttendanceValue} on ${
-    highestAttendanceDates.length > 1
-      ? highestAttendanceDates.join(', ')
-      : highestAttendanceDates[0]
-  }
-*Average attendance*: ${averageAttendance}
-*Most rehearsals attended:* ${highestAttendanceMembers} - ${highestAttended}`
+  return [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `:chart_with_upwards_trend: *Attendance statistics* - ${attendanceData.length} rehearsals`
+      }
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `*Highest attendance*: ${highestAttendanceValue} on ${
+          highestAttendanceDates.length > 1
+            ? highestAttendanceDates.join(', ')
+            : highestAttendanceDates[0]
+        }`
+      }
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `*Average attendance*: ${averageAttendance}`
+      }
+    }
+  ]
 }

@@ -30,12 +30,18 @@ async function updateView(team: TeamId): Promise<View> {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text:
-          '*Welcome!* \nThis is where you can configure SHEbot to fit your choir.'
+        text: '*Welcome to SHE Bot!*'
       }
     },
     {
       type: 'divider'
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: ':hammer_and_wrench: *SHEBot configuration*'
+      }
     },
     {
       type: 'section',
@@ -192,8 +198,34 @@ async function updateView(team: TeamId): Promise<View> {
       type: 'section',
       text: {
         type: 'mrkdwn',
+        text: ':chart_with_upwards_trend: *Attendance reports & statistics*'
+      }
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: 'View report for last four weeks of rehearsals'
+      },
+      accessory: {
+        type: 'button',
+        action_id: Actions.VIEW_REPORT,
+        text: {
+          type: 'plain_text',
+          text: 'View report',
+          emoji: true
+        }
+      }
+    },
+    {
+      type: 'divider'
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
         text:
-          "*Manually post messages*\nIn case the message didn't automatically post for any reason."
+          ":rotating_light: *Emergency toolkit* - manually post messages in case the message didn't automatically post for any reason."
       }
     },
     {
