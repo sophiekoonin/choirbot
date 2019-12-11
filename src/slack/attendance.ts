@@ -51,7 +51,9 @@ export const postAttendanceMessage = async ({
   blocks,
   introText
 }: PostAttendanceMessageArgs) => {
-  const songs = await google.getNextSongs(date, teamId)
+  const dateISO = date.format('YYYY-MM-DD')
+  const dateString = date.format('DD/MM/YYYY')
+  const songs = await google.getNextSongs(dateString, teamId)
   if (songs != null && songs.mainSong.toLowerCase().includes('no rehearsal')) {
     return
   }
@@ -88,7 +90,7 @@ export const postAttendanceMessage = async ({
       name: 'thumbsup'
     })
 
-    await db.setDbValue(`attendance-${teamId}`, date, {
+    await db.setDbValue(`attendance-${teamId}`, dateISO, {
       rehearsal_date: date,
       created_at: Firestore.Timestamp.now().seconds,
       ts: postMsgRsp.ts,

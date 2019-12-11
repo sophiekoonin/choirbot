@@ -28,7 +28,6 @@ export const checkForJobsToday = async (req: Request, res: Response) => {
 
 async function checkForAttendancePostJobs(date: moment.Moment) {
   const dateISO = date.format('YYYY-MM-DD')
-  const dateString = date.format('DD/MM/YYYY')
   const isBankHol = await utils.isBankHoliday(dateISO)
   if (isBankHol) return
 
@@ -48,7 +47,7 @@ async function checkForAttendancePostJobs(date: moment.Moment) {
     return await postAttendanceMessage({
       token: token as string,
       channel: channel as string,
-      date: dateString,
+      date,
       teamId: id,
       introText: introText as string,
       blocks: blocks as string[]

@@ -113,7 +113,7 @@ export async function postManually({
         teamId,
         blocks,
         introText,
-        date: date.format('DD/MM/YYYY')
+        date
       })
     case 'rehearsal':
       date.add(4, 'days')
