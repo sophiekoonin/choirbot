@@ -60,7 +60,7 @@ async function updateView(team: TeamId): Promise<View> {
         initial_option: {
           text: {
             type: 'plain_text',
-            text: DaysOfWeek[rehearsalDay],
+            text: DaysOfWeek[rehearsalDay as string],
             emoji: true
           },
           value: rehearsalDay

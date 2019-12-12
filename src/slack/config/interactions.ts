@@ -122,18 +122,18 @@ export async function postManually({
   switch (selectedOption) {
     case 'attendance':
       return await postAttendanceMessage({
-        channel,
-        token,
+        channel: channel as string,
+        token: channel as string,
         teamId,
-        blocks,
-        introText,
+        blocks: blocks as string[],
+        introText: introText as string,
         date
       })
     case 'rehearsal':
       date.add(4, 'days')
       return postRehearsalMusic({
-        token,
-        channel,
+        token: token as string,
+        channel: channel as string,
         teamId,
         dayOfWeek: date.format('dddd'),
         date: date.format('DD/MM/YYYY'),

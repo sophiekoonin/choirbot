@@ -118,8 +118,8 @@ export async function chooseAttendancePostBlocks(
       },
       ...getAttendancePostBlocks({
         songs: exampleSongData,
-        blocks: currentBlocks,
-        introText
+        blocks: currentBlocks as string[],
+        introText: introText as string
       }),
       {
         type: 'divider'
@@ -138,7 +138,7 @@ export async function chooseAttendancePostBlocks(
             type: 'plain_text',
             text: 'Rehearsal day!'
           },
-          initial_value: introText
+          initial_value: introText as string
         },
         optional: false
       },
@@ -158,7 +158,7 @@ export async function chooseAttendancePostBlocks(
             text: 'Please choose'
           },
           options: AttendanceBlockSelectors,
-          initial_options: currentBlocks
+          initial_options: (currentBlocks as string[])
             .map((block: string) =>
               AttendanceBlockSelectors.find(b => b.value === block)
             )
