@@ -106,11 +106,17 @@ export async function postManually({
   selectedOption: string
   teamId: TeamId
 }) {
-  const [token, channel, blocks, introText] = await db.getValues(
-    'teams',
-    teamId,
-    ['access_token', 'channel_id', 'attendance_blocks', 'intro_text']
-  )
+  const {
+    access_token: token,
+    channel_id: channel,
+    attendance_blocks: blocks,
+    intro_text: introText
+  } = await db.getValues('teams', teamId, [
+    'access_token',
+    'channel_id',
+    'attendance_blocks',
+    'intro_text'
+  ])
   const date = moment()
 
   switch (selectedOption) {

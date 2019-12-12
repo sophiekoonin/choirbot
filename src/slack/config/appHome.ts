@@ -20,10 +20,10 @@ export async function showAppHome({
 }
 
 async function updateView(team: TeamId): Promise<View> {
-  const [rehearsalDay, rehearsal_reminders] = await getValues('teams', team, [
-    'rehearsal_day',
-    'rehearsal_reminders'
-  ])
+  const {
+    rehearsal_day: rehearsalDay,
+    rehearsal_reminders
+  } = await getValues('teams', team, ['rehearsal_day', 'rehearsal_reminders'])
 
   const blocks = [
     {

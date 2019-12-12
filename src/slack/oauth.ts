@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 
-import { db, getValues } from '../db'
+import { db, getValues, getDbDoc } from '../db'
 import { onSlackInstall } from './config/installation'
 import { OAuthResponse } from './types'
 import { SlackClient } from './client'
@@ -41,30 +41,29 @@ export const oauth_redirect = async function(
   } = result as OAuthResponse
 
   const { channel_id, channel } = incoming_webhook
+  let intro_text = initialIntroText
+  let attendance_blocks = initialBlocks
+  let rehearsal_reminders = false
+  let rehearsal_day = '1'
+  let google_sheet_id = ''
 
-  let [
-    existingTeamName,
-    intro_text,
-    attendance_blocks,
-    rehearsal_reminders,
-    rehearsal_day,
-    google_sheet_id
-  ] = await getValues('teams', team_id, [
-    'team_name',
-    'intro_text',
-    'attendance_blocks',
-    'rehearsal_reminders',
-    'rehearsal_day',
-    'google_sheet_id'
-  ])
+  const doc = await getDbDoc('teams', team_id)
+  if (doc.exists) {
+    const values = await getValues('teams', team_id, [
+      'intro_text',
+      'attendance_blocks',
+      'rehearsal_reminders',
+      'rehearsal_day',
+      'google_sheet_id'
+    ])
 
-  if (existingTeamName == null || intro_text === '') {
-    intro_text = initialIntroText
-    attendance_blocks = initialBlocks
-    rehearsal_reminders = false
-    rehearsal_day = '1'
-    google_sheet_id = ''
+    intro_text = values.intro_text as string
+    attendance_blocks = values.attendance_blocks as string[]
+    rehearsal_reminders = values.rehearsal_reminders as boolean
+    rehearsal_day = values.rehearsal_day as string
+    google_sheet_id = values.google_sheet_id as string
   }
+
   await db
     .collection('teams')
     .doc(team_id)
@@ -81,6 +80,7 @@ export const oauth_redirect = async function(
       rehearsal_day,
       google_sheet_id
     })
+
   await onSlackInstall({ token: access_token, userId: user_id })
 
   return res

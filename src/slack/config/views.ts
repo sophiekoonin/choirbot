@@ -86,10 +86,10 @@ export async function reportView(teamId: TeamId): Promise<View> {
 export async function chooseAttendancePostBlocks(
   teamId: TeamId
 ): Promise<View> {
-  const [currentBlocks, introText] = await getValues('teams', teamId, [
-    'attendance_blocks',
-    'intro_text'
-  ])
+  const {
+    attendance_blocks: currentBlocks,
+    intro_text: introText
+  } = await getValues('teams', teamId, ['attendance_blocks', 'intro_text'])
   return {
     type: 'modal',
     title: {

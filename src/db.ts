@@ -67,12 +67,16 @@ export const getValues = async (
   collection: string,
   docName: string,
   keys: string[]
-) => {
+): Promise<{ [key: string]: string | number | string[] | boolean }> => {
   const doc = await getDbDoc(collection, docName)
   if (!doc.exists) {
     throw new Error(`Doc not found for ${docName}`)
   } else {
     const data = doc.data()
-    return keys.map(key => data[key])
+    return keys
+      .map(key => ({ [key]: data[key] }))
+      .reduce((acc, curr) => {
+        return { ...acc, curr }
+      }, {})
   }
 }
