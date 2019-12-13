@@ -1,10 +1,5 @@
 cron:
-- description: "check for attendance and rehearsal posts"
-  url: /cron
-  schedule: every day 09:30
-  timezone: Europe/London
-- description: "process attendance"
-  url: /process-attendance
-  schedule: every sunday 00:00
-  timezone: Europe/London
-  
+  - description: "check for attendance and rehearsal posts"
+    url: /cron
+    schedule: every day 09:30
+    timezone: Europe/London
