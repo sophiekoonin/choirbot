@@ -21,7 +21,7 @@ export async function handleInteractions(
   const token = await db.getValue('teams', team.id, 'access_token')
   res.send()
 
-  if (view != null && type == Interactions.VIEW_SUBMISSION) {
+  if (view != null && type === Interactions.VIEW_SUBMISSION) {
     await processConfigSubmission({
       values: view.state.values,
       teamId: team.id
@@ -67,7 +67,7 @@ export async function handleInteractions(
         })
         break
       case Actions.VIEW_REPORT:
-        const repView = await reportView(team.id)
+        const repView = await reportView(team.id, token)
         SlackClient.views.open({
           view: repView,
           token,

@@ -6,10 +6,6 @@ import { VerificationHeaders } from './types'
 import { Response, NextFunction } from 'express'
 import { Request } from '../types'
 
-export async function getToken(team_id: string) {
-  return await getValue('teams', team_id, 'token')
-}
-
 /**
  * Method to verify signature of requests - COURTESY OF SLACK SDK
  * https://github.com/slackapi/node-slack-sdk/

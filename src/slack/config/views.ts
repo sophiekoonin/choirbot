@@ -5,7 +5,8 @@ import { TeamId } from '../types'
 import { getAttendancePostBlocks } from '../attendance'
 import { AttendanceBlockSelectors } from '../blocks/config'
 import { Option } from '@slack/web-api'
-import { getStats, reportAttendance } from '../reports'
+import { getReportBlocks } from '../reports'
+import { getSlackUsers } from '../utils'
 
 const exampleSongData = {
   mainSong: 'Example Song',
@@ -70,16 +71,15 @@ export const setSheetIdView: View = {
   }
 }
 
-export async function reportView(teamId: TeamId): Promise<View> {
-  const reportBlocks = await reportAttendance(teamId)
-  const statsBlocks = await getStats(teamId)
+export async function reportView(teamId: TeamId, token: string): Promise<View> {
+  const reportBlocks = await getReportBlocks(teamId, token)
   return {
     type: 'modal',
     title: {
       type: 'plain_text',
       text: 'Attendance report'
     },
-    blocks: [...reportBlocks, ...statsBlocks]
+    blocks: [...reportBlocks]
   }
 }
 

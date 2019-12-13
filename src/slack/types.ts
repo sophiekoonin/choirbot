@@ -185,3 +185,9 @@ export interface InboundInteraction {
   view: ViewSubmissionDetails | null
   actions?: [ActionSubmission]
 }
+
+export interface ReportArgs {
+  teamId: TeamId
+  token: string
+  users: Array<SlackUser>
+}

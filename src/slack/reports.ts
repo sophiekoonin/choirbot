@@ -1,15 +1,7 @@
 import { getAttendancePosts } from './attendance'
-import { getToken } from './auth'
-import {
-  RehearsalAttendanceData,
-  UserId,
-  ListUsersResult,
-  SlackUser,
-  TeamId,
-  AttendanceData
-} from './types'
-import { SlackClient } from './client'
+import { RehearsalAttendanceData, TeamId } from './types'
 import { SectionBlock } from '@slack/types'
+import { getSlackUserIds } from './utils'
 
 function mapAttendance(
   posts: Array<FirebaseFirestore.QueryDocumentSnapshot>
@@ -21,87 +13,40 @@ function mapAttendance(
   }))
 }
 
-async function getSlackUsers(teamId: TeamId): Promise<Array<SlackUser>> {
-  const token = await getToken(teamId)
-  const { members } = (await SlackClient.users.list({
-    token
-  })) as ListUsersResult
-  return members
-    .filter(member => !member.deleted)
-    .filter(member => !member.is_bot)
-    .filter(member => member.id !== 'USLACKBOT')
-}
-
-async function getSlackUserIds(team_id: TeamId): Promise<Array<UserId>> {
-  const token = await getToken(team_id)
-  const { members } = (await SlackClient.users.list({
-    token
-  })) as ListUsersResult
-  return members
-    .filter(member => !member.deleted)
-    .filter(member => !member.is_bot)
-    .map(member => member.id)
-    .filter(id => id !== 'USLACKBOT')
-}
-
-function getAttendanceValue(
-  attendance: RehearsalAttendanceData,
-  user_id: UserId
-): string {
-  if (attendance.attending.includes(user_id)) {
-    return 'present'
-  } else if (attendance.notAttending.includes(user_id)) {
-    return 'absent'
-  }
-  return 'unknown'
-}
-
-export async function getAttendanceReport(teamId: TeamId) {
-  const allUsers = await getSlackUsers(teamId)
-  const attendanceRecords = await getAttendancePosts(teamId, 10)
-  const allAttendance = mapAttendance(attendanceRecords)
-
-  const allDates = allAttendance.map(record => record.date).sort()
-
-  const usersWithAttendance = allUsers.map((user: SlackUser) => {
-    const attendance = allAttendance.reduce(
-      (acc: AttendanceData, curr: RehearsalAttendanceData) => {
-        acc[curr.date] = getAttendanceValue(curr, user.id)
-        return acc
-      },
-      {}
-    )
-
-    return {
-      name: user.real_name,
-      attendance: attendance
-    }
-  })
-  return {
-    dates: allDates,
-    users: usersWithAttendance
-  }
-}
-
 /*
 1. Fetch last 4 rehearsals
 2. Filter list of users against attending/not attending 
 3. Show who hasn't responded
  */
-export async function reportAttendance(
-  teamId: TeamId
+export async function getReportBlocks(
+  teamId: TeamId,
+  token: string
 ): Promise<SectionBlock[]> {
-  const lastFourWeeks = await getAttendancePosts(teamId, 4)
-  const allUsers = await getSlackUserIds(teamId)
-  const postData = mapAttendance(lastFourWeeks)
-  const lastFourWeeksAttending = postData.map(
+  const allPosts = await getAttendancePosts(teamId)
+  const allUsers = await getSlackUserIds(token)
+  const attendanceData = mapAttendance(allPosts)
+  const lastFourWeeks = attendanceData.slice(0, 4)
+  const lastFourWeeksAttending = lastFourWeeks.map(
     post =>
       `${post.date}: :+1: ${post.attending.length} :-1: ${post.notAttending.length}`
   )
-  const responded = postData
+  const responded = lastFourWeeks
     .map(post => [post.attending, post.notAttending])
     .flat(2)
   const notResponded = allUsers.filter(user => !responded.includes(user))
+
+  const sumAttending = attendanceData.reduce(
+    (acc, curr) => (acc += curr.attending.length),
+    0
+  )
+  const averageAttendance = sumAttending / attendanceData.length
+  const highestAttendanceValue = Math.max.apply(
+    Math,
+    attendanceData.map(data => data.attending.length)
+  )
+  const highestAttendanceDates = attendanceData
+    .filter(obj => obj.attending.length === highestAttendanceValue)
+    .map(obj => obj.date)
 
   return [
     {
@@ -121,28 +66,7 @@ export async function reportAttendance(
           .map(uid => `<@${uid}>`)
           .join('\n')}`
       }
-    }
-  ]
-}
-
-export async function getStats(teamId: TeamId): Promise<SectionBlock[]> {
-  const allPosts = await getAttendancePosts(teamId)
-  const allUsers = await getSlackUserIds(teamId)
-  const attendanceData = mapAttendance(allPosts)
-  const sumAttending = attendanceData.reduce(
-    (acc, curr) => (acc += curr.attending.length),
-    0
-  )
-  const averageAttendance = sumAttending / attendanceData.length
-  const highestAttendanceValue = Math.max.apply(
-    Math,
-    attendanceData.map(data => data.attending.length)
-  )
-  const highestAttendanceDates = attendanceData
-    .filter(obj => obj.attending.length === highestAttendanceValue)
-    .map(obj => obj.date)
-
-  return [
+    },
     {
       type: 'section',
       text: {

@@ -22,9 +22,8 @@ export async function showAppHome({
 async function updateView(team: TeamId): Promise<View> {
   const {
     rehearsal_day: rehearsalDay,
-    rehearsal_reminders
+    rehearsal_reminders: remindersEnabled
   } = await getValues('teams', team, ['rehearsal_day', 'rehearsal_reminders'])
-
   const blocks = [
     {
       type: 'section',
@@ -135,10 +134,10 @@ async function updateView(team: TeamId): Promise<View> {
         type: 'radio_buttons',
         action_id: Actions.YES_NO_REMINDERS,
         initial_option: {
-          value: rehearsal_reminders.toString(),
+          value: remindersEnabled.toString(),
           text: {
             type: 'plain_text',
-            text: rehearsal_reminders ? 'Enabled' : 'Disabled'
+            text: remindersEnabled ? 'Enabled' : 'Disabled'
           }
         },
         options: [
