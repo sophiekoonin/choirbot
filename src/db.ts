@@ -76,7 +76,7 @@ export const getValues = async (
     return keys
       .map(key => ({ [key]: data[key] }))
       .reduce((acc, curr) => {
-        return { ...acc, curr }
+        return { ...acc, ...curr }
       }, {})
   }
 }
