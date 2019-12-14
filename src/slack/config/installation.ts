@@ -106,7 +106,7 @@ const installationMessageBlocks = [
     text: {
       type: 'mrkdwn',
       text:
-        'Click the `Home` tab above to open the SHEbot settings. This is where you can set your rehearsal day, enable or disable rehearsal reminder posts, and customise the message that gets posted every rehearsal day.'
+        "Click the `Home` tab above to open the SHEbot settings. This is where you can set your rehearsal day, set the channel you want me to post to, enable or disable rehearsal reminder posts, and customise the message that gets posted every rehearsal day. *You'll need to set this up otherwise the bot won't work.*"
     }
   },
   {

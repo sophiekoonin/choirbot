@@ -9,7 +9,8 @@ export const Actions = {
   SET_ATTENDANCE_BLOCKS: 'set_attendance_blocks',
   VIEW_REPORT: 'view_report',
   SHOW_IGNORE_MODAL: 'show_ignore_modal',
-  SET_IGNORED_USERS: 'ignored_users'
+  SET_IGNORED_USERS: 'ignored_users',
+  SET_CHANNEL: 'set_channel'
 }
 
 export const Interactions = {

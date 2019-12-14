@@ -5,7 +5,12 @@ import fetch from 'node-fetch'
 import * as db from '../../db'
 
 import { Actions, Interactions } from '../constants'
-import { ActionResponseBody, TeamId, InboundInteraction } from '../types'
+import {
+  ActionResponseBody,
+  TeamId,
+  InboundInteraction,
+  ChannelInfoResponse
+} from '../types'
 import { postAttendanceMessage } from '../attendance'
 import { postRehearsalMusic } from '..'
 import { SlackClient } from '../client'
@@ -59,6 +64,19 @@ export async function handleInteractions(
         db.updateDbValue('teams', team.id, {
           [action_id]: action.selected_option.value === 'true'
         })
+        break
+      case Actions.SET_CHANNEL:
+        const id = action.selected_channels[0]
+        const channelInfo = (await SlackClient.channels.info({
+          token,
+          channel: id
+        })) as ChannelInfoResponse
+        if (channelInfo.ok) {
+          db.updateDbValue('teams', team.id, {
+            channel: channelInfo.channel.name,
+            channel_id: id
+          })
+        }
         break
       case Actions.SHOW_SHEET_MODAL:
         SlackClient.views.open({ view: setSheetIdView, token, trigger_id })

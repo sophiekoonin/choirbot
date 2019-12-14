@@ -22,8 +22,13 @@ export async function showAppHome({
 async function updateView(team: TeamId): Promise<View> {
   const {
     rehearsal_day: rehearsalDay,
-    rehearsal_reminders: remindersEnabled
-  } = await getValues('teams', team, ['rehearsal_day', 'rehearsal_reminders'])
+    rehearsal_reminders: remindersEnabled,
+    channel
+  } = await getValues('teams', team, [
+    'rehearsal_day',
+    'rehearsal_reminders',
+    'channel'
+  ])
   const blocks = [
     {
       type: 'section',
@@ -122,6 +127,26 @@ async function updateView(team: TeamId): Promise<View> {
             value: '0'
           }
         ]
+      }
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `Choose a channel to post to. ${
+          channel !== ''
+            ? `Currently set to *#${channel}*`
+            : '*No channel set.*'
+        }`
+      },
+      accessory: {
+        type: 'multi_channels_select',
+        action_id: Actions.SET_CHANNEL,
+        placeholder: {
+          type: 'plain_text',
+          text: 'Select a channel'
+        },
+        max_selected_items: 1
       }
     },
     {

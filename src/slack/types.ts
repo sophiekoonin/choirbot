@@ -32,6 +32,18 @@ export interface ChatPostMessageResult extends WebAPICallResult {
   }
 }
 
+export interface ChannelInfoResponse extends WebAPICallResult {
+  ok: true
+  channel: {
+    id: string
+    name: string
+    is_channel: true
+    is_archived: boolean
+    is_general: boolean
+    members: UserId[]
+    previous_names: string[]
+  }
+}
 export interface SlackUser {
   id: UserId
   team_id: TeamId
@@ -158,8 +170,9 @@ export interface ActionSubmission {
   block_id: string
   text?: PlainTextElement
   value?: string
-  options: [Option]
-  selected_option: Option
+  options: Option[]
+  selected_option?: Option
+  selected_channels?: string[]
   type: string
   action_ts: string
 }

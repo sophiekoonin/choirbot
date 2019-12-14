@@ -40,12 +40,13 @@ export const oauth_redirect = async function(
     bot_user_id
   } = result as OAuthResponse
 
-  const { channel_id, channel } = incoming_webhook
   let intro_text = initialIntroText
   let attendance_blocks = initialBlocks
   let rehearsal_reminders = false
   let rehearsal_day = '1'
   let google_sheet_id = ''
+  let channel_id = ''
+  let channel = ''
 
   const doc = await getDbDoc('teams', team_id)
   if (doc.exists) {
@@ -54,7 +55,9 @@ export const oauth_redirect = async function(
       'attendance_blocks',
       'rehearsal_reminders',
       'rehearsal_day',
-      'google_sheet_id'
+      'google_sheet_id',
+      'channel_id',
+      'channel'
     ])
 
     intro_text = values.intro_text as string
@@ -62,6 +65,8 @@ export const oauth_redirect = async function(
     rehearsal_reminders = values.rehearsal_reminders as boolean
     rehearsal_day = values.rehearsal_day as string
     google_sheet_id = values.google_sheet_id as string
+    channel_id = values.channel_id as string
+    channel = values.channel as string
   }
 
   await db

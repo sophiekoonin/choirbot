@@ -7,6 +7,7 @@ import {
 import { postRehearsalMusic } from './slack/rehearsals'
 import { db, getQueryResults } from './db'
 import { Request, Response } from 'express'
+import { SlackClient } from './slack/client'
 
 export const checkForJobsToday = async (req: Request, res: Response) => {
   // Prevent illegitimate cron requests
@@ -41,9 +42,20 @@ async function checkForAttendancePostJobs(date: moment.Moment) {
       id,
       access_token: token,
       channel_id: channel,
+      user_id,
       attendance_blocks: blocks,
       intro_text: introText
     } = team
+    if (channel === '' || channel == null) {
+      SlackClient.chat.postMessage({
+        token: token as string,
+        channel: user_id as string,
+        text:
+          "You haven't set a channel, so I can't post an attendance message. Please choose a channel by clicking on the `Home` tab!"
+      })
+      return
+    }
+
     return await postAttendanceMessage({
       token: token as string,
       channel: channel as string,
@@ -72,6 +84,7 @@ async function checkForRehearsalReminderJobs(date: moment.Moment) {
   if (teams.length === 0) return
   teams.forEach(async team => {
     const { id, access_token: token, channel_id: channel } = team
+    if (channel === '' || channel == null) return
     return await postRehearsalMusic({
       token: token as string,
       teamId: id,
@@ -90,6 +103,8 @@ export const processAttendance = async () => {
 
   allTeams.forEach(async team => {
     const { id, access_token: token, channel_id: channel } = team
+    if (channel === '' || channel == null) return
+
     return await processAttendanceForTeam({
       token: token as string,
       channel: channel as string,
