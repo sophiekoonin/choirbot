@@ -134,9 +134,7 @@ async function updateView(team: TeamId): Promise<View> {
       text: {
         type: 'mrkdwn',
         text: `Choose a channel to post to. ${
-          channel !== ''
-            ? `Currently set to *#${channel}*`
-            : '*No channel set.*'
+          channel !== '' ? `Currently set to *${channel}*` : '*No channel set.*'
         }`
       },
       accessory: {
