@@ -33,7 +33,6 @@ export const oauth_redirect = async function(
   }
 
   const {
-    incoming_webhook,
     team: { id: team_id, name: team_name },
     authed_user: { id: user_id },
     access_token,

@@ -153,7 +153,7 @@ export async function postManually({
     case 'attendance':
       return await postAttendanceMessage({
         channel: channel as string,
-        token: channel as string,
+        token: token as string,
         teamId,
         blocks: blocks as string[],
         introText: introText as string,

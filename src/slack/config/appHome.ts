@@ -23,11 +23,13 @@ async function updateView(team: TeamId): Promise<View> {
   const {
     rehearsal_day: rehearsalDay,
     rehearsal_reminders: remindersEnabled,
-    channel
+    channel,
+    google_sheet_id: sheetId
   } = await getValues('teams', team, [
     'rehearsal_day',
     'rehearsal_reminders',
-    'channel'
+    'channel',
+    'google_sheet_id'
   ])
   const blocks = [
     {
@@ -44,14 +46,14 @@ async function updateView(team: TeamId): Promise<View> {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: ':hammer_and_wrench: *SHEBot configuration*'
+        text: ':hammer_and_wrench: *SHEBot configuration*\n\n'
       }
     },
     {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: 'Choose your rehearsal day'
+        text: '*Rehearsal day*'
       },
       accessory: {
         action_id: Actions.SELECT_REHEARSAL_DAY,
@@ -133,7 +135,7 @@ async function updateView(team: TeamId): Promise<View> {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `Choose a channel to post to. ${
+        text: `*Channel for bot posts*\n${
           channel !== '' ? `Currently set to *${channel}*` : '*No channel set.*'
         }`
       },
@@ -151,7 +153,7 @@ async function updateView(team: TeamId): Promise<View> {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: 'Rehearsal reminders (4 days before rehearsal day)'
+        text: '*Rehearsal reminders* (4 days before rehearsal day)'
       },
       accessory: {
         type: 'radio_buttons',
@@ -185,14 +187,18 @@ async function updateView(team: TeamId): Promise<View> {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: 'Configure SHEbot to work with your schedule spreadsheet'
+        text: `*Google Sheets ID for your schedule*\n${
+          sheetId !== ''
+            ? `Currently set to <https://docs.google.com/spreadsheets/d/${sheetId}|${sheetId}>`
+            : '*No sheet ID set - posts will not work*'
+        }`
       },
       accessory: {
         type: 'button',
         action_id: Actions.SHOW_SHEET_MODAL,
         text: {
           type: 'plain_text',
-          text: 'Click to set',
+          text: 'Click to change',
           emoji: true
         }
       }
@@ -201,7 +207,7 @@ async function updateView(team: TeamId): Promise<View> {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: 'Configure what your attendance posts will look like'
+        text: '*Configure what your attendance posts will look like*'
       },
       accessory: {
         type: 'button',
@@ -220,7 +226,7 @@ async function updateView(team: TeamId): Promise<View> {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: ':chart_with_upwards_trend: *Attendance reports & statistics*'
+        text: ':chart_with_upwards_trend: *Attendance reports & statistics*\n\n'
       }
     },
     {
@@ -263,7 +269,7 @@ async function updateView(team: TeamId): Promise<View> {
       text: {
         type: 'mrkdwn',
         text:
-          ":rotating_light: *Emergency toolkit* - manually post messages in case the message didn't automatically post for any reason."
+          ":rotating_light: *Emergency toolkit*\nManually post messages in case the message didn't automatically post for any reason.\n\n"
       }
     },
     {
