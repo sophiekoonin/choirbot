@@ -23,7 +23,7 @@ export async function getReportBlocks(
   token: string
 ): Promise<SectionBlock[]> {
   const allPosts = await getAttendancePosts(teamId)
-  const allUsers = await getSlackUserIds(token)
+  const allUsers = await getSlackUserIds(teamId, token)
   const attendanceData = mapAttendance(allPosts)
   const lastFourWeeks = attendanceData.slice(0, 4)
   const lastFourWeeksAttending = lastFourWeeks.map(

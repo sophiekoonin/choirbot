@@ -12,7 +12,6 @@ export async function processConfigSubmission({
   const valuesToUpdate = Object.keys(values).reduce((acc, curr) => {
     const item = values[curr][curr]
     if (item == null) return
-
     switch (item.type) {
       case BlockTypes.PLAIN_TEXT_INPUT:
         return { ...acc, [curr]: item.value }
@@ -20,6 +19,11 @@ export async function processConfigSubmission({
         return {
           ...acc,
           [curr]: item.selected_options.map(option => option.value)
+        }
+      case BlockTypes.MULTI_USERS_SELECT:
+        return {
+          ...acc,
+          [curr]: item.selected_users
         }
       default:
         return acc

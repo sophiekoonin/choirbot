@@ -129,6 +129,7 @@ export interface SubmissionValue {
     type: string
     value?: string
     selected_options?: [Option]
+    selected_users?: [UserId]
   }
 }
 

@@ -9,7 +9,12 @@ import { ActionResponseBody, TeamId, InboundInteraction } from '../types'
 import { postAttendanceMessage } from '../attendance'
 import { postRehearsalMusic } from '..'
 import { SlackClient } from '../client'
-import { setSheetIdView, chooseAttendancePostBlocks, reportView } from './views'
+import {
+  setSheetIdView,
+  chooseAttendancePostBlocks,
+  reportView,
+  setIgnoredUsersView
+} from './views'
 import { processConfigSubmission } from './config'
 
 export async function handleInteractions(
@@ -74,6 +79,13 @@ export async function handleInteractions(
           trigger_id
         })
         break
+      case Actions.SHOW_IGNORE_MODAL:
+        const ignoreView = await setIgnoredUsersView(team.id, token)
+        SlackClient.views.open({
+          view: ignoreView,
+          token,
+          trigger_id
+        })
       default:
         break
     }

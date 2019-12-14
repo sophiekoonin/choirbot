@@ -7,7 +7,9 @@ export const Actions = {
   POST_ATTENDANCE_MESSAGE: 'post_attendance_message',
   POST_REHEARSAL_MESSAGE: 'post_rehearsal_message',
   SET_ATTENDANCE_BLOCKS: 'set_attendance_blocks',
-  VIEW_REPORT: 'view_report'
+  VIEW_REPORT: 'view_report',
+  SHOW_IGNORE_MODAL: 'show_ignore_modal',
+  SET_IGNORED_USERS: 'ignored_users'
 }
 
 export const Interactions = {
@@ -30,7 +32,8 @@ export const EventTypes = {
 
 export const BlockTypes = {
   PLAIN_TEXT_INPUT: 'plain_text_input',
-  MULTI_STATIC_SELECT: 'multi_static_select'
+  MULTI_STATIC_SELECT: 'multi_static_select',
+  MULTI_USERS_SELECT: 'multi_users_select'
 }
 
 export const DaysOfWeek: { [key: string]: string } = {

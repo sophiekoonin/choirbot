@@ -217,6 +217,22 @@ async function updateView(team: TeamId): Promise<View> {
       }
     },
     {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: "Exclude members from the reports (e.g. if they're away)"
+      },
+      accessory: {
+        type: 'button',
+        action_id: Actions.SHOW_IGNORE_MODAL,
+        text: {
+          type: 'plain_text',
+          text: 'Choose members',
+          emoji: true
+        }
+      }
+    },
+    {
       type: 'divider'
     },
     {

@@ -1,12 +1,11 @@
 import { View } from '@slack/types'
 import { Actions, Blocks } from '../constants'
-import { getValues } from '../../db'
-import { TeamId } from '../types'
+import { getValues, getDbDoc } from '../../db'
+import { TeamId, UserId } from '../types'
 import { getAttendancePostBlocks } from '../attendance'
 import { AttendanceBlockSelectors } from '../blocks/config'
 import { Option } from '@slack/web-api'
 import { getReportBlocks } from '../reports'
-import { getSlackUsers } from '../utils'
 
 const exampleSongData = {
   mainSong: 'Example Song',
@@ -14,6 +13,60 @@ const exampleSongData = {
   runThrough: 'Example Song',
   runThroughLink: 'https://www.example.com',
   notes: 'Social after rehearsal!'
+}
+
+export async function setIgnoredUsersView(
+  teamId: TeamId,
+  token: string
+): Promise<View> {
+  const ignoredUsers: UserId[] = (await getDbDoc('teams', teamId)).get(
+    'ignored_users'
+  )
+
+  return {
+    type: 'modal',
+    title: {
+      type: 'plain_text',
+      text: 'Ignore members'
+    },
+    blocks: [
+      {
+        type: 'input',
+        block_id: Actions.SET_IGNORED_USERS,
+        label: {
+          type: 'plain_text',
+          text: 'Choose users to exclude from weekly reporting'
+        },
+        element: {
+          action_id: Actions.SET_IGNORED_USERS,
+          type: 'multi_users_select',
+          placeholder: {
+            type: 'plain_text',
+            text: 'Select members'
+          },
+          initial_users: ignoredUsers != null ? ignoredUsers : []
+        }
+      },
+      {
+        type: 'context',
+        elements: [
+          {
+            type: 'mrkdwn',
+            text:
+              "The selected users won't be included in any reports on attendance - this is useful if they leave temporarily but want to stay on Slack. You don't need to select the bot users, they're automatically ignored."
+          }
+        ]
+      }
+    ],
+    submit: {
+      type: 'plain_text',
+      text: 'Save'
+    },
+    close: {
+      type: 'plain_text',
+      text: 'Cancel'
+    }
+  }
 }
 
 export const setSheetIdView: View = {
