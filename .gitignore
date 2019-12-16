@@ -72,5 +72,7 @@ node_modules/
 # dotenv environment variables file
 .env
 
+.vscode/
+
 
 src/debug.ts
