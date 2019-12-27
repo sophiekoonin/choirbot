@@ -49,7 +49,6 @@ export async function postRehearsalMusic({
   try {
     let text = `:wave: Here's the plan for ${dayOfWeek}'s rehearsal!`
     let destination = channel
-    let as_user = false
     let blocks
 
     if (isBankHoliday) {
@@ -58,7 +57,6 @@ export async function postRehearsalMusic({
       const nextWeekSongs = await google.getNextSongs(date, teamId)
       if (nextWeekSongs == null || !nextWeekSongs.mainSong) {
         text = `I tried to post a rehearsal reminder, but I couldn't find a row for ${date} in the schedule. Please make sure the dates are correct!`
-        as_user = true
         destination = await getValue('teams', teamId, 'user_id')
       } else if (nextWeekSongs.mainSong.match(/no rehearsal/gi)) {
         text = "<!channel> Reminder: there's no rehearsal next week!"
@@ -73,7 +71,6 @@ export async function postRehearsalMusic({
       token,
       text,
       username: 'Schedule Bot',
-      as_user,
       channel: destination,
       blocks
     })

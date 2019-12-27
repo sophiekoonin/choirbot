@@ -66,7 +66,6 @@ export const postAttendanceMessage = async ({
     const postMsgRsp = (await SlackClient.chat.postMessage({
       token,
       channel,
-      as_user: false,
       username: 'Attendance Bot',
       text: `It's rehearsal day!`,
       blocks: messageBlocks
