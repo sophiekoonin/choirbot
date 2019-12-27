@@ -57,6 +57,14 @@ export const postAttendanceMessage = async ({
   if (songs != null && songs.mainSong.toLowerCase().includes('no rehearsal')) {
     return
   }
+  if (songs == null) {
+    await SlackClient.chat.postMessage({
+      token,
+      channel: await db.getValue('teams', teamId, 'user_id'),
+      text: `Tried to post attendance message, but couldn't find a row for ${dateString} in the schedule. Please make sure the dates are correct!`
+    })
+    return
+  }
   const messageBlocks = await getAttendancePostBlocks({
     songs,
     blocks,
