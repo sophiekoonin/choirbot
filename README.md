@@ -6,28 +6,18 @@ A helpful little Slack bot for SHE Choir to take attendance and remind us about 
 
 Slack permissions needed:
 
-- bot
-- commands
-- incoming-webhook
-- chat:write:bot
+Bot token
+
+- chat:write
+- channels:history
+- channels:read
+- channels:join
 - reactions:read
 - reactions:write
 - emoji:read
 - users:read
+- users:profile:read
 
-Events: app_home_opened
+Configure interactions and events with the endpoints `/interactions` and `/events` respectively.
 
-## TODO
-
-[] get tests working with typescript
-[x] verify signing signature
-[x] set up CI
-[x] allow messages to be customised
-[x] schedule template spreadsheet
-[x] better report info
-[x] handle modals better
-
-## To test
-
-[x] new workspace setup
-[x] dynamic cron
+Subscribe to the `app_home_opened` event.
