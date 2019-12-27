@@ -21,6 +21,7 @@ import {
   setIgnoredUsersView
 } from './views'
 import { processConfigSubmission } from './config'
+import { joinChannel } from '../utils'
 
 export async function handleInteractions(
   req: Request,
@@ -67,20 +68,22 @@ export async function handleInteractions(
         break
       case Actions.SET_CHANNEL:
         const id = action.selected_channels[0]
-        const channelInfo = (await SlackClient.channels.info({
-          token,
-          channel: id
-        })) as ChannelInfoResponse
-        if (channelInfo.ok) {
-          db.updateDbValue('teams', team.id, {
-            channel: channelInfo.channel.name,
-            channel_id: id
-          })
-          await SlackClient.channels.join({
+        try {
+          const channelInfo = (await SlackClient.channels.info({
             token,
-            name: channelInfo.channel.name
-          })
+            channel: id
+          })) as ChannelInfoResponse
+          if (channelInfo.ok) {
+            db.updateDbValue('teams', team.id, {
+              channel: channelInfo.channel.name,
+              channel_id: id
+            })
+            await joinChannel(team.id, channelInfo.channel.name, token)
+          }
+        } catch (err) {
+          console.error(err)
         }
+
         break
       case Actions.SHOW_SHEET_MODAL:
         SlackClient.views.open({ view: setSheetIdView, token, trigger_id })

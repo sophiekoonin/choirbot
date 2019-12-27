@@ -1,6 +1,6 @@
 import { TeamId, SlackUser, ListUsersResult, UserId } from './types'
 import { SlackClient } from './client'
-import { getDbDoc } from '../db'
+import { getDbDoc, getValue } from '../db'
 
 export async function getSlackUserIds(
   teamId: string,
@@ -16,4 +16,25 @@ export async function getSlackUserIds(
     .filter(member => !member.is_bot)
     .map(member => member.id)
     .filter(id => !ignoredUsers.includes(id))
+}
+
+export async function joinChannel(
+  teamId: string,
+  channel: string,
+  token: string
+) {
+  try {
+    await SlackClient.channels.join({
+      token,
+      name: channel
+    })
+  } catch (err) {
+    const user_id = await getValue('teams', teamId, 'user_id')
+    console.error('Error joining channel: ' + err)
+    await SlackClient.chat.postMessage({
+      token,
+      channel: user_id,
+      text: `Couldn't join the channel #${channel} - got the following error: ${err.message}`
+    })
+  }
 }
