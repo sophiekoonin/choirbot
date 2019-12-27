@@ -66,6 +66,11 @@ export const oauth_redirect = async function(
     google_sheet_id = values.google_sheet_id as string
     channel_id = values.channel_id as string
     channel = values.channel as string
+
+    SlackClient.channels.join({
+      name: channel,
+      token: access_token
+    })
   }
 
   await db

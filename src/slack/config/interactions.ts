@@ -76,6 +76,10 @@ export async function handleInteractions(
             channel: channelInfo.channel.name,
             channel_id: id
           })
+          await SlackClient.channels.join({
+            token,
+            name: channelInfo.channel.name
+          })
         }
         break
       case Actions.SHOW_SHEET_MODAL:
