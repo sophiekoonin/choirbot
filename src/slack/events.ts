@@ -2,6 +2,7 @@ import { Response } from 'express'
 import { Request } from '../types'
 import { EventTypes } from './constants'
 import { showAppHome } from './config/appHome'
+import { onUninstall } from './uninstall';
 
 export async function handleEvents(req: Request, res: Response) {
   const { team_id: team, api_app_id, event } = req.body
@@ -20,6 +21,9 @@ export async function handleEvents(req: Request, res: Response) {
   switch (type) {
     case EventTypes.APP_HOME_OPENED:
       showAppHome({ user, team })
+      break
+    case EventTypes.APP_UNINSTALLED:
+      onUninstall(team)
       break
     default:
       return

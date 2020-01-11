@@ -1,4 +1,5 @@
-import { Firestore } from '@google-cloud/firestore'
+import { Firestore, Query } from '@google-cloud/firestore'
+import { logging } from 'googleapis/build/src/apis/logging'
 
 export const db = new Firestore({
   projectId: process.env.GOOGLE_CLOUD_PROJECT,
@@ -79,4 +80,42 @@ export const getValues = async (
         return { ...acc, ...curr }
       }, {})
   }
+}
+
+export async function deleteCollection(
+  collectionPath: string,
+  batchSize: number
+) {
+  let collectionRef = db.collection(collectionPath)
+  let query = collectionRef.orderBy('__name__').limit(batchSize)
+  try {
+    return await deleteQueryBatch(query, batchSize)
+  } catch (err) {
+    console.error(`Error deleting collection ${collectionPath}`, err)
+  }
+}
+
+async function deleteQueryBatch(query: Query, batchSize: number) {
+  const snapshot = await query.get()
+  // When there are no documents left, we are done
+  if (snapshot.size === 0) {
+    return 0
+  }
+  // Delete documents in a batch
+  let batch = db.batch()
+  snapshot.docs.forEach(doc => {
+    batch.delete(doc.ref)
+  })
+
+  await batch.commit()
+
+  if (snapshot.size === 0) {
+    return
+  }
+
+  // Recurse on the next process tick, to avoid
+  // exploding the stack.
+  process.nextTick(() => {
+    deleteQueryBatch(query, batchSize)
+  })
 }
