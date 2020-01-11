@@ -10,7 +10,9 @@ export const Actions = {
   VIEW_REPORT: 'view_report',
   SHOW_IGNORE_MODAL: 'show_ignore_modal',
   SET_IGNORED_USERS: 'ignored_users',
-  SET_CHANNEL: 'set_channel'
+  SET_CHANNEL: 'set_channel',
+  DISABLE_SHEBOT: 'disable_shebot',
+  ENABLE_SHEBOT: 'enable_shebot'
 }
 
 export const Interactions = {

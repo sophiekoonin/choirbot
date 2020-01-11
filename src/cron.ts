@@ -33,7 +33,7 @@ async function checkForAttendancePostJobs(date: moment.Moment) {
   if (isBankHol) return
 
   const today = date.day().toString()
-  const todayQuery = db.collection('teams').where('rehearsal_day', '==', today)
+  const todayQuery = db.collection('teams').where('rehearsal_day', '==', today).where('active', '==', true)
   const teams = await getQueryResults(todayQuery)
   if (teams.length === 0) return
 
@@ -80,6 +80,7 @@ async function checkForRehearsalReminderJobs(date: moment.Moment) {
     .collection('teams')
     .where('rehearsal_day', '==', rehearsalDayNumber)
     .where('rehearsal_reminders', '==', 'true')
+    .where('active', '==', true)
   const teams = await getQueryResults(todayQuery)
   if (teams.length === 0) return
   teams.forEach(async team => {
@@ -99,7 +100,7 @@ async function checkForRehearsalReminderJobs(date: moment.Moment) {
 }
 
 export const processAttendance = async () => {
-  const allTeams = await getQueryResults(db.collection('teams'))
+  const allTeams = await getQueryResults(db.collection('teams').where('active', '==', true))
 
   allTeams.forEach(async team => {
     const { id, access_token: token, channel_id: channel } = team

@@ -47,10 +47,12 @@ export const oauth_redirect = async function(
   let google_sheet_id = ''
   let channel_id = ''
   let channel = ''
+  let active = true
 
   const doc = await getDbDoc('teams', team_id)
   if (doc.exists) {
     const values = await getValues('teams', team_id, [
+      'active',
       'intro_text',
       'attendance_blocks',
       'rehearsal_reminders',
@@ -60,6 +62,7 @@ export const oauth_redirect = async function(
       'channel'
     ])
 
+    active = values.active as boolean
     intro_text = values.intro_text as string
     attendance_blocks = values.attendance_blocks as string[]
     rehearsal_reminders = values.rehearsal_reminders as boolean
@@ -76,6 +79,7 @@ export const oauth_redirect = async function(
     .doc(team_id)
     .set({
       team_name,
+      active,
       user_id,
       channel_id,
       channel,

@@ -22,13 +22,14 @@ import {
 } from './views'
 import { processConfigSubmission } from './config'
 import { joinChannel } from '../utils'
+import { showAppHome } from './appHome'
 
 export async function handleInteractions(
   req: Request,
   res: Response
 ): Promise<void> {
   const payload: InboundInteraction = JSON.parse(req.body.payload)
-  const { actions, team, trigger_id, view, type } = payload
+  const { actions, team, trigger_id, view, type, user} = payload
   const token = await db.getValue('teams', team.id, 'access_token')
   res.send()
 
@@ -66,6 +67,16 @@ export async function handleInteractions(
           [action_id]: action.selected_option.value === 'true'
         })
         break
+      case Actions.DISABLE_SHEBOT:
+        db.updateDbValue('teams', team.id, {
+          active: false
+        })
+        break
+      case Actions.ENABLE_SHEBOT:
+        db.updateDbValue('teams', team.id, {
+          active: true
+        })
+        break
       case Actions.SET_CHANNEL:
         const id = action.selected_channels[0]
         try {
@@ -83,7 +94,6 @@ export async function handleInteractions(
         } catch (err) {
           console.error(err)
         }
-
         break
       case Actions.SHOW_SHEET_MODAL:
         SlackClient.views.open({ view: setSheetIdView, token, trigger_id })
@@ -115,6 +125,8 @@ export async function handleInteractions(
         break
     }
   }
+
+ showAppHome({ user: user.id, team: team.id})
 }
 
 export async function postToResponseUrl(

@@ -21,11 +21,13 @@ export async function showAppHome({
 
 async function updateView(team: TeamId): Promise<View> {
   const {
+    active,
     rehearsal_day: rehearsalDay,
     rehearsal_reminders: remindersEnabled,
     channel,
     google_sheet_id: sheetId
   } = await getValues('teams', team, [
+    'active',
     'rehearsal_day',
     'rehearsal_reminders',
     'channel',
@@ -332,6 +334,51 @@ async function updateView(team: TeamId): Promise<View> {
           confirm: {
             type: 'plain_text',
             text: 'Post message'
+          },
+          deny: {
+            type: 'plain_text',
+            text: 'Cancel'
+          }
+        }
+      }
+    },
+    {
+      type: 'divider',
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text:
+          `💤 *${active ? 'Disable' : 'Enable'} SHEBot*`
+      }
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `SHEBot is currently ${active ? 'enabled': 'disabled'}.`
+      },
+      accessory: {
+        type: 'button',
+        action_id: active ? Actions.DISABLE_SHEBOT : Actions.ENABLE_SHEBOT,
+        text: {
+          type: 'plain_text',
+          text: `${active ? 'Disable' : 'Enable'}`,
+          emoji: true
+        },
+        confirm: {
+          title: {
+            type: 'plain_text',
+            text: `${active ? 'Disable': 'Enable'} SHEBot`
+          },
+          text: {
+            type: 'plain_text',
+            text: `Are you sure you want to ${active ? 'disable' : 'enable'} SHEBot? You can ${active ? 'enable': 'disable'} it again at any time - no data will be deleted.`
+          },
+          confirm: {
+            type: 'plain_text',
+            text: 'Disable'
           },
           deny: {
             type: 'plain_text',
