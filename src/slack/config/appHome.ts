@@ -378,7 +378,7 @@ async function updateView(team: TeamId): Promise<View> {
           },
           confirm: {
             type: 'plain_text',
-            text: 'Disable'
+            text: active ? 'Disable' : 'Enable'
           },
           deny: {
             type: 'plain_text',
