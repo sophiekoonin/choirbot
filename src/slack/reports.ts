@@ -35,20 +35,10 @@ export async function getReportBlocks(
     .flat(2)
   const notResponded = allUsers.filter(user => !responded.includes(user))
 
-  const sumAttending = attendanceData.reduce(
-    (acc, curr) => (acc += curr.attending.length),
-    0
-  )
-  const averageAttendance = sumAttending / attendanceData.length
-  const highestAttendanceValue = Math.max.apply(
-    Math,
-    attendanceData.map(data => data.attending.length)
-  )
-  const highestAttendanceDates = attendanceData
-    .filter(obj => obj.attending.length === highestAttendanceValue)
-    .map(obj => obj.date)
+  
+  
 
-  return [
+  const blocks: SectionBlock[] = [
     {
       type: 'section',
       text: {
@@ -66,31 +56,49 @@ export async function getReportBlocks(
           .map(uid => `<@${uid}>`)
           .join('\n')}`
       }
-    },
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `:chart_with_upwards_trend: *Attendance statistics* - ${attendanceData.length} rehearsals`
-      }
-    },
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `*Highest attendance*: ${highestAttendanceValue} on ${
-          highestAttendanceDates.length > 1
-            ? highestAttendanceDates.join(', ')
-            : highestAttendanceDates[0]
-        }`
-      }
-    },
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `*Average attendance*: ${averageAttendance}`
-      }
     }
   ]
+
+  if (attendanceData.length > 0) {
+    const sumAttending = attendanceData.reduce(
+      (acc, curr) => (acc += curr.attending.length),
+      0
+    )
+    const averageAttendance = sumAttending / attendanceData.length
+    const highestAttendanceValue = Math.max.apply(
+      Math,
+      attendanceData.map(data => data.attending.length)
+    )
+    const highestAttendanceDates = attendanceData
+      .filter(obj => obj.attending.length === highestAttendanceValue)
+      .map(obj => obj.date)
+
+      return [...blocks, {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `:chart_with_upwards_trend: *Attendance statistics* - ${attendanceData.length} rehearsals`
+        }
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `*Highest attendance*: ${highestAttendanceValue} on ${
+            highestAttendanceDates.length > 1
+              ? highestAttendanceDates.join(', ')
+              : highestAttendanceDates[0]
+          }`
+        }
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `*Average attendance*: ${averageAttendance}`
+        }
+      }]
+  }
+
+  return blocks
 }

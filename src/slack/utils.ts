@@ -12,10 +12,8 @@ export async function getSlackUserIds(
     token
   })) as ListUsersResult
   return members
-    .filter(member => !member.deleted)
-    .filter(member => !member.is_bot)
+    .filter(member => !member.deleted && !member.is_bot && !ignoredUsers.includes(member.id) && member.id !== 'USLACKBOT')
     .map(member => member.id)
-    .filter(id => !ignoredUsers.includes(id))
 }
 
 export async function joinChannel(

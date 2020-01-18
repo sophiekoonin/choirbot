@@ -14,7 +14,7 @@ const installationMessageBlocks = [
       type: 'plain_text',
       emoji: true,
       text:
-        "I'm a Slack app that takes attendance for you, and keeps track of who hasn't been coming to rehearsals."
+        "I'm a Slack app that takes attendance for you, and keeps track of who hasn't been coming to rehearsals. Every week at 9:30 am on your rehearsal day, I'll post a message inviting people to respond if they are or aren't coming."
     }
   },
   {
