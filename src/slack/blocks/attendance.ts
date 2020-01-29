@@ -39,6 +39,15 @@ export const musicalWarmupBlock: SectionBlock = {
   }
 }
 
+export const genericWarmupBlock: SectionBlock = {
+  type: 'section',
+  block_id: AttendancePostSections.GENERAL_WARMUP,
+  text: {
+    type: 'mrkdwn',
+    text: 'If you want to lead warmup, respond with :musical_note:.'
+  }
+}
+
 export function mainSongBlock({
   mainSong,
   mainSongLink
@@ -108,6 +117,7 @@ export const AttendanceBlocks = {
   [AttendancePostSections.NOTES]: notesBlock,
   [AttendancePostSections.MUSICAL_WARMUP]: musicalWarmupBlock,
   [AttendancePostSections.PHYSICAL_WARMUP]: physicalWarmupBlock,
+  [AttendancePostSections.GENERAL_WARMUP]: genericWarmupBlock,
   [AttendancePostSections.FACILITATOR]: facilitatorBlock,
   [AttendancePostSections.MAIN_SONG]: mainSongBlock,
   [AttendancePostSections.RUN_THROUGH]: runThroughBlock,

@@ -21,6 +21,14 @@ export const AttendanceBlockSelectors: Option[] = [
     text: {
       type: 'plain_text',
       emoji: true,
+      text: 'Volunteer for warmup with 🎵'
+    },
+    value: AttendancePostSections.GENERAL_WARMUP
+  },
+  {
+    text: {
+      type: 'plain_text',
+      emoji: true,
       text: 'Volunteer for musical warmup with 🎵'
     },
     value: AttendancePostSections.MUSICAL_WARMUP

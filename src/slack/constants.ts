@@ -57,6 +57,7 @@ export const AttendancePostSections = {
   NOTES: 'notes',
   ATTENDANCE_EMOJI: 'attendance_emoji',
   PHYSICAL_WARMUP: 'physical_warmup',
+  GENERAL_WARMUP: 'general_warmup',
   MUSICAL_WARMUP: 'musical_warmup',
   FACILITATOR: 'facilitator'
 }
