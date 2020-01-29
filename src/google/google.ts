@@ -28,6 +28,17 @@ async function getRowNumberForDate(
   }
 }
 
+/*
+Schedule spreadsheet layout in columns:
+B - Main song
+C - Run through song
+D - Notes
+E - Main song link
+F - Run through link
+G - Free choice
+*/
+
+// TODO - grab the column header from G and pull through content.
 async function getSongDetailsFromSheet(
   auth: GoogleAuth,
   sheetId: string,
