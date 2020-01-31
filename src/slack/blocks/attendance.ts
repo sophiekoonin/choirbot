@@ -95,6 +95,18 @@ export function notesBlock({ notes }: { notes: string }): SectionBlock | null {
   }
 }
 
+export function customColumnBlock({customColumnValue, customColumnHeader}: {customColumnValue: string, customColumnHeader: string}): SectionBlock | null {
+  if (customColumnValue == null || customColumnValue === "") return null
+  return {
+    type: 'section',
+    block_id: AttendancePostSections.CUSTOM_COLUMN,
+    text: {
+      type: 'mrkdwn',
+      text: `*${customColumnHeader.trim()}*: ${customColumnValue}`
+    }
+  }
+}
+
 export const physicalWarmupBlock: SectionBlock = {
   type: 'section',
   block_id: AttendancePostSections.PHYSICAL_WARMUP,
@@ -118,6 +130,7 @@ export const AttendanceBlocks = {
   [AttendancePostSections.MUSICAL_WARMUP]: musicalWarmupBlock,
   [AttendancePostSections.PHYSICAL_WARMUP]: physicalWarmupBlock,
   [AttendancePostSections.GENERAL_WARMUP]: genericWarmupBlock,
+  [AttendancePostSections.CUSTOM_COLUMN]: customColumnBlock,
   [AttendancePostSections.FACILITATOR]: facilitatorBlock,
   [AttendancePostSections.MAIN_SONG]: mainSongBlock,
   [AttendancePostSections.RUN_THROUGH]: runThroughBlock,

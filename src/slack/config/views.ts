@@ -12,7 +12,9 @@ const exampleSongData = {
   mainSongLink: 'https://www.example.com',
   runThrough: 'Example Song',
   runThroughLink: 'https://www.example.com',
-  notes: 'Social after rehearsal!'
+  notes: 'Social after rehearsal!',
+  customColumnHeader: 'Column G header',
+  customColumnValue: 'Custom column value'
 }
 
 export async function setIgnoredUsersView(
@@ -143,6 +145,12 @@ export async function chooseAttendancePostBlocks(
     attendance_blocks: currentBlocks,
     intro_text: introText
   } = await getValues('teams', teamId, ['attendance_blocks', 'intro_text'])
+  const initialOptions = (currentBlocks as string[])
+  .map((block: string) =>
+    AttendanceBlockSelectors.find(b => b.value === block)
+  )
+  .filter((block: Option) => block != null)
+
   return {
     type: 'modal',
     title: {
@@ -211,11 +219,7 @@ export async function chooseAttendancePostBlocks(
             text: 'Please choose'
           },
           options: AttendanceBlockSelectors,
-          initial_options: (currentBlocks as string[])
-            .map((block: string) =>
-              AttendanceBlockSelectors.find(b => b.value === block)
-            )
-            .filter((block: Option) => block != null)
+          initial_options: initialOptions != null ? initialOptions : [],
         }
       }
     ],

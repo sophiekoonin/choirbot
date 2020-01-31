@@ -45,24 +45,31 @@ async function getSongDetailsFromSheet(
   rowNumber: string
 ): Promise<SongData> {
   try {
-    const response = await sheets.spreadsheets.values.get({
+    const response = await sheets.spreadsheets.values.batchGet({
       auth,
       spreadsheetId: sheetId,
-      range: `B${rowNumber}:I${rowNumber}`
+      ranges: ['B1:I1',`B${rowNumber}:I${rowNumber}`]
     })
+    const { valueRanges }= response.data
+    const headers = valueRanges.find(v => v.range.match(/B1:I1/ig))
+    const thisWeekData = valueRanges.find(v => v.range !== headers.range)
+    const customColumnHeader = headers.values.flat()[5]
     const [
       mainSong,
       runThrough,
       notes,
       mainSongLink,
-      runThroughLink
-    ] = response.data.values.flat()
+      runThroughLink,
+      customColumnValue
+    ] = thisWeekData.values.flat()
     return {
       mainSong,
       mainSongLink,
       runThrough,
       runThroughLink,
-      notes
+      notes, 
+      customColumnHeader,
+      customColumnValue
     }
   } catch (err) {
     console.error(

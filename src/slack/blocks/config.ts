@@ -58,6 +58,13 @@ export const AttendanceBlockSelectors: Option[] = [
   {
     text: {
       type: 'plain_text',
+      text: 'Custom Column (column G)'
+    },
+    value: AttendancePostSections.CUSTOM_COLUMN
+  },
+  {
+    text: {
+      type: 'plain_text',
       text: 'React with 👍👎 if attending/not attending',
       emoji: true
     },

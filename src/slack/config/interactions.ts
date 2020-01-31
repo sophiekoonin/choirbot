@@ -29,7 +29,7 @@ export async function handleInteractions(
   res: Response
 ): Promise<void> {
   const payload: InboundInteraction = JSON.parse(req.body.payload)
-  const { actions, team, trigger_id, view, type, user} = payload
+  const { actions, team, trigger_id, view, type, user } = payload
   const token = await db.getValue('teams', team.id, 'access_token')
   res.send()
 
@@ -79,54 +79,68 @@ export async function handleInteractions(
         break
       case Actions.SET_CHANNEL:
         const id = action.selected_channels[0]
-        try {
-          const channelInfo = (await SlackClient.channels.info({
-            token,
-            channel: id
-          })) as ChannelInfoResponse
-          if (channelInfo.ok) {
-            db.updateDbValue('teams', team.id, {
-              channel: channelInfo.channel.name,
-              channel_id: id
-            })
-            await joinChannel(team.id, channelInfo.channel.name, token)
-          }
-        } catch (err) {
-          console.error(err)
+        const channelInfo = (await SlackClient.channels.info({
+          token,
+          channel: id
+        })) as ChannelInfoResponse
+        if (channelInfo.ok) {
+          db.updateDbValue('teams', team.id, {
+            channel: channelInfo.channel.name,
+            channel_id: id
+          })
+          await joinChannel(team.id, channelInfo.channel.name, token)
         }
         break
       case Actions.SHOW_SHEET_MODAL:
-        SlackClient.views.open({ view: setSheetIdView, token, trigger_id })
+        SlackClient.views
+          .open({ view: setSheetIdView, token, trigger_id })
+          .catch(err =>
+            console.error(`Error showing sheet ID modal for ${team.id}`, err)
+          )
+
         break
       case Actions.SET_ATTENDANCE_BLOCKS:
         const view = await chooseAttendancePostBlocks(team.id)
-        SlackClient.views.open({
-          view,
-          token,
-          trigger_id
-        })
+        console.log(view.blocks)
+        SlackClient.views
+          .open({
+            view,
+            token,
+            trigger_id
+          })
+          .catch(err =>
+            console.error(`Error showing attendance block for ${team.id}`, err)
+          )
         break
       case Actions.VIEW_REPORT:
         const repView = await reportView(team.id, token)
-        SlackClient.views.open({
-          view: repView,
-          token,
-          trigger_id
-        })
+        SlackClient.views
+          .open({
+            view: repView,
+            token,
+            trigger_id
+          })
+          .catch(err =>
+            console.error(`Error showing report modal for ${team.id}`, err)
+          )
         break
       case Actions.SHOW_IGNORE_MODAL:
         const ignoreView = await setIgnoredUsersView(team.id, token)
-        SlackClient.views.open({
-          view: ignoreView,
-          token,
-          trigger_id
-        })
+        SlackClient.views
+          .open({
+            view: ignoreView,
+            token,
+            trigger_id
+          })
+          .catch(err =>
+            console.error(`Error showing ignore modal for ${team.id}`, err)
+          )
       default:
         break
     }
   }
 
- showAppHome({ user: user.id, team: team.id})
+  showAppHome({ user: user.id, team: team.id })
 }
 
 export async function postToResponseUrl(

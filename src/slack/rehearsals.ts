@@ -75,7 +75,7 @@ export async function postRehearsalMusic({
       blocks
     })
   } catch (err) {
-    console.error(teamId, err)
+    console.error(`Error posting rehearsam message for team ${teamId}`, err)
     return
   }
 }
