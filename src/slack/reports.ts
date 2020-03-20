@@ -50,7 +50,7 @@ export async function getReportBlocks(
     (acc, curr) => (acc += curr.attending.length),
     0
   )
-  const averageAttendance = sumAttending / attendanceData.length
+  const averageAttendance = Math.round(sumAttending / attendanceData.length)
   const highestAttendanceValue = Math.max.apply(
     Math,
     attendanceData.map(data => data.attending.length)
