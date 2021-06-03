@@ -34,7 +34,10 @@ export const covidAttendanceEmojiBlock: SectionBlock = {
   block_id: 'thumbs-covid',
   text: {
     type: 'mrkdwn',
-    text: `If you are coming tonight, *you must register by reacting to this post with* :thumbsup:. Please do not attend if you haven't registered.`
+    text:
+      `React with a 👍 emoji if you are planning to attend tonight.\n\n` +
+      `Don't add 👍 if there are already 30 responses (this is the legal limit on outdoor gatherings).\n\n` +
+      `Please remove your 👍 if you can no longer come, to free up the space for someone else.`
   }
 }
 
