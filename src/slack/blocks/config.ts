@@ -69,5 +69,13 @@ export const AttendanceBlockSelectors: Option[] = [
       emoji: true
     },
     value: AttendancePostSections.ATTENDANCE_EMOJI
+  },
+  {
+    text: {
+      type: 'plain_text',
+      text: 'Register with 👍 - covid rehearsals',
+      emoji: true
+    },
+    value: 'thumbs-covid'
   }
 ]

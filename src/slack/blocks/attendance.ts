@@ -25,8 +25,16 @@ export const attendanceEmojiBlock: SectionBlock = {
   block_id: 'thumbs',
   text: {
     type: 'mrkdwn',
-    text:
-      'Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup: (present) or :thumbsdown: (absent).'
+    text: 'Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup: (present) or :thumbsdown: (absent).'
+  }
+}
+
+export const covidAttendanceEmojiBlock: SectionBlock = {
+  type: 'section',
+  block_id: 'thumbs-covid',
+  text: {
+    type: 'mrkdwn',
+    text: `If you are coming tonight, *you must register by reacting to this post with* :thumbsup:. Please do not attend if you haven't registered.`
   }
 }
 
@@ -95,8 +103,14 @@ export function notesBlock({ notes }: { notes: string }): SectionBlock | null {
   }
 }
 
-export function customColumnBlock({customColumnValue, customColumnHeader}: {customColumnValue: string, customColumnHeader: string}): SectionBlock | null {
-  if (customColumnValue == null || customColumnValue === "") return null
+export function customColumnBlock({
+  customColumnValue,
+  customColumnHeader
+}: {
+  customColumnValue: string
+  customColumnHeader: string
+}): SectionBlock | null {
+  if (customColumnValue == null || customColumnValue === '') return null
   return {
     type: 'section',
     block_id: AttendancePostSections.CUSTOM_COLUMN,
@@ -134,7 +148,8 @@ export const AttendanceBlocks = {
   [AttendancePostSections.FACILITATOR]: facilitatorBlock,
   [AttendancePostSections.MAIN_SONG]: mainSongBlock,
   [AttendancePostSections.RUN_THROUGH]: runThroughBlock,
-  [AttendancePostSections.ATTENDANCE_EMOJI]: attendanceEmojiBlock
+  [AttendancePostSections.ATTENDANCE_EMOJI]: attendanceEmojiBlock,
+  'thumbs-covid': covidAttendanceEmojiBlock
 }
 
 export const initialIntroText = ':tada: Rehearsal day! :tada: <!channel>'
