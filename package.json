@@ -26,7 +26,7 @@
     "google-auth-library": "^5.5.1",
     "googleapis": "^45.0.0",
     "moment": "^2.22.2",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "tsscmp": "1.0.6",
     "typescript": "3.7.2"
   },
