@@ -270,8 +270,7 @@ async function updateView(team: TeamId): Promise<View> {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text:
-          ":rotating_light: *Emergency toolkit*\nManually post messages in case the message didn't automatically post for any reason.\n\n"
+        text: ":rotating_light: *Emergency toolkit*\nManually post messages in case the message didn't automatically post for any reason.\n\n"
       }
     },
     {
@@ -343,21 +342,20 @@ async function updateView(team: TeamId): Promise<View> {
       }
     },
     {
-      type: 'divider',
+      type: 'divider'
     },
     {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text:
-          `💤 *${active ? 'Disable' : 'Enable'} SHEBot*`
+        text: `💤 *${active ? 'Disable' : 'Enable'} SHEBot*`
       }
     },
     {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `SHEBot is currently ${active ? 'enabled': 'disabled'}.`
+        text: `SHEBot is currently ${active ? 'enabled' : 'disabled'}.`
       },
       accessory: {
         type: 'button',
@@ -370,11 +368,15 @@ async function updateView(team: TeamId): Promise<View> {
         confirm: {
           title: {
             type: 'plain_text',
-            text: `${active ? 'Disable': 'Enable'} SHEBot`
+            text: `${active ? 'Disable' : 'Enable'} SHEBot`
           },
           text: {
             type: 'plain_text',
-            text: `Are you sure you want to ${active ? 'disable' : 'enable'} SHEBot? You can ${active ? 'enable': 'disable'} it again at any time - no data will be deleted.`
+            text: `Are you sure you want to ${
+              active ? 'disable' : 'enable'
+            } SHEBot? You can ${
+              active ? 'enable' : 'disable'
+            } it again at any time - no data will be deleted.`
           },
           confirm: {
             type: 'plain_text',
@@ -391,10 +393,6 @@ async function updateView(team: TeamId): Promise<View> {
 
   return {
     type: 'home',
-    title: {
-      type: 'plain_text',
-      text: 'SHEBot configuration'
-    },
     blocks: blocks
   }
 }

@@ -35,9 +35,9 @@ export class BankHolidayCache {
       console.log('cache expired - fetching new data')
       const response = await fetch('https://www.gov.uk/bank-holidays.json')
       const data = await response.json()
-      this.cache = data
+      this.cache = data as BankHolidaysResponse
       this.fetchDate = new Date()
-      return data
+      return data as BankHolidaysResponse
     } else {
       return Promise.resolve(this.cache)
     }

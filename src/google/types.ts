@@ -2,7 +2,8 @@ import {
   JWT,
   Compute,
   UserRefreshClient,
-  OAuth2Client
+  Impersonated,
+  BaseExternalAccountClient
 } from 'google-auth-library'
 export interface SongData {
   mainSong: string
@@ -15,8 +16,8 @@ export interface SongData {
 }
 
 export type GoogleAuth =
-  | string
-  | OAuth2Client
   | JWT
   | Compute
   | UserRefreshClient
+  | BaseExternalAccountClient
+  | Impersonated
