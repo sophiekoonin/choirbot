@@ -4,15 +4,17 @@
   "description": "",
   "main": "app.js",
   "engines": {
-    "node": "14"
+    "node": "16"
   },
   "scripts": {
     "deploy": "gcloud app deploy --quiet app.yaml cron.yaml",
     "gcp-build": "tsc -p .",
+    "build:watch": "tsc --watch -p .",
     "start": "NODE_ENV=prod node dist/app.js",
-    "dev": "nodemon --watch 'src/**/*.ts' --exec 'node_modules/.bin/ts-node' -r dotenv/config src/app.ts",
+    "dev": "nodemon --experimental-specifier-resolution=node -r dotenv/config dist/app.js",
     "test": "jest"
   },
+  "type": "module",
   "author": "",
   "license": "ISC",
   "dependencies": {
