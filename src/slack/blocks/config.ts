@@ -1,7 +1,7 @@
 import { AttendancePostSections } from '../constants'
-import { Option } from '@slack/types'
+import { PlainTextOption } from '@slack/types'
 
-export const AttendanceBlockSelectors: Option[] = [
+export const AttendanceBlockSelectors: PlainTextOption[] = [
   {
     text: {
       type: 'plain_text',

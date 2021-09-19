@@ -94,7 +94,7 @@ export async function handleInteractions(
       case Actions.SHOW_SHEET_MODAL:
         SlackClient.views
           .open({ view: setSheetIdView, token, trigger_id })
-          .catch(err =>
+          .catch((err) =>
             console.error(`Error showing sheet ID modal for ${team.id}`, err)
           )
 
@@ -108,7 +108,7 @@ export async function handleInteractions(
             token,
             trigger_id
           })
-          .catch(err =>
+          .catch((err) =>
             console.error(`Error showing attendance block for ${team.id}`, err)
           )
         break
@@ -120,7 +120,7 @@ export async function handleInteractions(
             token,
             trigger_id
           })
-          .catch(err =>
+          .catch((err) =>
             console.error(`Error showing report modal for ${team.id}`, err)
           )
         break
@@ -132,7 +132,7 @@ export async function handleInteractions(
             token,
             trigger_id
           })
-          .catch(err =>
+          .catch((err) =>
             console.error(`Error showing ignore modal for ${team.id}`, err)
           )
       default:
@@ -156,9 +156,8 @@ export async function postToResponseUrl(
   }
 
   const res = await fetch(responseUrl, options)
-  const resJson = await res.json()
-  if (!resJson.ok) {
-    console.error('error', { resJson })
+  if (!res.ok) {
+    console.error('error', { body: res.body })
   }
 }
 

@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { raw, Request, Response } from 'express'
 
 import { db, getValues, getDbDoc } from '../db'
 import { onSlackInstall } from './config/installation'
@@ -14,18 +14,22 @@ const BASE_URL =
   process.env.BASE_URL ||
   `https://${process.env.GOOGLE_CLOUD_PROJECT}.appspot.com`
 
-export const oauth_redirect = async function(
+export const oauth_redirect = async function (
   req: Request,
   res: Response
 ): Promise<Response> {
-  if (!req.query && !req.query.code) {
+  if (!req?.query?.code) {
     return res.status(401).send("Missing query attribute 'code'")
   }
+
+  const code = Array.isArray(req.query.code)
+    ? (req.query.code[0] as string)
+    : (req.query.code as string)
 
   const result = await SlackClient.oauth.v2.access({
     client_id: SLACK_CLIENT_ID,
     client_secret: SLACK_CLIENT_SECRET,
-    code: req.query.code
+    code
   })
 
   if (result.ok != null && result.ok === false) {
@@ -74,23 +78,18 @@ export const oauth_redirect = async function(
     await joinChannel(team_id, channel, access_token)
   }
 
-  await db
-    .collection('teams')
-    .doc(team_id)
-    .set({
-      team_name,
-      active,
-      user_id,
-      channel_id,
-      channel,
-      bot_user_id,
-      access_token,
-      intro_text,
-      attendance_blocks,
-      rehearsal_reminders,
-      rehearsal_day,
-      google_sheet_id
-    })
+  await db.collection('teams').doc(team_id).set({
+    team_name,
+    active,
+    user_id,
+    channel_id,
+    channel,
+    bot_user_id,
+    attendance_blocks,
+    rehearsal_reminders,
+    rehearsal_day,
+    google_sheet_id
+  })
 
   await onSlackInstall({ token: access_token, userId: user_id })
 
