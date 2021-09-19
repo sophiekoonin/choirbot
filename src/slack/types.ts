@@ -5,7 +5,6 @@ import {
   Option,
   PlainTextElement
 } from '@slack/web-api'
-import moment from 'moment'
 import { IncomingHttpHeaders } from 'http'
 
 export interface SlackAPIArgs {
@@ -19,7 +18,7 @@ export interface VerificationHeaders extends IncomingHttpHeaders {
 }
 
 export interface PostAttendanceMessageArgs extends SlackAPIArgs {
-  date: moment.Moment
+  date: Date
   introText: string
   blocks: string[]
 }

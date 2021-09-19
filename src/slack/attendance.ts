@@ -1,6 +1,6 @@
 import Firestore from '@google-cloud/firestore'
 import { SectionBlock } from '@slack/types'
-
+import { format } from 'date-fns'
 import * as google from '../google/google'
 import * as db from '../db'
 import { SlackClient } from './client'
@@ -25,9 +25,9 @@ function getUserReactionsForEmoji({
   emoji: string
   botId: UserId
 }): UserId[] {
-  return (reactions.find(group => group.name === emoji)['users'] || []).filter(
-    user => user !== botId
-  )
+  return (
+    reactions.find((group) => group.name === emoji)['users'] || []
+  ).filter((user) => user !== botId)
 }
 export async function getAttendancePosts(team_id: TeamId, limit?: number) {
   const result = await db.db
@@ -51,8 +51,8 @@ export const postAttendanceMessage = async ({
   blocks,
   introText
 }: PostAttendanceMessageArgs) => {
-  const dateISO = date.format('YYYY-MM-DD')
-  const dateString = date.format('DD/MM/YYYY')
+  const dateISO = format(date, 'yyyy-MM-dd')
+  const dateString = format(date, 'dd/MM/yyyy')
   const songs = await google.getNextSongs(dateString, teamId)
   if (songs != null && songs.mainSong.toLowerCase().includes('no rehearsal')) {
     return
@@ -112,7 +112,7 @@ export const postAttendanceMessage = async ({
   return
 }
 
-export const processAttendanceForTeam = async function({
+export const processAttendanceForTeam = async function ({
   teamId,
   token,
   channel
@@ -164,10 +164,10 @@ export function getAttendancePostBlocks({
   return [
     introductionBlock(introText),
     ...blocks
-      .map(blockName => {
+      .map((blockName) => {
         const block = AttendanceBlocks[blockName]
         return typeof block === 'function' ? block(songs) : block
       })
-      .filter(block => block != null)
+      .filter((block) => block != null)
   ]
 }

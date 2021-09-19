@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
-import moment from 'moment'
 import fetch from 'node-fetch'
-
+import { addDays, format } from 'date-fns'
 import * as db from '../../db'
 
 import { Actions, Interactions } from '../constants'
@@ -179,7 +178,7 @@ export async function postManually({
     'attendance_blocks',
     'intro_text'
   ])
-  const date = moment()
+  const date = new Date()
 
   switch (selectedOption) {
     case 'attendance':
@@ -192,13 +191,13 @@ export async function postManually({
         date
       })
     case 'rehearsal':
-      date.add(4, 'days')
+      addDays(date, 4)
       return postRehearsalMusic({
         token: token as string,
         channel: channel as string,
         teamId,
-        dayOfWeek: date.format('dddd'),
-        date: date.format('DD/MM/YYYY'),
+        dayOfWeek: format(date, 'eeee'),
+        date: format(date, 'dd/MM/yyyy'),
         isBankHoliday: false
       })
     default:

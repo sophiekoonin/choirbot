@@ -1,5 +1,5 @@
-import moment from 'moment'
 import * as utils from './utils'
+import { format, addDays } from 'date-fns'
 import {
   postAttendanceMessage,
   processAttendanceForTeam
@@ -14,10 +14,10 @@ export const checkForJobsToday = async (req: Request, res: Response) => {
   if (!req.headers['x-appengine-cron']) {
     return res.sendStatus(400)
   }
-  const date = moment()
+  const date = new Date()
 
   // Process attendance on Sundays
-  if (date.day() === 0) {
+  if (date.getDay() === 0) {
     await processAttendance()
   }
 
@@ -27,17 +27,20 @@ export const checkForJobsToday = async (req: Request, res: Response) => {
   return res.sendStatus(200)
 }
 
-async function checkForAttendancePostJobs(date: moment.Moment) {
-  const dateISO = date.format('YYYY-MM-DD')
+async function checkForAttendancePostJobs(date: Date) {
+  const dateISO = format(date, 'yyyy-MM-dd')
   const isBankHol = await utils.isBankHoliday(dateISO)
   if (isBankHol) return
 
-  const today = date.day().toString()
-  const todayQuery = db.collection('teams').where('rehearsal_day', '==', today).where('active', '==', true)
+  const today = date.getDay().toString()
+  const todayQuery = db
+    .collection('teams')
+    .where('rehearsal_day', '==', today)
+    .where('active', '==', true)
   const teams = await getQueryResults(todayQuery)
   if (teams.length === 0) return
 
-  teams.forEach(async team => {
+  teams.forEach(async (team) => {
     const {
       id,
       access_token: token,
@@ -50,8 +53,7 @@ async function checkForAttendancePostJobs(date: moment.Moment) {
       SlackClient.chat.postMessage({
         token: token as string,
         channel: user_id as string,
-        text:
-          "You haven't set a channel, so I can't post an attendance message. Please choose a channel by clicking on the `Home` tab!"
+        text: "You haven't set a channel, so I can't post an attendance message. Please choose a channel by clicking on the `Home` tab!"
       })
       return
     }
@@ -67,14 +69,14 @@ async function checkForAttendancePostJobs(date: moment.Moment) {
   })
 }
 
-async function checkForRehearsalReminderJobs(date: moment.Moment) {
-  const rehearsalDay = date.add(4, 'days')
-  const rehearsalDayNumber = rehearsalDay.day().toString()
-  const dateString = rehearsalDay.format('DD/MM/YYYY')
+async function checkForRehearsalReminderJobs(date: Date) {
+  const rehearsalDay = addDays(date, 4)
+  const rehearsalDayNumber = rehearsalDay.getDay().toString()
+  const dateString = format(rehearsalDay, 'dd/MM/yyyy')
   const isBankHoliday = await utils.isBankHoliday(
-    rehearsalDay.format('YYYY-MM-DD')
+    format(rehearsalDay, 'yyyy-MM-dd')
   )
-  const dayOfWeek = rehearsalDay.format('dddd')
+  const dayOfWeek = format(rehearsalDay, 'eeee')
 
   const todayQuery = db
     .collection('teams')
@@ -83,7 +85,7 @@ async function checkForRehearsalReminderJobs(date: moment.Moment) {
     .where('active', '==', true)
   const teams = await getQueryResults(todayQuery)
   if (teams.length === 0) return
-  teams.forEach(async team => {
+  teams.forEach(async (team) => {
     const { id, access_token: token, channel_id: channel } = team
     if (channel === '' || channel == null) return
     return await postRehearsalMusic({
@@ -100,9 +102,11 @@ async function checkForRehearsalReminderJobs(date: moment.Moment) {
 }
 
 export const processAttendance = async () => {
-  const allTeams = await getQueryResults(db.collection('teams').where('active', '==', true))
+  const allTeams = await getQueryResults(
+    db.collection('teams').where('active', '==', true)
+  )
 
-  allTeams.forEach(async team => {
+  allTeams.forEach(async (team) => {
     const { id, access_token: token, channel_id: channel } = team
     if (channel === '' || channel == null) return
 

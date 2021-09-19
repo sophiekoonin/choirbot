@@ -18,7 +18,7 @@ app.use(bodyParser.json())
 app.use(
   bodyParser.urlencoded({
     extended: true,
-    verify: function(req: Request, _: Response, buf: Buffer) {
+    verify: function (req: Request, _: Response, buf: Buffer) {
       // get text body and add it as a field for signature verification
       req.text = buf.toString()
     }
