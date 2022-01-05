@@ -71,7 +71,10 @@ export async function postRehearsalMusic({
               isNextWeek ? 'next' : 'this'
             } week is cancelled`
           ),
-          notesBlock({ notes: nextWeekSongs.notes, showEmoji: false })
+          notesBlock({
+            notes: '<!channel> ' + nextWeekSongs.notes,
+            showEmoji: false
+          })
         ]
       } else if (nextWeekSongs.mainSong.match(/no rehearsal/gi)) {
         text = `<!channel> Reminder: there's no rehearsal ${
@@ -79,11 +82,14 @@ export async function postRehearsalMusic({
         } week!`
         blocks = [
           headerBlock(
-            `:information_source: <!channel> Reminder: there's no rehearsal ${
+            `:information_source: Reminder: there's no rehearsal ${
               isNextWeek ? 'next' : 'this'
             } week!`
           ),
-          notesBlock({ notes: nextWeekSongs.notes, showEmoji: false })
+          notesBlock({
+            notes: '<!channel> ' + nextWeekSongs.notes,
+            showEmoji: false
+          })
         ]
       } else {
         blocks = getRehearsalMusicBlocks(nextWeekSongs, dayOfWeek).filter(
