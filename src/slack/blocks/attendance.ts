@@ -1,4 +1,4 @@
-import { SectionBlock } from '@slack/types'
+import { SectionBlock, HeaderBlock } from '@slack/types'
 import { AttendancePostSections } from '../constants'
 
 function getSongLink(songName: string, songLink: string): string {
@@ -16,6 +16,14 @@ export const introductionBlock = (text: string): SectionBlock => ({
   block_id: AttendancePostSections.INTRODUCTION,
   text: {
     type: 'mrkdwn',
+    text
+  }
+})
+
+export const headerBlock = (text: string): HeaderBlock => ({
+  type: 'header',
+  text: {
+    type: 'plain_text',
     text
   }
 })
@@ -49,7 +57,6 @@ export const musicalWarmupBlock: SectionBlock = {
     text: 'If you want to lead musical warmup, respond with :musical_note:.'
   }
 }
-
 export const genericWarmupBlock: SectionBlock = {
   type: 'section',
   block_id: AttendancePostSections.GENERAL_WARMUP,
@@ -94,14 +101,20 @@ export function runThroughBlock({
   }
 }
 
-export function notesBlock({ notes }: { notes: string }): SectionBlock | null {
+export function notesBlock({
+  notes,
+  showEmoji = true
+}: {
+  notes: string
+  showEmoji?: boolean
+}): SectionBlock | null {
   if (notes == null || notes === '') return null
   return {
     type: 'section',
     block_id: AttendancePostSections.NOTES,
     text: {
       type: 'mrkdwn',
-      text: `:information_source: ${notes}`
+      text: `${showEmoji ? ':information_source: ' : ''}${notes}`
     }
   }
 }

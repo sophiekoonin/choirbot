@@ -177,7 +177,7 @@ export async function postManually({
     'attendance_blocks',
     'intro_text'
   ])
-  const date = new Date()
+  let date = new Date()
 
   switch (selectedOption) {
     case 'attendance':
@@ -190,7 +190,7 @@ export async function postManually({
         date
       })
     case 'rehearsal':
-      addDays(date, 4)
+      date = addDays(date, 4)
       return postRehearsalMusic({
         token: token as string,
         channel: channel as string,
