@@ -13,6 +13,14 @@ export const AttendanceBlockSelectors: PlainTextOption[] = [
   {
     text: {
       type: 'plain_text',
+      emoji: true,
+      text: 'Volunteer to open up/lock up'
+    },
+    value: AttendancePostSections.LOCKING_UP
+  },
+  {
+    text: {
+      type: 'plain_text',
       text: 'Notes'
     },
     value: AttendancePostSections.NOTES

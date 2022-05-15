@@ -60,5 +60,6 @@ export const AttendancePostSections = {
   PHYSICAL_WARMUP: 'physical_warmup',
   GENERAL_WARMUP: 'general_warmup',
   MUSICAL_WARMUP: 'musical_warmup',
-  FACILITATOR: 'facilitator'
+  FACILITATOR: 'facilitator',
+  LOCKING_UP: 'locking_up'
 }

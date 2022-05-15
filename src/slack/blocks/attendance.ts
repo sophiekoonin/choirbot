@@ -142,6 +142,15 @@ export const facilitatorBlock: SectionBlock = {
   }
 }
 
+export const lockingUpBlock: SectionBlock = {
+  type: 'section',
+  block_id: AttendancePostSections.LOCKING_UP,
+  text: {
+    type: 'mrkdwn',
+    text: `If you'll pick up the key from the Canopy hotel today, respond with :key:.\n\nIf you're locking up & taking the key back to the hotel, respond with :lock:.`
+  }
+}
+
 export const AttendanceBlocks = {
   [AttendancePostSections.NOTES]: notesBlock,
   [AttendancePostSections.MUSICAL_WARMUP]: musicalWarmupBlock,
@@ -149,6 +158,7 @@ export const AttendanceBlocks = {
   [AttendancePostSections.GENERAL_WARMUP]: genericWarmupBlock,
   [AttendancePostSections.CUSTOM_COLUMN]: customColumnBlock,
   [AttendancePostSections.FACILITATOR]: facilitatorBlock,
+  [AttendancePostSections.LOCKING_UP]: lockingUpBlock,
   [AttendancePostSections.MAIN_SONG]: mainSongBlock,
   [AttendancePostSections.RUN_THROUGH]: runThroughBlock,
   [AttendancePostSections.ATTENDANCE_EMOJI]: attendanceEmojiBlock,
