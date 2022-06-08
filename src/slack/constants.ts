@@ -57,9 +57,20 @@ export const AttendancePostSections = {
   NOTES: 'notes',
   CUSTOM_COLUMN: 'custom_column',
   ATTENDANCE_EMOJI: 'attendance_emoji',
+  WARMUP_BUTTONS: 'warmup_buttons',
   PHYSICAL_WARMUP: 'physical_warmup',
-  GENERAL_WARMUP: 'general_warmup',
   MUSICAL_WARMUP: 'musical_warmup',
+  GENERAL_WARMUP: 'general_warmup',
   FACILITATOR: 'facilitator',
+  FACILITATOR_BUTTONS: 'facilitator_buttons',
   LOCKING_UP: 'locking_up'
+}
+
+export enum AttendancePostButtons {
+  VOLUNTEER_GENERIC_WARMUP = 'volunteer_generic_warmup',
+  VOLUNTEER_PHYSICAL_WARMUP = 'volunteer_physical_warmup',
+  VOLUNTEER_MUSICAL_WARMUP = 'volunteer_musical_warmup',
+  VOLUNTEER_FACILITATOR = 'volunteer_facilitator',
+  VOLUNTEER_LOCKING_UP = 'volunteer_locking_up',
+  VOLUNTEER_COLLECT_KEY = 'volunteer_collect_key'
 }

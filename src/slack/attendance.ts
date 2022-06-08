@@ -1,6 +1,6 @@
 import Firestore from '@google-cloud/firestore'
-import { SectionBlock } from '@slack/types'
-import { format } from 'date-fns'
+import { SectionBlock, ActionsBlock } from '@slack/types'
+import { format, getUnixTime } from 'date-fns'
 import * as google from '../google/google'
 import * as db from '../db'
 import { SlackClient } from './client'
@@ -15,6 +15,7 @@ import {
 } from './types'
 import { SongData } from '../google/types'
 import { introductionBlock, AttendanceBlocks } from './blocks/attendance'
+import { AttendancePostButtons } from './constants'
 
 function getUserReactionsForEmoji({
   reactions,
@@ -43,16 +44,21 @@ export async function getAttendancePosts(team_id: TeamId, limit?: number) {
   return snapshot.docs
 }
 
-export const postAttendanceMessage = async ({
-  channel,
-  token,
+const prepareAttendancePostData = async ({
   teamId,
-  date,
+  token,
+  dateString,
+  roles,
   blocks,
   introText
-}: PostAttendanceMessageArgs) => {
-  const dateISO = format(date, 'yyyy-MM-dd')
-  const dateString = format(date, 'dd/MM/yyyy')
+}: {
+  teamId: string
+  token: string
+  dateString: string
+  roles: { [role: string]: string }
+  blocks: string[]
+  introText: string
+}) => {
   const songs = await google.getNextSongs(dateString, teamId)
   if (songs != null && songs.mainSong.toLowerCase().includes('no rehearsal')) {
     return
@@ -61,12 +67,32 @@ export const postAttendanceMessage = async ({
     await SlackClient.chat.postMessage({
       token,
       channel: await db.getValue('teams', teamId, 'user_id'),
-      text: `Tried to post attendance message, but couldn't find a row for ${dateString} in the schedule. Please make sure the dates are correct!`
+      text: `Tried to post or update attendance message, but couldn't find a row for ${dateString} in the schedule. Please make sure the dates are correct!`
     })
     return
   }
-  const messageBlocks = await getAttendancePostBlocks({
+  return getAttendancePostBlocks({
     songs,
+    blocks,
+    roles,
+    introText
+  })
+}
+
+export const postAttendanceMessage = async ({
+  channel,
+  token,
+  teamId,
+  date,
+  blocks,
+  introText
+}: PostAttendanceMessageArgs) => {
+  const dateString = format(date, 'dd/MM/yyyy')
+  const messageBlocks = await prepareAttendancePostData({
+    teamId,
+    token,
+    dateString,
+    roles: {},
     blocks,
     introText
   })
@@ -97,19 +123,100 @@ export const postAttendanceMessage = async ({
       name: 'thumbsup'
     })
 
-    await db.setDbValue(`attendance-${teamId}`, dateISO, {
+    await db.setDbValue(`attendance-${teamId}`, postMsgRsp.ts, {
       rehearsal_date: dateString,
       created_at: Firestore.Timestamp.now().seconds,
       ts: postMsgRsp.ts,
       channel: channel,
       attending: [],
-      notAttending: []
+      notAttending: [],
+      roles: {}
     })
   } catch (err) {
     console.error(err)
   }
 
   return
+}
+
+export async function updateAttendancePost({
+  teamId,
+  ts,
+  dateString,
+  channel,
+  token,
+  roles,
+  blocks,
+  introText
+}: Omit<PostAttendanceMessageArgs, 'date'> & {
+  ts: string
+  roles: { [role: string]: string }
+  dateString: string
+}) {
+  const messageBlocks = await prepareAttendancePostData({
+    teamId,
+    token,
+    dateString,
+    roles,
+    blocks,
+    introText
+  })
+
+  await SlackClient.chat.update({
+    token,
+    channel,
+    ts,
+    blocks: messageBlocks,
+    text: `It's rehearsal day!`
+  })
+}
+export const updateAttendancePostRoles = async function ({
+  teamId,
+  token,
+  postTimestamp,
+  roleName,
+  userId
+}: {
+  teamId: string
+  token: string
+  postTimestamp: string
+  roleName: string
+  userId?: string
+}) {
+  try {
+    const post = await db.getDocData(`attendance-${teamId}`, postTimestamp)
+    const { rehearsal_date } = post
+    const roles = post['roles'] || {}
+    const { [roleName]: _, ...restRoles } = roles
+    const newRoles = userId ? { ...restRoles, [roleName]: userId } : restRoles
+    await db.updateDbValue(`attendance-${teamId}`, postTimestamp, {
+      roles: newRoles
+    })
+
+    const {
+      attendance_blocks: blocks,
+      intro_text: introText,
+      channel_id: channel
+    } = await db.getValues('teams', teamId, [
+      'access_token',
+      'channel_id',
+      'attendance_blocks',
+      'intro_text'
+    ])
+
+    await updateAttendancePost({
+      teamId,
+      token,
+      ts: postTimestamp,
+      dateString: rehearsal_date as string,
+      channel: channel as string,
+      roles: newRoles,
+      blocks: blocks as string[],
+      introText: introText as string
+    })
+  } catch (err) {
+    console.error(err)
+  }
 }
 
 export const processAttendanceForTeam = async function ({
@@ -155,19 +262,24 @@ export const processAttendanceForTeam = async function ({
 export function getAttendancePostBlocks({
   songs,
   blocks,
-  introText
+  introText,
+  roles
 }: {
   songs: SongData
   blocks: string[]
   introText: string
-}): Array<SectionBlock> {
+  roles: { [role: string]: string }
+}): Array<SectionBlock | ActionsBlock> {
   return [
     introductionBlock(introText),
     ...blocks
       .map((blockName) => {
         const block = AttendanceBlocks[blockName]
-        return typeof block === 'function' ? block(songs) : block
+        return typeof block === 'function'
+          ? block({ ...songs, ...roles })
+          : block
       })
+      .flat()
       .filter((block) => block != null)
   ]
 }

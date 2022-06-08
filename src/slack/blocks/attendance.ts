@@ -1,5 +1,16 @@
-import { SectionBlock, HeaderBlock } from '@slack/types'
-import { AttendancePostSections } from '../constants'
+import { ActionsBlock, SectionBlock, HeaderBlock } from '@slack/types'
+import { AttendancePostButtons, AttendancePostSections } from '../constants'
+
+function newSectionBlock(text: string, blockId: string): SectionBlock {
+  return {
+    type: 'section',
+    block_id: blockId,
+    text: {
+      type: 'mrkdwn',
+      text
+    }
+  }
+}
 
 function getSongLink(songName: string, songLink: string): string {
   if (songLink == null || songLink === '') {
@@ -11,14 +22,8 @@ function getSongLink(songName: string, songLink: string): string {
   return `<${songLink}|${songName}>`
 }
 
-export const introductionBlock = (text: string): SectionBlock => ({
-  type: 'section',
-  block_id: AttendancePostSections.INTRODUCTION,
-  text: {
-    type: 'mrkdwn',
-    text
-  }
-})
+export const introductionBlock = (text: string): SectionBlock =>
+  newSectionBlock(text, AttendancePostSections.INTRODUCTION)
 
 export const headerBlock = (text: string): HeaderBlock => ({
   type: 'header',
@@ -28,35 +33,71 @@ export const headerBlock = (text: string): HeaderBlock => ({
   }
 })
 
-export const attendanceEmojiBlock: SectionBlock = {
-  type: 'section',
-  block_id: 'thumbs',
+export const attendanceEmojiBlock: SectionBlock = newSectionBlock(
+  'Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup: (present) or :thumbsdown: (absent).',
+  'thumbs'
+)
+
+const physicalWarmupButton = {
+  type: 'button',
   text: {
-    type: 'mrkdwn',
-    text: 'Please indicate whether or not you can attend tonight by reacting to this message with :thumbsup: (present) or :thumbsdown: (absent).'
-  }
+    type: 'plain_text',
+    text: `:muscle: I'll lead physical warmup`,
+    emoji: true
+  },
+  value: AttendancePostButtons.VOLUNTEER_PHYSICAL_WARMUP
 }
 
-export const covidAttendanceEmojiBlock: SectionBlock = {
-  type: 'section',
-  block_id: 'thumbs-covid',
+const musicalWarmupButton = {
+  type: 'button',
   text: {
-    type: 'mrkdwn',
-    text:
-      `React with a 👍 emoji if you are planning to attend tonight.\n\n` +
-      `Don't add 👍 if there are already 30 responses (this is the legal limit on outdoor gatherings).\n\n` +
-      `Please remove your 👍 if you can no longer come, to free up the space for someone else.`
-  }
+    type: 'plain_text',
+    text: `:musical_note: I'll lead musical warmup`,
+    emoji: true
+  },
+  value: AttendancePostButtons.VOLUNTEER_MUSICAL_WARMUP
 }
 
-export const musicalWarmupBlock: SectionBlock = {
-  type: 'section',
-  block_id: AttendancePostSections.MUSICAL_WARMUP,
-  text: {
-    type: 'mrkdwn',
-    text: 'If you want to lead musical warmup, respond with :musical_note:.'
+export const warmupButtonsBlock = ({
+  volunteer_physical_warmup: physicalWarmupVolunteer,
+  volunteer_musical_warmup: musicalWarmupVolunteer
+}: {
+  [AttendancePostButtons.VOLUNTEER_PHYSICAL_WARMUP]?: string
+  [AttendancePostButtons.VOLUNTEER_MUSICAL_WARMUP]?: string
+}): Array<ActionsBlock | SectionBlock> => {
+  const physicalWarmupText = physicalWarmupVolunteer
+    ? `:muscle: *Physical warmup:* <@${physicalWarmupVolunteer}>`
+    : undefined
+  const musicalWarmupText = musicalWarmupVolunteer
+    ? `:musical_note: *Musical warmup:* <@${musicalWarmupVolunteer}>`
+    : undefined
+
+  let warmupActionsBlock: ActionsBlock
+
+  if (physicalWarmupText && musicalWarmupText) {
+    warmupActionsBlock = undefined
+  } else {
+    warmupActionsBlock = {
+      type: 'actions',
+      block_id: AttendancePostSections.WARMUP_BUTTONS,
+      elements: [
+        physicalWarmupText ? undefined : physicalWarmupButton,
+        musicalWarmupText ? undefined : musicalWarmupButton
+      ].filter(Boolean)
+    }
   }
+
+  return [
+    physicalWarmupText
+      ? newSectionBlock(physicalWarmupText, 'phys_warmup_name')
+      : undefined,
+    warmupActionsBlock,
+    musicalWarmupText
+      ? newSectionBlock(musicalWarmupText, 'mus_warmup_name')
+      : undefined
+  ].filter(Boolean)
 }
+
 export const genericWarmupBlock: SectionBlock = {
   type: 'section',
   block_id: AttendancePostSections.GENERAL_WARMUP,
@@ -150,32 +191,114 @@ export const facilitatorBlock: SectionBlock = {
   type: 'section',
   block_id: AttendancePostSections.FACILITATOR,
   text: {
-    type: 'mrkdwn',
-    text: 'Facilitator please respond with :raised_hands:!'
+    type: 'plain_text',
+    text: `:raised_hands: I'll facilitate`,
+    emoji: true
   }
 }
 
-export const lockingUpBlock: SectionBlock = {
-  type: 'section',
-  block_id: AttendancePostSections.LOCKING_UP,
+export const facilitatorButtonBlock = ({
+  volunteer_facilitator: facilitatorVolunteer
+}: {
+  [AttendancePostButtons.VOLUNTEER_FACILITATOR]?: string
+}): ActionsBlock | SectionBlock =>
+  facilitatorVolunteer
+    ? newSectionBlock(
+        `:raised_hands: *Facilitator:* <@${facilitatorVolunteer}>`,
+        'facilitator_name'
+      )
+    : {
+        type: 'actions',
+        block_id: AttendancePostSections.FACILITATOR,
+        elements: [
+          {
+            type: 'button',
+            text: {
+              type: 'plain_text',
+              text: `:raised_hands: I'll facilitate`,
+              emoji: true
+            },
+            value: AttendancePostButtons.VOLUNTEER_FACILITATOR
+          }
+        ]
+      }
+
+const pickUpKeyButton = {
+  type: 'button',
   text: {
-    type: 'mrkdwn',
-    text: `If you'll pick up the key from the Canopy hotel today, respond with :key:.\n\nIf you're locking up & taking the key back to the hotel, respond with :lock:.`
-  }
+    type: 'plain_text',
+    text: `:key: I'll pick up the key`,
+    emoji: true
+  },
+  value: AttendancePostButtons.VOLUNTEER_COLLECT_KEY
+}
+
+const lockUpButton = {
+  type: 'button',
+  text: {
+    type: 'plain_text',
+    text: `:lock: I'll lock up`,
+    emoji: true
+  },
+  value: AttendancePostButtons.VOLUNTEER_LOCKING_UP
+}
+
+export const lockingUpBlock = ({
+  volunteer_locking_up: lockupVolunteer,
+  volunteer_collect_key: pickupVolunteer
+}: {
+  [AttendancePostButtons.VOLUNTEER_LOCKING_UP]?: string
+  [AttendancePostButtons.VOLUNTEER_COLLECT_KEY]?: string
+}): Array<SectionBlock | ActionsBlock> => {
+  const lockupText = lockupVolunteer
+    ? newSectionBlock(
+        `:lock: *Locking up:* <@${lockupVolunteer}>`,
+        'lockup_name'
+      )
+    : undefined
+  const pickupText = pickupVolunteer
+    ? newSectionBlock(
+        `:key: *Picking up the key:* <@${pickupVolunteer}>`,
+        'pickup_name'
+      )
+    : undefined
+
+  const introText = !(lockupText && pickupText)
+    ? newSectionBlock(
+        `We need a volunteer to ${
+          !pickupText ? 'pick up the key from the Canopy hotel today' : ''
+        }${!pickupText && !lockupText ? ' and someone else to ' : ''}${
+          !lockupText ? 'lock up & take the key back after rehearsal' : ''
+        }.`,
+        `${AttendancePostSections.LOCKING_UP}-intro`
+      )
+    : undefined
+
+  const actions: ActionsBlock | undefined = !(lockupText && pickupText)
+    ? {
+        type: 'actions',
+        block_id: AttendancePostSections.LOCKING_UP,
+        elements: [
+          pickupText ? undefined : pickUpKeyButton,
+          lockupText ? undefined : lockUpButton
+        ].filter(Boolean)
+      }
+    : undefined
+
+  return [pickupText, introText, actions, lockupText].filter(Boolean)
 }
 
 export const AttendanceBlocks = {
   [AttendancePostSections.NOTES]: notesBlock,
-  [AttendancePostSections.MUSICAL_WARMUP]: musicalWarmupBlock,
-  [AttendancePostSections.PHYSICAL_WARMUP]: physicalWarmupBlock,
+  [AttendancePostSections.WARMUP_BUTTONS]: warmupButtonsBlock,
+  [AttendancePostSections.FACILITATOR_BUTTONS]: facilitatorButtonBlock,
   [AttendancePostSections.GENERAL_WARMUP]: genericWarmupBlock,
   [AttendancePostSections.CUSTOM_COLUMN]: customColumnBlock,
   [AttendancePostSections.FACILITATOR]: facilitatorBlock,
   [AttendancePostSections.LOCKING_UP]: lockingUpBlock,
   [AttendancePostSections.MAIN_SONG]: mainSongBlock,
   [AttendancePostSections.RUN_THROUGH]: runThroughBlock,
-  [AttendancePostSections.ATTENDANCE_EMOJI]: attendanceEmojiBlock,
-  'thumbs-covid': covidAttendanceEmojiBlock
+  [AttendancePostSections.ATTENDANCE_EMOJI]: attendanceEmojiBlock
 }
 
 export const initialIntroText = ':tada: Rehearsal day! :tada: <!channel>'

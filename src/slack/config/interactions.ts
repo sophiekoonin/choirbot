@@ -3,14 +3,19 @@ import fetch from 'node-fetch'
 import { addDays, format } from 'date-fns'
 import * as db from '../../db'
 
-import { Actions, Interactions } from '../constants'
+import {
+  Actions,
+  AttendancePostButtons,
+  AttendancePostSections,
+  Interactions
+} from '../constants'
 import {
   ActionResponseBody,
   TeamId,
   InboundInteraction,
   ChannelInfoResponse
 } from '../types'
-import { postAttendanceMessage } from '../attendance'
+import { postAttendanceMessage, updateAttendancePostRoles } from '../attendance'
 import { postRehearsalMusic } from '..'
 import { SlackClient } from '../client'
 import {
@@ -28,7 +33,7 @@ export async function handleInteractions(
   res: Response
 ): Promise<void> {
   const payload: InboundInteraction = JSON.parse(req.body.payload)
-  const { actions, team, trigger_id, view, type, user } = payload
+  const { actions, team, trigger_id, view, type, user, message } = payload
   const token = await db.getValue('teams', team.id, 'access_token')
   res.send()
 
@@ -39,10 +44,32 @@ export async function handleInteractions(
     })
   }
 
+  if (message != null && actions != null) {
+    // We're dealing with an interaction on a post here
+    const action = actions[0]
+    const { ts } = message
+    switch (action.value) {
+      case AttendancePostButtons.VOLUNTEER_COLLECT_KEY:
+      case AttendancePostButtons.VOLUNTEER_LOCKING_UP:
+      case AttendancePostButtons.VOLUNTEER_FACILITATOR:
+      case AttendancePostButtons.VOLUNTEER_MUSICAL_WARMUP:
+      case AttendancePostButtons.VOLUNTEER_PHYSICAL_WARMUP:
+        await updateAttendancePostRoles({
+          teamId: team.id,
+          token,
+          postTimestamp: ts,
+          userId: user.id,
+          roleName: action.value
+        })
+        return
+      default:
+        break
+    }
+  }
+
   if (actions != null) {
     const action = actions[0]
     const { action_id } = action
-
     switch (action_id) {
       case Actions.POST_ATTENDANCE_MESSAGE:
         postManually({
@@ -133,6 +160,7 @@ export async function handleInteractions(
           .catch((err) =>
             console.error(`Error showing ignore modal for ${team.id}`, err)
           )
+        break
       default:
         break
     }

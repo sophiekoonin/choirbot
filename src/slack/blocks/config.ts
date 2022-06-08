@@ -14,6 +14,14 @@ export const AttendanceBlockSelectors: PlainTextOption[] = [
     text: {
       type: 'plain_text',
       emoji: true,
+      text: 'Volunteer to facilitate - button'
+    },
+    value: AttendancePostSections.FACILITATOR_BUTTONS
+  },
+  {
+    text: {
+      type: 'plain_text',
+      emoji: true,
       text: 'Volunteer to open up/lock up'
     },
     value: AttendancePostSections.LOCKING_UP
@@ -52,6 +60,14 @@ export const AttendanceBlockSelectors: PlainTextOption[] = [
   {
     text: {
       type: 'plain_text',
+      emoji: true,
+      text: 'Musical/physical warmup buttons'
+    },
+    value: AttendancePostSections.WARMUP_BUTTONS
+  },
+  {
+    text: {
+      type: 'plain_text',
       text: 'Main song'
     },
     value: AttendancePostSections.MAIN_SONG
@@ -77,13 +93,5 @@ export const AttendanceBlockSelectors: PlainTextOption[] = [
       emoji: true
     },
     value: AttendancePostSections.ATTENDANCE_EMOJI
-  },
-  {
-    text: {
-      type: 'plain_text',
-      text: 'Register with 👍 - covid rehearsals',
-      emoji: true
-    },
-    value: 'thumbs-covid'
   }
 ]

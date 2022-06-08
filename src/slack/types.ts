@@ -197,6 +197,7 @@ export interface InboundInteraction {
   trigger_id: string
   view: ViewSubmissionDetails | null
   actions?: [ActionSubmission]
+  message?: ChatPostMessageResult
 }
 
 export interface ReportArgs {
