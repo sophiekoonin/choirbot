@@ -26,16 +26,8 @@ workflows:
   deploy:
     jobs:
       - deploy:
-          name: deploy-staging
+          name: deploy-prod
           filters:
             branches:
               only: master
-      - approve-prod-deployment:
-          type: approval
-          requires:
-            - deploy-staging
-      - deploy:
-          name: deploy-prod
           context: "SHE Choir Production"
-          requires:
-            - approve-prod-deployment
