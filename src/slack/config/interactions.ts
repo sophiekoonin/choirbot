@@ -10,7 +10,7 @@ import {
   InboundInteraction,
   ChannelInfoResponse
 } from '../types'
-import { postAttendanceMessage } from '../attendance'
+import { postAttendanceMessage, updateAttendanceMessage } from '../attendance'
 import { postRehearsalMusic } from '..'
 import { SlackClient } from '../client'
 import {
@@ -55,6 +55,9 @@ export async function handleInteractions(
           selectedOption: 'rehearsal',
           teamId: team.id
         })
+        break
+      case Actions.UPDATE_ATTENDANCE_MESSAGE:
+        updateAttendanceMessage({ teamId: team.id, token })
         break
       case Actions.SELECT_REHEARSAL_DAY:
         db.updateDbValue('teams', team.id, {

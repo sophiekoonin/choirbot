@@ -43,6 +43,55 @@ export async function getAttendancePosts(team_id: TeamId, limit?: number) {
   return snapshot.docs
 }
 
+export const updateAttendanceMessage = async ({
+  token,
+  teamId
+}: {
+  token: string
+  teamId: string
+}) => {
+  const recentAttendancePosts = await getAttendancePosts(teamId, 1)
+  if (recentAttendancePosts == null || recentAttendancePosts.length === 0) {
+    await SlackClient.chat.postMessage({
+      token,
+      channel: await db.getValue('teams', teamId, 'user_id'),
+      text: `Tried to update attendance message, but couldn't find the post to update.`
+    })
+    return
+  }
+  const mostRecentPost = recentAttendancePosts[0]
+  const timestamp = mostRecentPost.get('ts')
+  const channel = mostRecentPost.get('channel')
+  const dateString = mostRecentPost.get('rehearsal_date')
+
+  const songs = await google.getNextSongs(dateString, teamId)
+  if (songs != null && songs.mainSong.toLowerCase().includes('no rehearsal')) {
+    return
+  }
+  const team = await db.getDocData('teams', teamId)
+  if (songs == null) {
+    await SlackClient.chat.postMessage({
+      token,
+      channel: await team.get('user_id'),
+      text: `Tried to post attendance message, but couldn't find a row for ${dateString} in the schedule. Please make sure the dates are correct!`
+    })
+    return
+  }
+  const messageBlocks = getAttendancePostBlocks({
+    songs,
+    blocks: team.attendance_blocks,
+    introText: team.intro_text
+  })
+
+  await SlackClient.chat.update({
+    token,
+    ts: timestamp,
+    channel,
+    text: "It's rehearsal day!",
+    blocks: messageBlocks
+  })
+}
+
 export const postAttendanceMessage = async ({
   channel,
   token,
@@ -65,7 +114,7 @@ export const postAttendanceMessage = async ({
     })
     return
   }
-  const messageBlocks = await getAttendancePostBlocks({
+  const messageBlocks = getAttendancePostBlocks({
     songs,
     blocks,
     introText

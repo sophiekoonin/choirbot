@@ -277,6 +277,40 @@ async function updateView(team: TeamId): Promise<View> {
       type: 'section',
       text: {
         type: 'mrkdwn',
+        text: `*Update last attendance post*\n\nYou can update the latest rehearsal post if you've changed your schedule. I won't notify your members.`
+      },
+      accessory: {
+        type: 'button',
+        action_id: Actions.UPDATE_ATTENDANCE_MESSAGE,
+        text: {
+          type: 'plain_text',
+          text: 'Update post',
+          emoji: true
+        },
+        confirm: {
+          title: {
+            type: 'plain_text',
+            text: 'Update attendance message'
+          },
+          text: {
+            type: 'plain_text',
+            text: 'Are you sure you want to update the most recent attendance message?'
+          },
+          confirm: {
+            type: 'plain_text',
+            text: 'Update'
+          },
+          deny: {
+            type: 'plain_text',
+            text: 'Cancel'
+          }
+        }
+      }
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
         text: '*Post an attendance message*'
       },
       accessory: {

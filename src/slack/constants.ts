@@ -5,6 +5,7 @@ export const Actions = {
   SHOW_SHEET_MODAL: 'show_sheet_modal',
   GOOGLE_SHEET_ID: 'google_sheet_id',
   POST_ATTENDANCE_MESSAGE: 'post_attendance_message',
+  UPDATE_ATTENDANCE_MESSAGE: 'update_attendance_message',
   POST_REHEARSAL_MESSAGE: 'post_rehearsal_message',
   SET_ATTENDANCE_BLOCKS: 'set_attendance_blocks',
   VIEW_REPORT: 'view_report',
