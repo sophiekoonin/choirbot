@@ -48,6 +48,43 @@ async function updateView(team: TeamId): Promise<View> {
       type: 'section',
       text: {
         type: 'mrkdwn',
+        text: `:repeat: *Refresh most recent attendance post*\n\nYou can refresh the latest attendance post if you've changed your schedule.\n\nI won't notify your members, and the attendance responses won't change.\n\nDon't worry, if you click this by accident, nothing will happen!\n\n`
+      },
+      accessory: {
+        type: 'button',
+        action_id: Actions.UPDATE_ATTENDANCE_MESSAGE,
+        text: {
+          type: 'plain_text',
+          text: 'Update post',
+          emoji: true
+        },
+        confirm: {
+          title: {
+            type: 'plain_text',
+            text: 'Update attendance message'
+          },
+          text: {
+            type: 'plain_text',
+            text: 'Are you sure you want to update the most recent attendance message?'
+          },
+          confirm: {
+            type: 'plain_text',
+            text: 'Update'
+          },
+          deny: {
+            type: 'plain_text',
+            text: 'Cancel'
+          }
+        }
+      }
+    },
+    {
+      type: 'divider'
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
         text: ':hammer_and_wrench: *SHEBot configuration*\n\n'
       }
     },
@@ -271,40 +308,6 @@ async function updateView(team: TeamId): Promise<View> {
       text: {
         type: 'mrkdwn',
         text: ":rotating_light: *Emergency toolkit*\nManually post messages in case the message didn't automatically post for any reason.\n\n"
-      }
-    },
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `*Update last attendance post*\n\nYou can update the latest rehearsal post if you've changed your schedule. I won't notify your members.`
-      },
-      accessory: {
-        type: 'button',
-        action_id: Actions.UPDATE_ATTENDANCE_MESSAGE,
-        text: {
-          type: 'plain_text',
-          text: 'Update post',
-          emoji: true
-        },
-        confirm: {
-          title: {
-            type: 'plain_text',
-            text: 'Update attendance message'
-          },
-          text: {
-            type: 'plain_text',
-            text: 'Are you sure you want to update the most recent attendance message?'
-          },
-          confirm: {
-            type: 'plain_text',
-            text: 'Update'
-          },
-          deny: {
-            type: 'plain_text',
-            text: 'Cancel'
-          }
-        }
       }
     },
     {
