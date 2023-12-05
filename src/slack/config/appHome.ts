@@ -85,7 +85,7 @@ async function updateView(team: TeamId): Promise<View> {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: ':hammer_and_wrench: *SHEBot configuration*\n\n'
+        text: ':hammer_and_wrench: *Choirbot configuration*\n\n'
       }
     },
     {
@@ -385,18 +385,18 @@ async function updateView(team: TeamId): Promise<View> {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `💤 *${active ? 'Disable' : 'Enable'} SHEBot*`
+        text: `💤 *${active ? 'Disable' : 'Enable'} Choirbot*`
       }
     },
     {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `SHEBot is currently ${active ? 'enabled' : 'disabled'}.`
+        text: `Choirbot is currently ${active ? 'enabled' : 'disabled'}.`
       },
       accessory: {
         type: 'button',
-        action_id: active ? Actions.DISABLE_SHEBOT : Actions.ENABLE_SHEBOT,
+        action_id: active ? Actions.DISABLE_CHOIRBOT : Actions.ENABLE_CHOIRBOT,
         text: {
           type: 'plain_text',
           text: `${active ? 'Disable' : 'Enable'}`,
@@ -405,13 +405,13 @@ async function updateView(team: TeamId): Promise<View> {
         confirm: {
           title: {
             type: 'plain_text',
-            text: `${active ? 'Disable' : 'Enable'} SHEBot`
+            text: `${active ? 'Disable' : 'Enable'} Choirbot`
           },
           text: {
             type: 'plain_text',
             text: `Are you sure you want to ${
               active ? 'disable' : 'enable'
-            } SHEBot? You can ${
+            } Choirbot? You can ${
               active ? 'enable' : 'disable'
             } it again at any time - no data will be deleted.`
           },

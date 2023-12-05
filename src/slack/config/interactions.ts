@@ -69,12 +69,12 @@ export async function handleInteractions(
           [action_id]: action.selected_option.value === 'true'
         })
         break
-      case Actions.DISABLE_SHEBOT:
+      case Actions.DISABLE_CHOIRBOT:
         db.updateDbValue('teams', team.id, {
           active: false
         })
         break
-      case Actions.ENABLE_SHEBOT:
+      case Actions.ENABLE_CHOIRBOT:
         db.updateDbValue('teams', team.id, {
           active: true
         })

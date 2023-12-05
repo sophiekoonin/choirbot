@@ -12,8 +12,8 @@ export const Actions = {
   SHOW_IGNORE_MODAL: 'show_ignore_modal',
   SET_IGNORED_USERS: 'ignored_users',
   SET_CHANNEL: 'set_channel',
-  DISABLE_SHEBOT: 'disable_shebot',
-  ENABLE_SHEBOT: 'enable_shebot'
+  DISABLE_CHOIRBOT: 'disable_choirbot',
+  ENABLE_CHOIRBOT: 'enable_choirbot'
 }
 
 export const Interactions = {
