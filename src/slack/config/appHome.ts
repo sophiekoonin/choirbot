@@ -38,7 +38,7 @@ async function updateView(team: TeamId): Promise<View> {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: '*Welcome to SHE Bot!*'
+        text: '*Welcome to Choirbot!*'
       }
     },
     {
@@ -48,35 +48,31 @@ async function updateView(team: TeamId): Promise<View> {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `:repeat: *Refresh most recent attendance post*\n\nYou can refresh the latest attendance post if you've changed your schedule.\n\nI won't notify your members, and the attendance responses won't change.\n\nDon't worry, if you click this by accident, nothing will happen!\n\n`
-      },
-      accessory: {
-        type: 'button',
-        action_id: Actions.UPDATE_ATTENDANCE_MESSAGE,
-        text: {
-          type: 'plain_text',
-          text: 'Update post',
-          emoji: true
-        },
-        confirm: {
-          title: {
-            type: 'plain_text',
-            text: 'Update attendance message'
-          },
+        text: `:repeat: *Refresh posts*\n\nMade a last-minute change? Refresh the latest attendance or rehearsal reminder post if you've changed your schedule.\n\nI won't notify members, and any existing attendance responses won't change.\n\nDon't worry, if you click this by accident, nothing will happen!\n\n`
+      }
+    },
+    {
+      type: 'actions',
+      elements: [
+        {
+          type: 'button',
+          action_id: Actions.UPDATE_ATTENDANCE_MESSAGE,
           text: {
             type: 'plain_text',
-            text: 'Are you sure you want to update the most recent attendance message?'
-          },
-          confirm: {
+            text: 'Update attendance post',
+            emoji: true
+          }
+        },
+        {
+          type: 'button',
+          action_id: Actions.UPDATE_REHEARSAL_MESSAGE,
+          text: {
             type: 'plain_text',
-            text: 'Update'
-          },
-          deny: {
-            type: 'plain_text',
-            text: 'Cancel'
+            text: 'Update rehearsal post',
+            emoji: true
           }
         }
-      }
+      ]
     },
     {
       type: 'divider'

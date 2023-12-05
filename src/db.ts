@@ -1,5 +1,4 @@
 import { Firestore, Query } from '@google-cloud/firestore'
-import { logging } from 'googleapis/build/src/apis/logging'
 
 export const db = new Firestore({
   projectId: process.env.GOOGLE_CLOUD_PROJECT,
@@ -10,27 +9,16 @@ export const setDbValue = async (
   collection: string,
   docName: string,
   value: FirebaseFirestore.DocumentData
-) =>
-  await db
-    .collection(collection)
-    .doc(docName)
-    .set(value)
+) => await db.collection(collection).doc(docName).set(value)
 
 export const updateDbValue = async (
   collection: string,
   docName: string,
   value: FirebaseFirestore.DocumentData
-) =>
-  await db
-    .collection(collection)
-    .doc(docName)
-    .update(value)
+) => await db.collection(collection).doc(docName).update(value)
 
-export const getDbDoc = async function(collection: string, docName: string) {
-  return await db
-    .collection(collection)
-    .doc(docName)
-    .get()
+export const getDbDoc = async function (collection: string, docName: string) {
+  return await db.collection(collection).doc(docName).get()
 }
 
 interface QueryResult {
@@ -42,11 +30,11 @@ export async function getQueryResults(query: FirebaseFirestore.Query) {
   const snapshot = await query.get()
   const results: QueryResult[] = []
 
-  snapshot.forEach(doc => results.push({ id: doc.id, ...doc.data() }))
+  snapshot.forEach((doc) => results.push({ id: doc.id, ...doc.data() }))
   return results
 }
 
-export const getDocData = async function(collection: string, docName: string) {
+export const getDocData = async function (collection: string, docName: string) {
   const doc = await getDbDoc(collection, docName)
   return doc.data()
 }
@@ -75,7 +63,7 @@ export const getValues = async (
   } else {
     const data = doc.data()
     return keys
-      .map(key => ({ [key]: data[key] }))
+      .map((key) => ({ [key]: data[key] }))
       .reduce((acc, curr) => {
         return { ...acc, ...curr }
       }, {})
@@ -103,7 +91,7 @@ async function deleteQueryBatch(query: Query, batchSize: number) {
   }
   // Delete documents in a batch
   let batch = db.batch()
-  snapshot.docs.forEach(doc => {
+  snapshot.docs.forEach((doc) => {
     batch.delete(doc.ref)
   })
 

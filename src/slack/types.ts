@@ -1,7 +1,6 @@
 import {
   WebAPICallResult,
   Block,
-  Action,
   Option,
   PlainTextElement
 } from '@slack/web-api'

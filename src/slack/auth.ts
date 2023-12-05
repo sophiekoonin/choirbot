@@ -1,7 +1,6 @@
 import crypto from 'crypto'
 import timingSafeCompare from 'tsscmp'
 
-import { getValue } from '../db'
 import { VerificationHeaders } from './types'
 import { Response, NextFunction } from 'express'
 import { Request } from '../types'
@@ -34,8 +33,7 @@ export function verifyRequestSignature(
   if (ts < fiveMinutesAgo) {
     return res.status(200).send({
       response_type: 'ephemeral',
-      text:
-        "Sorry, that didn't work. Please try again. (Error: signing secret too old)"
+      text: "Sorry, that didn't work. Please try again. (Error: signing secret too old)"
     })
   }
   const hmac = crypto.createHmac('sha256', signingSecret)
@@ -45,8 +43,7 @@ export function verifyRequestSignature(
   if (!timingSafeCompare(hash, hmac.digest('hex'))) {
     return res.status(200).send({
       response_type: 'ephemeral',
-      text:
-        "Sorry, that didn't work. Please try again. (Error: signing secret could not be verified)"
+      text: "Sorry, that didn't work. Please try again. (Error: signing secret could not be verified)"
     })
   }
 
