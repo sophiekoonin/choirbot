@@ -1,6 +1,6 @@
 # Choirbot
 
-A helpful little Slack bot for SHE Choir to take attendance and remind us about rehearsals.
+A helpful little Slack bot for Mixtape Choir & SHE Choir to take attendance and remind us about rehearsals.
 
 ## Installation
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 echo """
-runtime: nodejs16
+runtime: nodejs18
 instance_class: F1
 automatic_scaling:
   max_instances: 1
