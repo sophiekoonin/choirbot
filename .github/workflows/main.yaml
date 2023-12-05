@@ -15,10 +15,18 @@ jobs:
   deploy:
     name: Deploy to prod
     runs-on: ubuntu-latest
-
+    environment: prod
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - id: 'auth'
+        name: 'Authenticate with Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+          project_id: ${{ vars.GCP_PROJECT }}
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
       - name: Deploy to App Engine
         id: deploy
@@ -27,8 +35,7 @@ jobs:
           deliverables: app.yaml cron.yaml
           version: v1
           project_id: ${{ vars.GCP_PROJECT }}
-          credentials: ${{ secrets.GCP_CREDENTIALS }}
-          build_env_vars: |-
+          env_vars: |-
             SLACK_CLIENT_ID=${{ secrets.SLACK_CLIENT_ID }}
             SLACK_CLIENT_SECRET=${{ secrets.SLACK_CLIENT_SECRET }}
             SLACK_SIGNING_SECRET=${{ secrets.SLACK_SIGNING_SECRET }}
