@@ -1,0 +1,38 @@
+name: Deploy to Google Appengine
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  deploy:
+    name: Deploy to prod
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Deploy to App Engine
+        id: deploy
+        uses: google-github-actions/deploy-appengine@v1.2.7
+        with:
+          deliverables: app.yaml cron.yaml
+          version: v1
+          project_id: ${{ vars.GCP_PROJECT }}
+          credentials: ${{ secrets.GCP_CREDENTIALS }}
+          build_env_vars: |-
+            SLACK_CLIENT_ID=${{ secrets.SLACK_CLIENT_ID }}
+            SLACK_CLIENT_SECRET=${{ secrets.SLACK_CLIENT_SECRET }}
+            SLACK_SIGNING_SECRET=${{ secrets.SLACK_SIGNING_SECRET }}
+            SLACK_APP_ID=${{ vars.SLACK_APP_ID }}
+
+      - name: Test
+        run: curl "${{ steps.deploy.outputs.url }}"
