@@ -22,6 +22,7 @@ import {
 import { processConfigSubmission } from './config'
 import { joinChannel } from '../utils'
 import { showAppHome } from './appHome'
+import { updateRehearsalMessage } from '../rehearsals'
 
 export async function handleInteractions(
   req: Request,
@@ -43,101 +44,111 @@ export async function handleInteractions(
     const action = actions[0]
     const { action_id } = action
 
-    switch (action_id) {
-      case Actions.POST_ATTENDANCE_MESSAGE:
-        postManually({
-          selectedOption: 'attendance',
-          teamId: team.id
-        })
-        break
-      case Actions.POST_REHEARSAL_MESSAGE:
-        postManually({
-          selectedOption: 'rehearsal',
-          teamId: team.id
-        })
-        break
-      case Actions.UPDATE_ATTENDANCE_MESSAGE:
-        updateAttendanceMessage({ teamId: team.id, token })
-        break
-      case Actions.SELECT_REHEARSAL_DAY:
-        db.updateDbValue('teams', team.id, {
-          [action_id]: action.selected_option.value
-        })
-        break
-      case Actions.YES_NO_REMINDERS:
-        db.updateDbValue('teams', team.id, {
-          [action_id]: action.selected_option.value === 'true'
-        })
-        break
-      case Actions.DISABLE_CHOIRBOT:
-        db.updateDbValue('teams', team.id, {
-          active: false
-        })
-        break
-      case Actions.ENABLE_CHOIRBOT:
-        db.updateDbValue('teams', team.id, {
-          active: true
-        })
-        break
-      case Actions.SET_CHANNEL:
-        const id = action.selected_channels[0]
-        const channelInfo = (await SlackClient.channels.info({
-          token,
-          channel: id
-        })) as ChannelInfoResponse
-        if (channelInfo.ok) {
+    try {
+      switch (action_id) {
+        case Actions.POST_ATTENDANCE_MESSAGE:
+          postManually({
+            selectedOption: 'attendance',
+            teamId: team.id
+          })
+          break
+        case Actions.POST_REHEARSAL_MESSAGE:
+          postManually({
+            selectedOption: 'rehearsal',
+            teamId: team.id
+          })
+          break
+        case Actions.UPDATE_ATTENDANCE_MESSAGE:
+          updateAttendanceMessage({ teamId: team.id, token })
+          break
+        case Actions.UPDATE_REHEARSAL_MESSAGE:
+          updateRehearsalMessage({ teamId: team.id, token })
+          break
+        case Actions.SELECT_REHEARSAL_DAY:
           db.updateDbValue('teams', team.id, {
-            channel: channelInfo.channel.name,
-            channel_id: id
+            [action_id]: action.selected_option.value
           })
-          await joinChannel(team.id, channelInfo.channel.name, token)
-        }
-        break
-      case Actions.SHOW_SHEET_MODAL:
-        SlackClient.views
-          .open({ view: setSheetIdView, token, trigger_id })
-          .catch((err) =>
-            console.error(`Error showing sheet ID modal for ${team.id}`, err)
-          )
+          break
+        case Actions.YES_NO_REMINDERS:
+          db.updateDbValue('teams', team.id, {
+            [action_id]: action.selected_option.value === 'true'
+          })
+          break
+        case Actions.DISABLE_CHOIRBOT:
+          db.updateDbValue('teams', team.id, {
+            active: false
+          })
+          break
+        case Actions.ENABLE_CHOIRBOT:
+          db.updateDbValue('teams', team.id, {
+            active: true
+          })
+          break
+        case Actions.SET_CHANNEL:
+          const id = action.selected_channels[0]
+          const channelInfo = (await SlackClient.channels.info({
+            token,
+            channel: id
+          })) as ChannelInfoResponse
+          if (channelInfo.ok) {
+            db.updateDbValue('teams', team.id, {
+              channel: channelInfo.channel.name,
+              channel_id: id
+            })
+            await joinChannel(team.id, channelInfo.channel.name, token)
+          }
+          break
+        case Actions.SHOW_SHEET_MODAL:
+          SlackClient.views
+            .open({ view: setSheetIdView, token, trigger_id })
+            .catch((err) =>
+              console.error(`Error showing sheet ID modal for ${team.id}`, err)
+            )
 
-        break
-      case Actions.SET_ATTENDANCE_BLOCKS:
-        const view = await chooseAttendancePostBlocks(team.id)
-        SlackClient.views
-          .open({
-            view,
-            token,
-            trigger_id
-          })
-          .catch((err) =>
-            console.error(`Error showing attendance block for ${team.id}`, err)
-          )
-        break
-      case Actions.VIEW_REPORT:
-        const repView = await reportView(team.id, token)
-        SlackClient.views
-          .open({
-            view: repView,
-            token,
-            trigger_id
-          })
-          .catch((err) =>
-            console.error(`Error showing report modal for ${team.id}`, err)
-          )
-        break
-      case Actions.SHOW_IGNORE_MODAL:
-        const ignoreView = await setIgnoredUsersView(team.id, token)
-        SlackClient.views
-          .open({
-            view: ignoreView,
-            token,
-            trigger_id
-          })
-          .catch((err) =>
-            console.error(`Error showing ignore modal for ${team.id}`, err)
-          )
-      default:
-        break
+          break
+        case Actions.SET_ATTENDANCE_BLOCKS:
+          const view = await chooseAttendancePostBlocks(team.id)
+          SlackClient.views
+            .open({
+              view,
+              token,
+              trigger_id
+            })
+            .catch((err) =>
+              console.error(
+                `Error showing attendance block for ${team.id}`,
+                err
+              )
+            )
+          break
+        case Actions.VIEW_REPORT:
+          const repView = await reportView(team.id, token)
+          SlackClient.views
+            .open({
+              view: repView,
+              token,
+              trigger_id
+            })
+            .catch((err) =>
+              console.error(`Error showing report modal for ${team.id}`, err)
+            )
+          break
+        case Actions.SHOW_IGNORE_MODAL:
+          const ignoreView = await setIgnoredUsersView(team.id, token)
+          SlackClient.views
+            .open({
+              view: ignoreView,
+              token,
+              trigger_id
+            })
+            .catch((err) =>
+              console.error(`Error showing ignore modal for ${team.id}`, err)
+            )
+        default:
+          break
+      }
+    } catch (err) {
+      console.error(err)
     }
   }
 

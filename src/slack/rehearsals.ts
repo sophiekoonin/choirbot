@@ -1,7 +1,7 @@
 import * as google from '../google/google'
 import { SongData } from '../google/types'
 import { SlackClient } from './client'
-import { getValue } from '../db'
+import { getValue, getValues } from '../db'
 import { SectionBlock } from '@slack/types'
 import {
   mainSongBlock,
@@ -9,6 +9,8 @@ import {
   notesBlock,
   headerBlock
 } from './blocks/attendance'
+import { addDays, format } from 'date-fns'
+import * as utils from '../utils'
 
 function getRehearsalMusicBlocks(
   { mainSong, mainSongLink, runThrough, runThroughLink, notes }: SongData,
@@ -41,7 +43,8 @@ export async function postRehearsalMusic({
   token,
   dayOfWeek,
   date,
-  isBankHoliday
+  isBankHoliday,
+  existingPostTimestamp
 }: {
   channel: string
   teamId: string
@@ -49,6 +52,7 @@ export async function postRehearsalMusic({
   dayOfWeek: string
   date: string
   isBankHoliday: boolean
+  existingPostTimestamp?: string
 }): Promise<void> {
   try {
     let text = `:wave: Here's the plan for ${dayOfWeek}'s rehearsal!`
@@ -97,16 +101,74 @@ export async function postRehearsalMusic({
         )
       }
     }
-
-    await SlackClient.chat.postMessage({
-      token,
-      text,
-      username: 'Schedule Bot',
-      channel: destination,
-      blocks
-    })
+    if (existingPostTimestamp != null && destination === channel) {
+      await SlackClient.chat.update({
+        token,
+        ts: existingPostTimestamp,
+        channel: destination,
+        text,
+        blocks
+      })
+    } else {
+      await SlackClient.chat.postMessage({
+        token,
+        text,
+        channel: destination,
+        blocks
+      })
+    }
   } catch (err) {
-    console.error(`Error posting rehearsam message for team ${teamId}`, err)
+    console.error(`Error posting rehearsal message for team ${teamId}`, err)
     return
+  }
+}
+
+export const updateRehearsalMessage = async ({
+  token,
+  teamId
+}: {
+  token: string
+  teamId: string
+}) => {
+  const { channel_id: channel, rehearsal_day } = await getValues(
+    'teams',
+    teamId,
+    ['channel_id', 'rehearsal_day']
+  )
+
+  const today = new Date()
+  const todayDayNumber = today.getDay()
+  const diff = parseInt(rehearsal_day as string) - todayDayNumber
+  const rehearsalDate = addDays(today, diff)
+  const dateString = format(rehearsalDate, 'dd/MM/yyyy')
+  const dayOfWeek = format(rehearsalDate, 'eeee')
+  const isBankHoliday = await utils.isBankHoliday(
+    format(rehearsalDate, 'yyyy-MM-dd')
+  )
+
+  const conversationHistory = await SlackClient.conversations.history({
+    channel: channel as string,
+    token
+  })
+  // Conversations are in reverse-chron order, so we look through for the first one by the bot
+  const rehearsalMessage = conversationHistory.messages.find(
+    (message) =>
+      message.app_id === process.env.SLACK_APP_ID &&
+      !message.text.includes(`It's rehearsal day!`)
+  )
+
+  const timestamp = rehearsalMessage.ts
+  try {
+    await postRehearsalMusic({
+      channel: channel as string,
+      teamId,
+      token,
+      dayOfWeek,
+      date: dateString,
+      isBankHoliday,
+      existingPostTimestamp: timestamp
+    })
+  } catch (error) {
+    console.error(error)
   }
 }
