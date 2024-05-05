@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
 import fetch from 'node-fetch'
-import { addDays, format } from 'date-fns'
-import * as db from '../../db'
+import * as db from '../../db/helpers'
 
 import { Actions, Interactions } from '../constants'
 import {

@@ -1,7 +1,7 @@
 import * as google from '../google/google'
 import { SongData } from '../google/types'
 import { SlackClient } from './client'
-import { getValue, getValues } from '../db'
+import { getValue, getValues } from '../db/helpers'
 import { SectionBlock } from '@slack/types'
 import {
   mainSongBlock,

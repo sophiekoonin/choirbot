@@ -30,7 +30,7 @@ function getUserReactionsForEmoji({
   ).filter((user) => user !== botId)
 }
 export async function getAttendancePosts(team_id: TeamId, limit?: number) {
-  const result = await db.db
+  const result = db.db
     .collection(`attendance-${team_id}`)
     .orderBy('created_at', 'desc')
 

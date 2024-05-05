@@ -54,8 +54,7 @@ export async function setIgnoredUsersView(
         elements: [
           {
             type: 'mrkdwn',
-            text:
-              "The selected users won't be included in any reports on attendance - this is useful if they leave temporarily but want to stay on Slack. You don't need to select the bot users, they're automatically ignored."
+            text: "The selected users won't be included in any reports on attendance - this is useful if they leave temporarily but want to stay on Slack. You don't need to select the bot users, they're automatically ignored."
           }
         ]
       }
@@ -82,16 +81,14 @@ export const setSheetIdView: View = {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text:
-          'SHEbot needs the ID of your schedule spreadsheet in order to post what songs are coming up. You can find it by getting the URL of your sheet and copying the string of letters and numbers that comes *after /d/* at the end of the URL.'
+        text: 'SHEbot needs the ID of your schedule spreadsheet in order to post what songs are coming up. You can find it by getting the URL of your sheet and copying the string of letters and numbers that comes *after /d/* at the end of the URL.'
       }
     },
     {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text:
-          "Don't have a schedule in Google Sheets? <https://docs.google.com/spreadsheets/d/1ngSxEdAuhdJTEb_pFE5nq1avNjzEjdMY8r-Z1QQL-v0/edit#gid=0|Here's the template>. Make a copy, and make sure the sharing settings are set to 'Anyone can view' or 'Anyone can edit'."
+        text: "Don't have a schedule in Google Sheets? <https://docs.google.com/spreadsheets/d/1ngSxEdAuhdJTEb_pFE5nq1avNjzEjdMY8r-Z1QQL-v0/edit#gid=0|Here's the template>. Make a copy, and make sure the sharing settings are set to 'Anyone can view' or 'Anyone can edit'."
       }
     },
     {
@@ -141,15 +138,13 @@ export async function reportView(teamId: TeamId, token: string): Promise<View> {
 export async function chooseAttendancePostBlocks(
   teamId: TeamId
 ): Promise<View> {
-  const {
-    attendance_blocks: currentBlocks,
-    intro_text: introText
-  } = await getValues('teams', teamId, ['attendance_blocks', 'intro_text'])
+  const { attendance_blocks: currentBlocks, intro_text: introText } =
+    await getValues('teams', teamId, ['attendance_blocks', 'intro_text'])
   const initialOptions = (currentBlocks as string[])
-  .map((block: string) =>
-    AttendanceBlockSelectors.find(b => b.value === block)
-  )
-  .filter((block: Option) => block != null)
+    .map((block: string) =>
+      AttendanceBlockSelectors.find((b) => b.value === block)
+    )
+    .filter((block: Option) => block != null)
 
   return {
     type: 'modal',
@@ -163,8 +158,7 @@ export async function chooseAttendancePostBlocks(
         text: {
           type: 'mrkdwn',
           verbatim: true,
-          text:
-            'This is where you can compose the parts of the message that will be sent on *the day of* your rehearsal.'
+          text: 'This is where you can compose the parts of the message that will be sent on *the day of* your rehearsal.'
         }
       },
       {
@@ -208,8 +202,7 @@ export async function chooseAttendancePostBlocks(
         block_id: Blocks.ATTENDANCE_BLOCKS,
         label: {
           type: 'plain_text',
-          text:
-            "Choose the sections that come next in the order that you want them. Leave out any you don't want."
+          text: "Choose the sections that come next in the order that you want them. Leave out any you don't want."
         },
         element: {
           type: 'multi_static_select',
@@ -219,7 +212,7 @@ export async function chooseAttendancePostBlocks(
             text: 'Please choose'
           },
           options: AttendanceBlockSelectors,
-          initial_options: initialOptions != null ? initialOptions : [],
+          initial_options: initialOptions != null ? initialOptions : []
         }
       }
     ],

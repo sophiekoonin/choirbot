@@ -1,6 +1,6 @@
-import { TeamId, SlackUser, ListUsersResult, UserId } from './types'
+import { ListUsersResult, UserId } from './types'
 import { SlackClient } from './client'
-import { getDbDoc, getValue } from '../db'
+import { getDbDoc, getValue } from '../db/helpers'
 
 export async function getSlackUserIds(
   teamId: string,
@@ -12,8 +12,14 @@ export async function getSlackUserIds(
     token
   })) as ListUsersResult
   return members
-    .filter(member => !member.deleted && !member.is_bot && !ignoredUsers.includes(member.id) && member.id !== 'USLACKBOT')
-    .map(member => member.id)
+    .filter(
+      (member) =>
+        !member.deleted &&
+        !member.is_bot &&
+        !ignoredUsers.includes(member.id) &&
+        member.id !== 'USLACKBOT'
+    )
+    .map((member) => member.id)
 }
 
 export async function joinChannel(

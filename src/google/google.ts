@@ -48,11 +48,11 @@ async function getSongDetailsFromSheet(
     const response = await sheets.spreadsheets.values.batchGet({
       auth,
       spreadsheetId: sheetId,
-      ranges: ['B1:I1',`B${rowNumber}:I${rowNumber}`]
+      ranges: ['B1:I1', `B${rowNumber}:I${rowNumber}`]
     })
-    const { valueRanges }= response.data
-    const headers = valueRanges.find(v => v.range.match(/B1:I1/ig))
-    const thisWeekData = valueRanges.find(v => v.range !== headers.range)
+    const { valueRanges } = response.data
+    const headers = valueRanges.find((v) => v.range.match(/B1:I1/gi))
+    const thisWeekData = valueRanges.find((v) => v.range !== headers.range)
     const customColumnHeader = headers.values.flat()[5]
     const [
       mainSong,
@@ -67,7 +67,7 @@ async function getSongDetailsFromSheet(
       mainSongLink,
       runThrough,
       runThroughLink,
-      notes, 
+      notes,
       customColumnHeader,
       customColumnValue
     }

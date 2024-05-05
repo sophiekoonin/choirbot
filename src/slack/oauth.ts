@@ -1,6 +1,5 @@
-import { raw, Request, Response } from 'express'
-
-import { db, getValues, getDbDoc } from '../db'
+import { Request, Response } from 'express'
+import { db, getDbDoc, getValues } from '../db'
 import { onSlackInstall } from './config/installation'
 import { OAuthResponse } from './types'
 import { SlackClient } from './client'
