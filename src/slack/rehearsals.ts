@@ -123,6 +123,20 @@ export async function postRehearsalMusic({
   }
 }
 
+export async function getRehearsalDateFromToday(rehearsalDay: string) {
+  const today = new Date()
+  const todayDayNumber = today.getDay()
+  const diff = parseInt(rehearsalDay) - todayDayNumber
+  const date = addDays(today, diff)
+  console.log({ rehearsalDay, todayDayNumber, diff })
+  return {
+    date,
+    dayOfWeek: format(date, 'eeee'),
+    dateString: format(date, 'dd/MM/yyyy'),
+    isBankHoliday: await utils.isBankHoliday(format(date, 'yyyy-MM-dd'))
+  }
+}
+
 export const updateRehearsalMessage = async ({
   token,
   teamId
@@ -136,15 +150,8 @@ export const updateRehearsalMessage = async ({
     ['channel_id', 'rehearsal_day']
   )
 
-  const today = new Date()
-  const todayDayNumber = today.getDay()
-  const diff = parseInt(rehearsal_day as string) - todayDayNumber
-  const rehearsalDate = addDays(today, diff)
-  const dateString = format(rehearsalDate, 'dd/MM/yyyy')
-  const dayOfWeek = format(rehearsalDate, 'eeee')
-  const isBankHoliday = await utils.isBankHoliday(
-    format(rehearsalDate, 'yyyy-MM-dd')
-  )
+  const { dayOfWeek, dateString, isBankHoliday } =
+    await getRehearsalDateFromToday(rehearsal_day as string)
 
   const conversationHistory = await SlackClient.conversations.history({
     channel: channel as string,
@@ -154,7 +161,7 @@ export const updateRehearsalMessage = async ({
   const rehearsalMessage = conversationHistory.messages.find(
     (message) =>
       message.app_id === process.env.SLACK_APP_ID &&
-      !message.text.includes(`It's rehearsal day!`)
+      !message.text.includes(`Here's the plan for ${dayOfWeek}'s rehearsal!`)
   )
 
   const timestamp = rehearsalMessage.ts

@@ -22,7 +22,10 @@ import {
 import { processConfigSubmission } from './config'
 import { joinChannel } from '../utils'
 import { showAppHome } from './appHome'
-import { updateRehearsalMessage } from '../rehearsals'
+import {
+  getRehearsalDateFromToday,
+  updateRehearsalMessage
+} from '../rehearsals'
 
 export async function handleInteractions(
   req: Request,
@@ -184,12 +187,14 @@ export async function postManually({
     access_token: token,
     channel_id: channel,
     attendance_blocks: blocks,
-    intro_text: introText
+    intro_text: introText,
+    rehearsal_day: rehearsalDay
   } = await db.getValues('teams', teamId, [
     'access_token',
     'channel_id',
     'attendance_blocks',
-    'intro_text'
+    'intro_text',
+    'rehearsal_day'
   ])
   let date = new Date()
 
@@ -204,13 +209,15 @@ export async function postManually({
         date
       })
     case 'rehearsal':
-      date = addDays(date, 4)
+      const { dateString, dayOfWeek, isBankHoliday } =
+        await getRehearsalDateFromToday(rehearsalDay as string)
+
       return postRehearsalMusic({
         token: token as string,
         channel: channel as string,
         teamId,
-        dayOfWeek: format(date, 'eeee'),
-        date: format(date, 'dd/MM/yyyy'),
+        dayOfWeek,
+        date: dateString,
         isBankHoliday: false
       })
     default:
