@@ -1,9 +1,5 @@
-import { Firestore, Query } from '@google-cloud/firestore'
-
-export const db = new Firestore({
-  projectId: process.env.GOOGLE_CLOUD_PROJECT,
-  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS
-})
+import { Query } from '@google-cloud/firestore'
+import db from './'
 
 export const setDbValue = async (
   collection: string,
@@ -34,16 +30,16 @@ export async function getQueryResults(query: FirebaseFirestore.Query) {
   return results
 }
 
-export const getDocData = async function (collection: string, docName: string) {
+export async function getDocData(collection: string, docName: string) {
   const doc = await getDbDoc(collection, docName)
   return doc.data()
 }
 
-export const getValue = async (
+export async function getValue(
   collection: string,
   docName: string,
   key: string
-) => {
+) {
   const doc = await getDbDoc(collection, docName)
   if (!doc.exists) {
     throw new Error(`Value not found for ${docName}-${key}`)
@@ -74,8 +70,8 @@ export async function deleteCollection(
   collectionPath: string,
   batchSize: number
 ) {
-  let collectionRef = db.collection(collectionPath)
-  let query = collectionRef.orderBy('__name__').limit(batchSize)
+  const collectionRef = db.collection(collectionPath)
+  const query = collectionRef.orderBy('__name__').limit(batchSize)
   try {
     return await deleteQueryBatch(query, batchSize)
   } catch (err) {
@@ -90,7 +86,7 @@ async function deleteQueryBatch(query: Query, batchSize: number) {
     return 0
   }
   // Delete documents in a batch
-  let batch = db.batch()
+  const batch = db.batch()
   snapshot.docs.forEach((doc) => {
     batch.delete(doc.ref)
   })

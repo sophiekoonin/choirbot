@@ -1,6 +1,6 @@
 import { BlockTypes } from '../constants'
 import { TeamId, SubmissionValues } from '../types'
-import { updateDbValue } from '../../db'
+import { updateDbValue } from '../../db/helpers'
 
 export async function processConfigSubmission({
   values,

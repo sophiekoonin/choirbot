@@ -1,7 +1,7 @@
 import { google, sheets_v4 } from 'googleapis'
 import { Request, Response } from 'express'
 
-import * as db from '../db'
+import * as dbHelpers from '../db/helpers'
 import { SongData, GoogleAuth } from './types'
 import { TeamId } from '../slack/types'
 
@@ -19,7 +19,7 @@ async function getRowNumberForDate(
   }
   try {
     const response = await sheets.spreadsheets.values.get(request)
-    const values = [].concat.apply([], response.data.values)
+    const values = [...response.data.values].flat()
     const rowNumber = values.indexOf(dateString) + 1
     return rowNumber > 0 ? rowNumber : 1
   } catch (err) {
@@ -42,7 +42,7 @@ G - Free choice
 async function getSongDetailsFromSheet(
   auth: GoogleAuth,
   sheetId: string,
-  rowNumber: string
+  rowNumber: number
 ): Promise<SongData> {
   try {
     const response = await sheets.spreadsheets.values.batchGet({
@@ -87,7 +87,7 @@ export async function getNextSongs(
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS
   })
-  const sheetId = await db.getValue('teams', teamId, 'google_sheet_id')
+  const sheetId = await dbHelpers.getValue('teams', teamId, 'google_sheet_id')
   const rowNumber = await getRowNumberForDate(auth, sheetId, dateString)
   return rowNumber > 1
     ? await getSongDetailsFromSheet(auth, sheetId, rowNumber)
@@ -97,7 +97,7 @@ export async function getNextSongs(
 export async function putGoogleCredentials(req: Request, res: Response) {
   const { credentials } = req.body
   try {
-    await db.updateDbValue('tokens', 'google', credentials)
+    await dbHelpers.updateDbValue('tokens', 'google', credentials)
     res.status(201).send('Successfully set!')
   } catch (err) {
     console.error(err)

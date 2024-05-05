@@ -1,4 +1,4 @@
-import { ListUsersResult, UserId } from './types'
+import { ListUsersResult, ReactionResult, UserId } from './types'
 import { SlackClient } from './client'
 import { getDbDoc, getValue } from '../db/helpers'
 
@@ -41,4 +41,18 @@ export async function joinChannel(
       text: `Couldn't join the channel #${channel} - got the following error: ${err.message}`
     })
   }
+}
+
+export function getUserReactionsForEmoji({
+  reactions,
+  emoji,
+  botId
+}: {
+  reactions: ReactionResult[]
+  emoji: string
+  botId: UserId
+}): UserId[] {
+  return (
+    reactions.find((group) => group.name === emoji)['users'] || []
+  ).filter((user) => user !== botId)
 }

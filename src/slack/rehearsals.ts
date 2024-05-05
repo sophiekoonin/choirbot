@@ -57,7 +57,7 @@ export async function postRehearsalMusic({
   try {
     let text = `:wave: Here's the plan for ${dayOfWeek}'s rehearsal!`
     let destination = channel
-    let isNextWeek = ['Monday', 'Tuesday', 'Wednesday'].includes(dayOfWeek)
+    const isNextWeek = ['Monday', 'Tuesday', 'Wednesday'].includes(dayOfWeek)
     let blocks
 
     if (isBankHoliday) {

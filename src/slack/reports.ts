@@ -53,9 +53,8 @@ export async function getReportBlocks(
     0
   )
   const averageAttendance = Math.round(sumAttending / attendanceData.length)
-  const highestAttendanceValue = Math.max.apply(
-    Math,
-    attendanceData.map((data) => data.attending.length)
+  const highestAttendanceValue = Math.max(
+    ...attendanceData.map((data) => data.attending.length)
   )
   const highestAttendanceDates = attendanceData
     .filter((obj) => obj.attending.length === highestAttendanceValue)

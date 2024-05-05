@@ -1,6 +1,6 @@
 import { View } from '@slack/types'
 import { Actions, Blocks } from '../constants'
-import { getValues, getDbDoc } from '../../db'
+import { getValues, getDbDoc } from '../../db/helpers'
 import { TeamId, UserId } from '../types'
 import { getAttendancePostBlocks } from '../attendance'
 import { AttendanceBlockSelectors } from '../blocks/config'

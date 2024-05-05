@@ -5,9 +5,10 @@ import {
   processAttendanceForTeam
 } from './slack/attendance'
 import { postRehearsalMusic } from './slack/rehearsals'
-import { db, getQueryResults } from './db'
 import { Request, Response } from 'express'
 import { SlackClient } from './slack/client'
+import { getQueryResults } from './db/helpers'
+import db from './db'
 
 export const checkForJobsToday = async (req: Request, res: Response) => {
   // Prevent illegitimate cron requests

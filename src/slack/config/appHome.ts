@@ -1,6 +1,6 @@
 import { UserId, TeamId } from '../types'
 import { SlackClient } from '../client'
-import { getValue, getValues } from '../../db'
+import { getValue, getValues } from '../../db/helpers'
 import { View } from '@slack/types'
 import { Actions, DaysOfWeek } from '../constants'
 

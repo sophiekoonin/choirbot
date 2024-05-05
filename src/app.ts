@@ -13,7 +13,7 @@ import {
 import { checkForJobsToday } from './cron'
 import { Request } from './types'
 
-let app: express.Application = express()
+const app: express.Application = express()
 app.use(bodyParser.json())
 app.use(
   bodyParser.urlencoded({

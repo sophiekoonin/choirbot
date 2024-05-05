@@ -2,35 +2,22 @@ import Firestore from '@google-cloud/firestore'
 import { SectionBlock } from '@slack/types'
 import { format } from 'date-fns'
 import * as google from '../google/google'
-import * as db from '../db'
+import { getDocData, getValue, setDbValue, updateDbValue } from '../db/helpers'
+import db from '../db'
 import { SlackClient } from './client'
 import {
   ChatPostMessageResult,
   PostAttendanceMessageArgs,
   MessageReactionsResult,
   TeamId,
-  SlackAPIArgs,
-  UserId,
-  ReactionResult
+  SlackAPIArgs
 } from './types'
 import { SongData } from '../google/types'
 import { introductionBlock, AttendanceBlocks } from './blocks/attendance'
+import { getUserReactionsForEmoji } from './utils'
 
-function getUserReactionsForEmoji({
-  reactions,
-  emoji,
-  botId
-}: {
-  reactions: ReactionResult[]
-  emoji: string
-  botId: UserId
-}): UserId[] {
-  return (
-    reactions.find((group) => group.name === emoji)['users'] || []
-  ).filter((user) => user !== botId)
-}
 export async function getAttendancePosts(team_id: TeamId, limit?: number) {
-  const result = db.db
+  const result = db
     .collection(`attendance-${team_id}`)
     .orderBy('created_at', 'desc')
 
@@ -54,7 +41,7 @@ export const updateAttendanceMessage = async ({
   if (recentAttendancePosts == null || recentAttendancePosts.length === 0) {
     await SlackClient.chat.postMessage({
       token,
-      channel: await db.getValue('teams', teamId, 'user_id'),
+      channel: await getValue('teams', teamId, 'user_id'),
       text: `Tried to update attendance message, but couldn't find the post to update.`
     })
     return
@@ -68,7 +55,7 @@ export const updateAttendanceMessage = async ({
   if (songs != null && songs.mainSong.toLowerCase().includes('no rehearsal')) {
     return
   }
-  const team = await db.getDocData('teams', teamId)
+  const team = await getDocData('teams', teamId)
   if (songs == null) {
     await SlackClient.chat.postMessage({
       token,
@@ -107,9 +94,10 @@ export const postAttendanceMessage = async ({
     return
   }
   if (songs == null) {
+    const userId = await getValue('teams', teamId, 'user_id')
     await SlackClient.chat.postMessage({
       token,
-      channel: await db.getValue('teams', teamId, 'user_id'),
+      channel: userId,
       text: `Tried to post attendance message, but couldn't find a row for ${dateString} in the schedule. Please make sure the dates are correct!`
     })
     return
@@ -146,7 +134,7 @@ export const postAttendanceMessage = async ({
       name: 'thumbsup'
     })
 
-    await db.setDbValue(`attendance-${teamId}`, dateISO, {
+    await setDbValue(`attendance-${teamId}`, dateISO, {
       rehearsal_date: dateString,
       created_at: Firestore.Timestamp.now().seconds,
       ts: postMsgRsp.ts,
@@ -166,7 +154,7 @@ export const processAttendanceForTeam = async function ({
   token,
   channel
 }: SlackAPIArgs) {
-  const botId = await db.getValue('teams', teamId, 'bot_user_id')
+  const botId = await getValue('teams', teamId, 'bot_user_id')
   const docs = await getAttendancePosts(teamId, 1)
   if (docs.length === 0) return
   const firstResult = docs[0]
@@ -191,7 +179,7 @@ export const processAttendanceForTeam = async function ({
       emoji: '-1',
       botId
     })
-    await db.updateDbValue(`attendance-${teamId}`, id, {
+    await updateDbValue(`attendance-${teamId}`, id, {
       attending,
       notAttending
     })
