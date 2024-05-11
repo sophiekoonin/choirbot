@@ -32,10 +32,10 @@ export const google = {
   }))
 }
 
-const setMockBatchGetReturnValue = (value: any) => {
+const _setMockBatchGetReturnValue = (value: any) => {
   mockBatchGetReturnValue = value
 }
 
+google.setMockBatchGetReturnValue = _setMockBatchGetReturnValue
 googleapis.google = google
-googleapis._setMockBatchGetReturnValue = setMockBatchGetReturnValue
 export default googleapis

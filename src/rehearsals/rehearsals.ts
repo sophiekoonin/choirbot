@@ -1,43 +1,11 @@
 import * as google from '../google/google'
-import { SongData } from '../google/types'
-import { SlackClient } from './client'
+import { SlackClient } from '../slack/client'
 import { getValue, getValues } from '../db/helpers'
-import { SectionBlock } from '@slack/types'
-import {
-  mainSongBlock,
-  runThroughBlock,
-  notesBlock,
-  headerBlock
-} from './blocks/attendance'
-import { addDays, format } from 'date-fns'
-import * as utils from '../utils'
+import { notesBlock, headerBlock } from '../slack/blocks/attendance'
+import { getRehearsalDateFromToday, getRehearsalMusicBlocks } from './helpers'
+import { Block } from '@slack/web-api'
 
-function getRehearsalMusicBlocks(
-  { mainSong, mainSongLink, runThrough, runThroughLink, notes }: SongData,
-  dayOfWeek: string
-): SectionBlock[] {
-  return [
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `<!channel> Here's the plan for ${dayOfWeek}'s rehearsal!`
-      }
-    },
-    notesBlock({ notes }),
-    mainSongBlock({ mainSong, mainSongLink }),
-    runThroughBlock({ runThrough, runThroughLink }),
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: ':musical_note: Please give the recordings a listen before rehearsal.'
-      }
-    }
-  ]
-}
-
-export async function postRehearsalMusic({
+export async function postRehearsalReminder({
   channel,
   teamId,
   token,
@@ -58,7 +26,7 @@ export async function postRehearsalMusic({
     let text = `:wave: Here's the plan for ${dayOfWeek}'s rehearsal!`
     let destination = channel
     const isNextWeek = ['Monday', 'Tuesday', 'Wednesday'].includes(dayOfWeek)
-    let blocks
+    let blocks: Block[]
 
     if (isBankHoliday) {
       text = `<!channel> It's a bank holiday next ${dayOfWeek}, so no rehearsal! Have a lovely day off!`
@@ -71,7 +39,7 @@ export async function postRehearsalMusic({
         text = `Rehearsal is cancelled ${isNextWeek ? 'next' : 'this'} week.`
         blocks = [
           headerBlock(
-            `:information_source: <!channel> Rehearsal ${
+            `:information_source: Rehearsal ${
               isNextWeek ? 'next' : 'this'
             } week is cancelled`
           ),
@@ -81,7 +49,7 @@ export async function postRehearsalMusic({
           })
         ]
       } else if (nextWeekSongs.mainSong.match(/no rehearsal/gi)) {
-        text = `<!channel> Reminder: there's no rehearsal ${
+        text = `Reminder: there's no rehearsal ${
           isNextWeek ? 'next' : 'this'
         } week!`
         blocks = [
@@ -91,7 +59,10 @@ export async function postRehearsalMusic({
             } week!`
           ),
           notesBlock({
-            notes: '<!channel> ' + nextWeekSongs.notes,
+            notes:
+              '<!channel> ' +
+              (nextWeekSongs.notes ||
+                `We're not meeting ${isNextWeek ? 'next' : 'this'} week.`),
             showEmoji: false
           })
         ]
@@ -120,20 +91,6 @@ export async function postRehearsalMusic({
   } catch (err) {
     console.error(`Error posting rehearsal message for team ${teamId}`, err)
     return
-  }
-}
-
-export async function getRehearsalDateFromToday(rehearsalDay: string) {
-  const today = new Date()
-  const todayDayNumber = today.getDay()
-  const diff = parseInt(rehearsalDay) - todayDayNumber
-  const date = addDays(today, diff)
-  console.log({ rehearsalDay, todayDayNumber, diff })
-  return {
-    date,
-    dayOfWeek: format(date, 'eeee'),
-    dateString: format(date, 'dd/MM/yyyy'),
-    isBankHoliday: await utils.isBankHoliday(format(date, 'yyyy-MM-dd'))
   }
 }
 
@@ -166,7 +123,7 @@ export const updateRehearsalMessage = async ({
 
   const timestamp = rehearsalMessage.ts
   try {
-    await postRehearsalMusic({
+    await postRehearsalReminder({
       channel: channel as string,
       teamId,
       token,

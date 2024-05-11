@@ -1,7 +1,7 @@
 import * as utils from './utils'
 import { format, addDays } from 'date-fns'
 import { postAttendanceMessage, processAttendanceForTeam } from './attendance'
-import { postRehearsalMusic } from './slack/rehearsals'
+import { postRehearsalReminder } from './rehearsals/rehearsals'
 import { Request, Response } from 'express'
 import { SlackClient } from './slack/client'
 import { getQueryResults } from './db/helpers'
@@ -86,7 +86,7 @@ async function checkForRehearsalReminderJobs(date: Date) {
   teams.forEach(async (team) => {
     const { id, access_token: token, channel_id: channel } = team
     if (channel === '' || channel == null) return
-    return await postRehearsalMusic({
+    return await postRehearsalReminder({
       token: token as string,
       teamId: id,
       dayOfWeek,

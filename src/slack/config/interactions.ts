@@ -27,7 +27,7 @@ import { showAppHome } from './appHome'
 import {
   getRehearsalDateFromToday,
   updateRehearsalMessage
-} from '../rehearsals'
+} from '../../rehearsals/rehearsals'
 
 export async function handleInteractions(
   req: Request,
