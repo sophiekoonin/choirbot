@@ -9,12 +9,10 @@ import db from '../db'
 import { postAttendanceMessage, updateAttendanceMessage } from './attendance'
 import { SlackClient } from './client'
 import { mockSet } from 'firestore-jest-mock/mocks/firestore'
-// @ts-expect-error this is a mock
-import { _setMockBatchGetReturnValue } from '../google/google'
 
 jest.mock('./client')
 jest.mock('../db')
-describe.skip('postAttendanceMessage', () => {
+describe('postAttendanceMessage', () => {
   const token = testTeamData.token
   const channel = testChannelId
   const teamId = testTeamData.id
@@ -114,10 +112,14 @@ describe('updateAttendanceMessage', () => {
   const teamId = testTeamData.id
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    jest.restoreAllMocks()
   })
 
   test("Messages the person who installed if couldn't find a post", async () => {
+    db.setMockDbContents({
+      attendance: []
+    })
+
     await updateAttendanceMessage({
       token,
       teamId
@@ -130,7 +132,7 @@ describe('updateAttendanceMessage', () => {
     })
   })
 
-  test.only("Messages the person who installed if couldn't find a row in the spreadsheet", async () => {
+  test("Messages the person who installed if couldn't find a row in the spreadsheet", async () => {
     db.setMockDbContents({
       attendanceOverrides: {
         rehearsal_date: '01/01/2021'
@@ -149,7 +151,7 @@ describe('updateAttendanceMessage', () => {
     })
   })
 
-  test.skip('Posts the correct thing with the appropriate blocks successfully, reacts to it, and stores the info', async () => {
+  test('Posts the correct thing with the appropriate blocks successfully, reacts to it, and stores the info', async () => {
     await postAttendanceMessage({
       channel,
       token,

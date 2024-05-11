@@ -9,6 +9,8 @@ import { Firestore as FirestoreT } from '@google-cloud/firestore'
 type TestDataOverrides = {
   teamOverrides?: Partial<typeof testTeamData>
   attendanceOverrides?: Partial<typeof testAttendancePost>
+  attendance?: Array<typeof testAttendancePost>
+  teams?: Array<typeof testTeamData>
 }
 
 class DB {
@@ -26,20 +28,21 @@ class DB {
     return this.mockFirestore.collection(args)
   }
 
-  setMockDbContents(overrides: TestDataOverrides) {
+  setMockDbContents(testData: TestDataOverrides) {
+    const { attendance, teams, teamOverrides, attendanceOverrides } = testData
     const teamData = {
       ...testTeamData,
-      ...overrides.teamOverrides
+      ...teamOverrides
     }
 
     const attendanceData = {
       ...testAttendancePost,
-      ...overrides.attendanceOverrides
+      ...attendanceOverrides
     }
     const { Firestore } = firestoreStub({
       database: {
-        teams: [teamData],
-        [`attendance-${testTeamId}`]: [attendanceData]
+        teams: teams ? teams : [teamData],
+        [`attendance-${testTeamId}`]: attendance ? attendance : [attendanceData]
       }
     })
     this.mockFirestore = new Firestore()
