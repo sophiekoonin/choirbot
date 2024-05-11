@@ -1,6 +1,7 @@
 export const testUserId = 'U01A1B2C3'
 export const testChannelId = 'C01A1B2C3'
 export const testTeamId = 'T01A1B2C3'
+export const testBotId = 'B01A1B2C3'
 export const testTeamData = {
   id: testTeamId,
   channel_id: testChannelId,
@@ -8,7 +9,7 @@ export const testTeamData = {
   rehearsal_day: 1,
   token: 'test-token',
   attendance_blocks: ['main_song', 'run_through'],
-  bot_user_id: 'B0T123',
+  bot_user_id: testBotId,
   channel: 'rehearsals',
   google_sheet_id: 'somesheetid',
   intro_text: 'Hello world',
