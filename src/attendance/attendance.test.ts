@@ -98,7 +98,7 @@ describe('postAttendanceMessage', () => {
         attending: [],
         channel: 'C01A1B2C3',
         notAttending: [],
-        rehearsal_date: '05/05/2024',
+        rehearsal_date: '06/05/2024',
         ts: 'returnTimestamp'
       })
     )
@@ -213,7 +213,7 @@ describe('updateAttendanceMessage', () => {
         attending: [],
         channel: 'C01A1B2C3',
         notAttending: [],
-        rehearsal_date: '05/05/2024',
+        rehearsal_date: '06/05/2024',
         ts: 'returnTimestamp'
       })
     )

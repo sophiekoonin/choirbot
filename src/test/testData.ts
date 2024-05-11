@@ -20,8 +20,8 @@ export const testTeamData = {
 export const testUser2 = 'U01A1B2C4'
 export const testUser3 = 'U01A1B2C5'
 export const testUser4 = 'U01A1B2C6'
-export const testRehearsalDate = new Date('2024-05-05')
-export const testRehearsalDateString = '05/05/2024'
+export const testRehearsalDate = new Date('2024-05-06') // this is a Monday
+export const testRehearsalDateString = '06/05/2024'
 export const testTimestamp = '1654709611.420969'
 export const testAttendancePost = {
   id: testTimestamp,

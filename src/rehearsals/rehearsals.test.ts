@@ -1,20 +1,25 @@
 import {
   testChannelId,
+  testRehearsalDate,
   testRehearsalDateString,
   testSpreadsheetHeaders,
   testTeamData,
   testUserId
 } from '../test/testData'
-// import { db } from '../db/db'
 
 import { google } from 'googleapis'
 import { SlackClient } from '../slack/client'
-import { postRehearsalReminder } from './rehearsals'
+import { postRehearsalReminder, updateRehearsalMessage } from './rehearsals'
+import { subDays } from 'date-fns'
 
 jest.mock('googleapis')
 jest.mock('../slack/client')
 jest.mock('../db/db')
-describe('postRehearsalMusic', () => {
+jest.mock('../utils', () => ({
+  isBankHoliday: async () => false
+}))
+
+describe('postRehearsalReminder', () => {
   const token = testTeamData.token
   const channel = testChannelId
   const teamId = testTeamData.id
@@ -378,6 +383,201 @@ describe('postRehearsalMusic', () => {
         channel: testChannelId,
         text: "<!channel> It's a bank holiday next Monday, so no rehearsal! Have a lovely day off!"
       })
+    })
+  })
+
+  describe('With existingPostTimestamp', () => {
+    test('Updates an existing post successfully', async () => {
+      const existingPostTimestamp = '12345'
+      // @ts-expect-error mock type
+      google.setMockBatchGetReturnValue([
+        {
+          range: 'B1:I1',
+          values: [testSpreadsheetHeaders]
+        },
+        {
+          range: 'B4:I4',
+          values: [
+            'Main Song Title',
+            'Run Through Title',
+            'Blah blah blah',
+            'main-song-link',
+            'run-through-link'
+          ]
+        }
+      ])
+
+      await postRehearsalReminder({
+        channel,
+        token,
+        teamId,
+        dayOfWeek: 'Monday',
+        date: testRehearsalDateString,
+        isBankHoliday: false,
+        existingPostTimestamp
+      })
+
+      expect(SlackClient.chat.update).toHaveBeenCalledWith({
+        token,
+        ts: existingPostTimestamp,
+        channel: testChannelId,
+        text: ":wave: Here's the plan for Monday's rehearsal!",
+        blocks: [
+          {
+            type: 'section',
+            text: {
+              text: "<!channel> Here's the plan for Monday's rehearsal!",
+              type: 'mrkdwn'
+            }
+          },
+          {
+            block_id: 'notes',
+            text: {
+              text: ':information_source: Blah blah blah',
+              type: 'mrkdwn'
+            },
+            type: 'section'
+          },
+          {
+            block_id: 'main_song',
+            text: {
+              text: "*We're singing*: <main-song-link|Main Song Title>",
+              type: 'mrkdwn'
+            },
+            type: 'section'
+          },
+          {
+            block_id: 'run_through',
+            text: {
+              text: '*Run through*: <run-through-link|Run Through Title>',
+              type: 'mrkdwn'
+            },
+            type: 'section'
+          },
+          {
+            text: {
+              text: ':musical_note: Please give the recordings a listen before rehearsal.',
+              type: 'mrkdwn'
+            },
+            type: 'section'
+          }
+        ]
+      })
+    })
+  })
+})
+
+describe('Updating an existing rehearsal post', () => {
+  const token = testTeamData.token
+  const teamId = testTeamData.id
+  const existingPostTimestamp = '12345'
+  process.env.SLACK_APP_ID = 'APP_ID'
+  const fakeToday = subDays(testRehearsalDate, 4)
+  jest.useFakeTimers().setSystemTime(fakeToday)
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  test("Lets the person who installed know if it can't find a post to update", async () => {
+    // @ts-expect-error mock type
+    SlackClient.conversations.history.mockResolvedValue({
+      messages: [
+        {
+          app_id: 'APP_ID',
+          text: `What's your favourite cheese?`,
+          ts: '135363.63635'
+        }
+      ]
+    })
+    await updateRehearsalMessage({ token, teamId })
+    expect(SlackClient.chat.postMessage).toHaveBeenCalledWith({
+      token,
+      channel: testUserId,
+      text: "I tried to post a rehearsal reminder, but I couldn't find an existing rehearsal reminder post to update. Maybe try posting a new one."
+    })
+  })
+
+  test("Updates an existing post successfully if it's found", async () => {
+    // @ts-expect-error mock type
+    google.setMockBatchGetReturnValue([
+      {
+        range: 'B1:I1',
+        values: [testSpreadsheetHeaders]
+      },
+      {
+        range: 'B4:I4',
+        values: [
+          'New song who dis',
+          'Run Through Title',
+          'Blah blah blah',
+          'main-song-link',
+          'run-through-link'
+        ]
+      }
+    ])
+
+    // @ts-expect-error mock type
+    SlackClient.conversations.history.mockResolvedValue({
+      messages: [
+        {
+          app_id: 'APP_ID',
+          text: "Here's the plan for Monday's rehearsal!",
+          ts: existingPostTimestamp
+        },
+        {
+          app_id: 'APP_ID',
+          text: "What's your favourite cheese?",
+          ts: '135363.63635'
+        }
+      ]
+    })
+    await updateRehearsalMessage({ token, teamId })
+
+    expect(SlackClient.chat.update).toHaveBeenCalledWith({
+      token,
+      ts: existingPostTimestamp,
+      channel: testChannelId,
+      text: ":wave: Here's the plan for Monday's rehearsal!",
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            text: "<!channel> Here's the plan for Monday's rehearsal!",
+            type: 'mrkdwn'
+          }
+        },
+        {
+          block_id: 'notes',
+          text: {
+            text: ':information_source: Blah blah blah',
+            type: 'mrkdwn'
+          },
+          type: 'section'
+        },
+        {
+          block_id: 'main_song',
+          text: {
+            text: "*We're singing*: <main-song-link|New song who dis>",
+            type: 'mrkdwn'
+          },
+          type: 'section'
+        },
+        {
+          block_id: 'run_through',
+          text: {
+            text: '*Run through*: <run-through-link|Run Through Title>',
+            type: 'mrkdwn'
+          },
+          type: 'section'
+        },
+        {
+          text: {
+            text: ':musical_note: Please give the recordings a listen before rehearsal.',
+            type: 'mrkdwn'
+          },
+          type: 'section'
+        }
+      ]
     })
   })
 })

@@ -5,7 +5,7 @@ import {
   runThroughBlock
 } from '../slack/blocks/attendance'
 import { SongData } from '../google/types'
-import { addDays, format } from 'date-fns'
+import { addDays, format, differenceInDays, nextDay, Day } from 'date-fns'
 import { isBankHoliday } from '../utils'
 
 export function getRehearsalMusicBlocks(
@@ -35,10 +35,7 @@ export function getRehearsalMusicBlocks(
 
 export async function getRehearsalDateFromToday(rehearsalDay: string) {
   const today = new Date()
-  const todayDayNumber = today.getDay()
-  const diff = parseInt(rehearsalDay) - todayDayNumber
-  const date = addDays(today, diff)
-  console.log({ rehearsalDay, todayDayNumber, diff })
+  const date = nextDay(today, parseInt(rehearsalDay) as Day)
   return {
     date,
     dayOfWeek: format(date, 'eeee'),

@@ -101,11 +101,15 @@ export const updateRehearsalMessage = async ({
   token: string
   teamId: string
 }) => {
-  const { channel_id: channel, rehearsal_day } = await getValues(
-    'teams',
-    teamId,
-    ['channel_id', 'rehearsal_day']
-  )
+  const {
+    channel_id: channel,
+    rehearsal_day,
+    user_id
+  } = await getValues('teams', teamId, [
+    'channel_id',
+    'rehearsal_day',
+    'user_id'
+  ])
 
   const { dayOfWeek, dateString, isBankHoliday } =
     await getRehearsalDateFromToday(rehearsal_day as string)
@@ -118,8 +122,18 @@ export const updateRehearsalMessage = async ({
   const rehearsalMessage = conversationHistory.messages.find(
     (message) =>
       message.app_id === process.env.SLACK_APP_ID &&
-      !message.text.includes(`Here's the plan for ${dayOfWeek}'s rehearsal!`)
+      message.text.includes(`Here's the plan for ${dayOfWeek}'s rehearsal!`)
   )
+
+  if (rehearsalMessage == null) {
+    const userId = user_id as string
+    await SlackClient.chat.postMessage({
+      token,
+      channel: userId,
+      text: "I tried to post a rehearsal reminder, but I couldn't find an existing rehearsal reminder post to update. Maybe try posting a new one."
+    })
+    return
+  }
 
   const timestamp = rehearsalMessage.ts
   try {
