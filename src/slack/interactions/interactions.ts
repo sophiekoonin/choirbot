@@ -91,7 +91,7 @@ export async function setChannel(
   teamId: string
 ) {
   const id = action.selected_channels[0]
-  const channelInfo = (await SlackClient.channels.info({
+  const channelInfo = (await SlackClient.conversations.info({
     token,
     channel: id
   })) as ChannelInfoResponse
@@ -100,7 +100,7 @@ export async function setChannel(
       channel: channelInfo.channel.name,
       channel_id: id
     })
-    await joinChannel(teamId, channelInfo.channel.name, token)
+    await joinChannel(teamId, channelInfo.channel.id, token)
   }
 }
 

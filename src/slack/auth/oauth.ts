@@ -75,7 +75,7 @@ export const oauth_redirect = async function (
     channel_id = values.channel_id as string
     channel = values.channel as string
 
-    await joinChannel(team_id, channel, access_token)
+    await joinChannel(team_id, channel_id, access_token)
   }
 
   await db.collection('teams').doc(team_id).set({

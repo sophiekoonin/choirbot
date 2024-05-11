@@ -29,9 +29,9 @@ export async function joinChannel(
   token: string
 ) {
   try {
-    await SlackClient.channels.join({
+    await SlackClient.conversations.join({
       token,
-      name: channel
+      channel
     })
   } catch (err) {
     const user_id = await getValue('teams', teamId, 'user_id')
