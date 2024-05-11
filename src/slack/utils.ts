@@ -1,6 +1,6 @@
 import { ListUsersResult, ReactionResult, UserId } from './types'
 import { SlackClient } from './client'
-import { getDbDoc, getValue } from '../db/helpers'
+import { getDbDoc, getValue } from '../db'
 
 export async function getSlackUserIds(
   teamId: string,

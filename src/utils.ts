@@ -17,7 +17,7 @@ export function getNextMonday(): string {
 }
 
 export async function isBankHoliday(date: string): Promise<boolean> {
-  let allBankHols = await BankHolCache.getData()
+  const allBankHols = await BankHolCache.getData()
   const { events }: { events: Array<BankHolidayEvent> } =
     allBankHols['england-and-wales']
   const allDates = events.map((evt) => evt.date)

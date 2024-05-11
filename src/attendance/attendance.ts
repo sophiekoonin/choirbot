@@ -2,19 +2,16 @@ import Firestore from '@google-cloud/firestore'
 import { SectionBlock } from '@slack/types'
 import { format } from 'date-fns'
 import * as google from '../google/google'
-import { getDocData, getValue, setDbValue, updateDbValue } from '../db/helpers'
-import db from '../db'
-import { SlackClient } from './client'
+import { getDocData, getValue, setDbValue } from '../db'
+import { db } from '../db/db'
+import { SlackClient } from '../slack/client'
 import {
   ChatPostMessageResult,
   PostAttendanceMessageArgs,
-  MessageReactionsResult,
-  TeamId,
-  SlackAPIArgs
-} from './types'
+  TeamId
+} from '../slack/types'
 import { SongData } from '../google/types'
-import { introductionBlock, AttendanceBlocks } from './blocks/attendance'
-import { getUserReactionsForEmoji } from './utils'
+import { introductionBlock, AttendanceBlocks } from '../slack/blocks/attendance'
 
 export async function getAttendancePosts(team_id: TeamId, limit?: number) {
   const result = db
@@ -148,46 +145,6 @@ export const postAttendanceMessage = async ({
     console.error(err)
   }
 
-  return
-}
-
-export const processAttendanceForTeam = async function ({
-  teamId,
-  token,
-  channel
-}: SlackAPIArgs) {
-  const botId = await getValue('teams', teamId, 'bot_user_id')
-  const docs = await getAttendancePosts(teamId, 1)
-  if (docs.length === 0) return
-  const firstResult = docs[0]
-  try {
-    const response = (await SlackClient.reactions.get({
-      token,
-      timestamp: firstResult.get('ts'),
-      channel
-    })) as MessageReactionsResult
-    if (!response.ok) {
-      throw new Error('Something went wrong!')
-    }
-    const id = firstResult.id
-    const { reactions } = response.message
-    const attending = getUserReactionsForEmoji({
-      reactions,
-      emoji: '+1',
-      botId
-    })
-    const notAttending = getUserReactionsForEmoji({
-      reactions,
-      emoji: '-1',
-      botId
-    })
-    await updateDbValue(`attendance-${teamId}`, id, {
-      attending,
-      notAttending
-    })
-  } catch (err) {
-    console.error(err)
-  }
   return
 }
 

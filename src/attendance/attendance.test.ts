@@ -1,17 +1,16 @@
 import {
-  testAttendancePost,
   testChannelId,
   testRehearsalDate,
   testTeamData,
   testUserId
 } from '../test/testData'
-import db from '../db'
+import { db } from '../db/db'
 import { postAttendanceMessage, updateAttendanceMessage } from './attendance'
-import { SlackClient } from './client'
+import { SlackClient } from '../slack/client'
 import { mockSet } from 'firestore-jest-mock/mocks/firestore'
 
-jest.mock('./client')
-jest.mock('../db')
+jest.mock('../slack/client')
+jest.mock('../db/db')
 describe('postAttendanceMessage', () => {
   const token = testTeamData.token
   const channel = testChannelId
@@ -116,6 +115,7 @@ describe('updateAttendanceMessage', () => {
   })
 
   test("Messages the person who installed if couldn't find a post", async () => {
+    // @ts-expect-error mock type
     db.setMockDbContents({
       attendance: []
     })
@@ -133,6 +133,7 @@ describe('updateAttendanceMessage', () => {
   })
 
   test("Messages the person who installed if couldn't find a row in the spreadsheet", async () => {
+    // @ts-expect-error mock type
     db.setMockDbContents({
       attendanceOverrides: {
         rehearsal_date: '01/01/2021'

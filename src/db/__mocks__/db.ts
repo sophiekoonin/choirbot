@@ -51,4 +51,4 @@ class DB {
 
 const testDB = new DB()
 
-export default testDB
+export const db = testDB

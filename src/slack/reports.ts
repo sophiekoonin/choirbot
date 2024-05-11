@@ -1,4 +1,4 @@
-import { getAttendancePosts } from './attendance'
+import { getAttendancePosts } from '../attendance/attendance'
 import { RehearsalAttendanceData, TeamId } from './types'
 import { SectionBlock } from '@slack/types'
 import { getSlackUserIds } from './utils'

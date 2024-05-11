@@ -1,5 +1,5 @@
 import { Query } from '@google-cloud/firestore'
-import db from './'
+import { db } from './db'
 
 export const setDbValue = async (
   collection: string,

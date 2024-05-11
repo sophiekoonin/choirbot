@@ -1,14 +1,11 @@
 import * as utils from './utils'
 import { format, addDays } from 'date-fns'
-import {
-  postAttendanceMessage,
-  processAttendanceForTeam
-} from './slack/attendance'
+import { postAttendanceMessage, processAttendanceForTeam } from './attendance'
 import { postRehearsalMusic } from './slack/rehearsals'
 import { Request, Response } from 'express'
 import { SlackClient } from './slack/client'
 import { getQueryResults } from './db/helpers'
-import db from './db'
+import { db } from './db/db'
 
 export const checkForJobsToday = async (req: Request, res: Response) => {
   // Prevent illegitimate cron requests

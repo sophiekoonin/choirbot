@@ -9,7 +9,10 @@ import {
   InboundInteraction,
   ChannelInfoResponse
 } from '../types'
-import { postAttendanceMessage, updateAttendanceMessage } from '../attendance'
+import {
+  postAttendanceMessage,
+  updateAttendanceMessage
+} from '../../attendance/attendance'
 import { postRehearsalMusic } from '..'
 import { SlackClient } from '../client'
 import {
