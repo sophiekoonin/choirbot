@@ -5,7 +5,7 @@ import {
   runThroughBlock
 } from '../slack/blocks/attendance'
 import { SongData } from '../google/types'
-import { addDays, format, differenceInDays, nextDay, Day } from 'date-fns'
+import { format, nextDay, Day } from 'date-fns'
 import { isBankHoliday } from '../utils'
 
 export function getRehearsalMusicBlocks(
