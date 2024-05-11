@@ -3,29 +3,14 @@ import { SectionBlock } from '@slack/types'
 import { format } from 'date-fns'
 import * as google from '../google/google'
 import { getDocData, getValue, setDbValue } from '../db'
-import { db } from '../db/db'
 import { SlackClient } from '../slack/client'
 import {
   ChatPostMessageResult,
-  PostAttendanceMessageArgs,
-  TeamId
+  PostAttendanceMessageArgs
 } from '../slack/types'
 import { SongData } from '../google/types'
 import { introductionBlock, AttendanceBlocks } from '../slack/blocks/attendance'
-
-export async function getAttendancePosts(team_id: TeamId, limit?: number) {
-  const result = db
-    .collection(`attendance-${team_id}`)
-    .orderBy('created_at', 'desc')
-
-  if (limit != null) {
-    const slice = await result.limit(limit).get()
-    return slice.docs
-  }
-
-  const snapshot = await result.get()
-  return snapshot.docs
-}
+import { getAttendancePosts } from './helpers'
 
 export const updateAttendanceMessage = async ({
   token,

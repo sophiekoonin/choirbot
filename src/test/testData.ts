@@ -23,17 +23,13 @@ export const testUser4 = 'U01A1B2C6'
 export const testRehearsalDate = new Date('2024-05-06') // this is a Monday
 export const testRehearsalDateString = '06/05/2024'
 export const testTimestamp = '1654709611.420969'
+
 export const testAttendancePost = {
   id: testTimestamp,
   attending: [testUserId, testUser2, testUser3],
   not_attending: [testUser4],
   created_at: 1654709612,
   rehearsal_date: testRehearsalDateString,
-  roles: {
-    volunteer_facilitator: testUser2,
-    volunteer_musical_warmup: testUserId,
-    volunteer_physical_warmup: testUser3
-  },
   ts: testTimestamp
 }
 
@@ -69,3 +65,11 @@ export const spreadsheetDateRows = [
   '12/05/2024',
   '19/05/2024'
 ]
+
+export function recordWithoutId(
+  obj: typeof testAttendancePost | typeof testTeamData
+) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { id, ...rest } = obj
+  return rest
+}
