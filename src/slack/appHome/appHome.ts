@@ -68,7 +68,7 @@ async function updateView(team: TeamId): Promise<View> {
           action_id: Actions.UPDATE_REHEARSAL_MESSAGE,
           text: {
             type: 'plain_text',
-            text: 'Update rehearsal post',
+            text: 'Update rehearsal reminder',
             emoji: true
           }
         }

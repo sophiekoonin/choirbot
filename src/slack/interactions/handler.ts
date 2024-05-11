@@ -24,7 +24,6 @@ export async function handleInteractions(
   const { actions, team, trigger_id, view, type, user } = payload
   const token = await getValue('teams', team.id, 'access_token')
   res.send()
-  console.log(payload)
   if (view != null && type === Interactions.VIEW_SUBMISSION) {
     const valuesToUpdate = getConfigSubmissionValues(view.state.values)
     await updateDbValue('teams', team.id, valuesToUpdate)

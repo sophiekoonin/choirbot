@@ -113,7 +113,6 @@ export const updateRehearsalMessage = async ({
 
   const { dayOfWeek, dateString, isBankHoliday } =
     await getRehearsalDateFromToday(rehearsal_day as string)
-
   const conversationHistory = await SlackClient.conversations.history({
     channel: channel as string,
     token
