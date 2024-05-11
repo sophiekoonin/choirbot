@@ -2,7 +2,7 @@ import { getValue, updateDbValue } from '../db'
 import { SlackClient } from '../slack/client'
 import { MessageReactionsResult, SlackAPIArgs } from '../slack/types'
 import { getUserReactionsForEmoji } from '../slack/utils'
-import { getAttendancePosts } from './attendance'
+import { getAttendancePosts } from './helpers'
 
 export const processAttendanceForTeam = async function ({
   teamId,
@@ -20,7 +20,7 @@ export const processAttendanceForTeam = async function ({
       channel
     })) as MessageReactionsResult
     if (!response.ok) {
-      throw new Error('Something went wrong!')
+      throw new Error('Failed to fetch Slack reactions')
     }
     const id = firstResult.id
     const { reactions } = response.message
