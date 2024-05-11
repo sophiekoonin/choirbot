@@ -3,7 +3,7 @@ import { getDbDoc, getValues } from '../db/helpers'
 import { onSlackInstall } from './config/installation'
 import { OAuthResponse } from './types'
 import { SlackClient } from './client'
-import { initialIntroText, initialBlocks } from './blocks/attendance'
+import { initialIntroText, initialBlocks } from './blocks/messages'
 import { joinChannel } from './utils'
 import db from '../db/db'
 

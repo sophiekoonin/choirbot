@@ -3,7 +3,7 @@ import {
   mainSongBlock,
   notesBlock,
   runThroughBlock
-} from '../slack/blocks/attendance'
+} from '../slack/blocks/messages'
 import { SongData } from '../google/types'
 import { format, nextDay, Day } from 'date-fns'
 import { isBankHoliday } from '../utils'

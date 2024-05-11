@@ -2,7 +2,7 @@ import { SectionBlock } from '@slack/web-api'
 import { db } from '../db'
 import { SongData } from '../google/types'
 import { TeamId } from '../slack/types'
-import { AttendanceBlocks, introductionBlock } from '../slack/blocks/attendance'
+import { AttendanceBlocks, introductionBlock } from '../slack/blocks/messages'
 
 export async function getAttendancePosts(team_id: TeamId, limit?: number) {
   const result = db

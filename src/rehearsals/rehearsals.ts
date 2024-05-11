@@ -1,7 +1,7 @@
 import * as google from '../google/google'
 import { SlackClient } from '../slack/client'
 import { getValue, getValues } from '../db/helpers'
-import { notesBlock, headerBlock } from '../slack/blocks/attendance'
+import { notesBlock, headerBlock } from '../slack/blocks/messages'
 import { getRehearsalDateFromToday, getRehearsalMusicBlocks } from './helpers'
 import { Block } from '@slack/web-api'
 
