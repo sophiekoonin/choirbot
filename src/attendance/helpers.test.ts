@@ -1,5 +1,5 @@
 import { testAttendancePost, testTeamId } from '../test/testData'
-import { getAttendancePosts } from './helpers'
+import { getAttendancePostBlocks, getAttendancePosts } from './helpers'
 import { db } from '../db/db'
 import { mockLimit } from 'firestore-jest-mock/mocks/firestore'
 jest.mock('../db/db')
@@ -47,5 +47,55 @@ describe('attendance helpers', () => {
       await getAttendancePosts(testTeamId, 1)
       expect(mockLimit).toHaveBeenCalledWith(1)
     })
+  })
+
+  test('getAttendancePostBlocks', () => {
+    const blocks = getAttendancePostBlocks({
+      songs: {
+        mainSong: 'Main Song',
+        runThrough: 'Run Through',
+        mainSongLink: 'main-song-link',
+        runThroughLink: 'run-through-link',
+        notes: 'Blah blah blah',
+        customColumnHeader: '',
+        customColumnValue: ''
+      },
+      blocks: ['main_song', 'run_through', 'notes'],
+      introText: 'Hello world'
+    })
+    expect(blocks).toEqual([
+      {
+        type: 'section',
+        block_id: 'introduction',
+        text: {
+          type: 'mrkdwn',
+          text: 'Hello world'
+        }
+      },
+      {
+        type: 'section',
+        block_id: 'main_song',
+        text: {
+          type: 'mrkdwn',
+          text: "*We're singing*: <main-song-link|Main Song>"
+        }
+      },
+      {
+        type: 'section',
+        block_id: 'run_through',
+        text: {
+          type: 'mrkdwn',
+          text: '*Run through*: <run-through-link|Run Through>'
+        }
+      },
+      {
+        type: 'section',
+        block_id: 'notes',
+        text: {
+          type: 'mrkdwn',
+          text: ':information_source: Blah blah blah'
+        }
+      }
+    ])
   })
 })

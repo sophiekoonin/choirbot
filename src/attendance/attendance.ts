@@ -1,5 +1,4 @@
 import Firestore from '@google-cloud/firestore'
-import { SectionBlock } from '@slack/types'
 import { format } from 'date-fns'
 import * as google from '../google/google'
 import { getDocData, getValue, setDbValue } from '../db'
@@ -8,9 +7,7 @@ import {
   ChatPostMessageResult,
   PostAttendanceMessageArgs
 } from '../slack/types'
-import { SongData } from '../google/types'
-import { introductionBlock, AttendanceBlocks } from '../slack/blocks/attendance'
-import { getAttendancePosts } from './helpers'
+import { getAttendancePostBlocks, getAttendancePosts } from './helpers'
 
 export const updateAttendanceMessage = async ({
   token,
@@ -131,24 +128,4 @@ export const postAttendanceMessage = async ({
   }
 
   return
-}
-
-export function getAttendancePostBlocks({
-  songs,
-  blocks,
-  introText
-}: {
-  songs: SongData
-  blocks: string[]
-  introText: string
-}): Array<SectionBlock> {
-  return [
-    introductionBlock(introText),
-    ...blocks
-      .map((blockName) => {
-        const block = AttendanceBlocks[blockName]
-        return typeof block === 'function' ? block(songs) : block
-      })
-      .filter((block) => block != null)
-  ]
 }
