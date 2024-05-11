@@ -1,7 +1,7 @@
-import { getAttendancePosts } from '../attendance/attendance'
-import { RehearsalAttendanceData, TeamId } from './types'
+import { RehearsalAttendanceData, TeamId } from '../types'
 import { SectionBlock } from '@slack/types'
-import { getSlackUserIds } from './utils'
+import { getSlackUserIds } from '../utils'
+import { getAttendancePosts } from '../../attendance'
 
 function mapAttendance(
   posts: Array<FirebaseFirestore.QueryDocumentSnapshot>
@@ -11,6 +11,28 @@ function mapAttendance(
     notAttending: post.get('notAttending'),
     date: post.get('rehearsal_date')
   }))
+}
+
+export function calculateAttendanceStats(
+  attendanceData: Array<RehearsalAttendanceData>
+) {
+  const sumAttending = attendanceData.reduce(
+    (acc, curr) => (acc += curr.attending.length),
+    0
+  )
+  const averageAttendance = Math.round(sumAttending / attendanceData.length)
+  const highestAttendanceValue = Math.max(
+    ...attendanceData.map((data) => data.attending.length)
+  )
+  const highestAttendanceDates = attendanceData
+    .filter((obj) => obj.attending.length === highestAttendanceValue)
+    .map((obj) => obj.date)
+
+  return {
+    averageAttendance,
+    highestAttendanceValue,
+    highestAttendanceDates
+  }
 }
 
 /*
@@ -38,34 +60,29 @@ export async function getReportBlocks(
   }
 
   const allUsers = await getSlackUserIds(teamId, token)
-  const lastFourWeeks = attendanceData.slice(0, 4)
-  const lastFourWeeksAttending = lastFourWeeks.map(
+  const last4WeeksOrLess = attendanceData.slice(
+    0,
+    Math.min(4, attendanceData.length)
+  )
+  const lastFourWeeksAttending = last4WeeksOrLess.map(
     (post) =>
       `${post.date}: :+1: ${post.attending.length} :-1: ${post.notAttending.length}`
   )
-  const responded = lastFourWeeks
+  const responded = last4WeeksOrLess
     .map((post) => [post.attending, post.notAttending])
     .flat(2)
   const notResponded = allUsers.filter((user) => !responded.includes(user))
 
-  const sumAttending = attendanceData.reduce(
-    (acc, curr) => (acc += curr.attending.length),
-    0
-  )
-  const averageAttendance = Math.round(sumAttending / attendanceData.length)
-  const highestAttendanceValue = Math.max(
-    ...attendanceData.map((data) => data.attending.length)
-  )
-  const highestAttendanceDates = attendanceData
-    .filter((obj) => obj.attending.length === highestAttendanceValue)
-    .map((obj) => obj.date)
+  const { averageAttendance, highestAttendanceValue, highestAttendanceDates } =
+    calculateAttendanceStats(attendanceData)
 
+  const numRehearsals = last4WeeksOrLess.length
   return [
     {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `*Responses for last 4 rehearsals:*\n${lastFourWeeksAttending.join(
+        text: `*Responses for last ${numRehearsals} rehearsals:*\n${lastFourWeeksAttending.join(
           '\n'
         )}`
       }
@@ -74,7 +91,7 @@ export async function getReportBlocks(
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `*Not responded in last 4 weeks:*\n${notResponded
+        text: `*Not responded in last ${numRehearsals} weeks:*\n${notResponded
           .map((uid) => `<@${uid}>`)
           .join('\n')}`
       }

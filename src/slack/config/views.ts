@@ -5,7 +5,7 @@ import { TeamId, UserId } from '../types'
 import { getAttendancePostBlocks } from '../../attendance/attendance'
 import { AttendanceBlockSelectors } from '../blocks/config'
 import { Option } from '@slack/web-api'
-import { getReportBlocks } from '../reports'
+import { getReportBlocks } from '../reports/reports'
 
 const exampleSongData = {
   mainSong: 'Example Song',
