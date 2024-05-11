@@ -1,5 +1,3 @@
-import fetch from 'node-fetch'
-
 export interface BankHolidayEvent {
   title: string
   date: string
