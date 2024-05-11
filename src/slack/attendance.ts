@@ -56,11 +56,13 @@ export const updateAttendanceMessage = async ({
     return
   }
   const team = await getDocData('teams', teamId)
+
   if (songs == null) {
+    const userId = team.user_id
     await SlackClient.chat.postMessage({
       token,
-      channel: await team.get('user_id'),
-      text: `Tried to post attendance message, but couldn't find a row for ${dateString} in the schedule. Please make sure the dates are correct!`
+      channel: userId,
+      text: `Tried to update attendance message, but couldn't find a row for ${dateString} in the schedule. Please make sure the dates are correct!`
     })
     return
   }

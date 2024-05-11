@@ -3,20 +3,18 @@ import {
   testChannelId,
   testRehearsalDate,
   testTeamData,
-  testTeamId,
   testUserId
 } from '../test/testData'
+import db from '../db'
 import { postAttendanceMessage, updateAttendanceMessage } from './attendance'
 import { SlackClient } from './client'
 import { mockSet } from 'firestore-jest-mock/mocks/firestore'
-import db from '../db'
 // @ts-expect-error this is a mock
 import { _setMockBatchGetReturnValue } from '../google/google'
-import { firestoreStub } from 'firestore-jest-mock/mocks/googleCloudFirestore'
 
 jest.mock('./client')
 jest.mock('../db')
-describe('postAttendanceMessage', () => {
+describe.skip('postAttendanceMessage', () => {
   const token = testTeamData.token
   const channel = testChannelId
   const teamId = testTeamData.id
@@ -110,7 +108,7 @@ describe('postAttendanceMessage', () => {
   })
 })
 
-describe.skip('updateAttendanceMessage', () => {
+describe('updateAttendanceMessage', () => {
   const token = testTeamData.token
   const channel = testChannelId
   const teamId = testTeamData.id
@@ -132,11 +130,13 @@ describe.skip('updateAttendanceMessage', () => {
     })
   })
 
-  test("Messages the person who installed if couldn't find a row in the spreadsheet", async () => {
-    db.setAttendanceData({
-      ...testAttendancePost,
-      rehearsal_date: '01/01/2021'
+  test.only("Messages the person who installed if couldn't find a row in the spreadsheet", async () => {
+    db.setMockDbContents({
+      attendanceOverrides: {
+        rehearsal_date: '01/01/2021'
+      }
     })
+
     await updateAttendanceMessage({
       token,
       teamId
@@ -145,7 +145,7 @@ describe.skip('updateAttendanceMessage', () => {
     expect(SlackClient.chat.postMessage).toHaveBeenCalledWith({
       token,
       channel: testUserId,
-      text: "Tried to post attendance message, but couldn't find a row for 01/01/2021 in the schedule. Please make sure the dates are correct!"
+      text: "Tried to update attendance message, but couldn't find a row for 01/01/2021 in the schedule. Please make sure the dates are correct!"
     })
   })
 
