@@ -7,7 +7,7 @@ import { TeamId } from '../slack/types'
 
 const sheets: sheets_v4.Sheets = google.sheets('v4')
 
-async function getRowNumberForDate(
+export async function getRowNumberForDate(
   auth: GoogleAuth,
   sheetId: string,
   dateString: string
@@ -20,8 +20,9 @@ async function getRowNumberForDate(
   try {
     const response = await sheets.spreadsheets.values.get(request)
     const values = [...response.data.values].flat()
-    const rowNumber = values.indexOf(dateString) + 1
-    return rowNumber > 0 ? rowNumber : 1
+    const rowNumber = values.indexOf(dateString)
+    // 1-indexed
+    return rowNumber < 0 ? rowNumber : rowNumber + 1
   } catch (err) {
     console.error(`Error getting row number: ${err}`)
     throw new Error(err)
@@ -39,7 +40,7 @@ G - Free choice
 */
 
 // TODO - grab the column header from G and pull through content.
-async function getSongDetailsFromSheet(
+export async function getSongDetailsFromSheet(
   auth: GoogleAuth,
   sheetId: string,
   rowNumber: number

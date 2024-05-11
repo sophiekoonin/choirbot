@@ -38,7 +38,8 @@ export const testSpreadsheetHeaders = [
   'Run through',
   'Notes',
   'Main song link',
-  'Run through link'
+  'Run through link',
+  'Custom Column Header'
 ]
 export const testSpreadsheetData = [
   {
@@ -52,7 +53,8 @@ export const testSpreadsheetData = [
       'Run Through Title',
       'Blah blah blah',
       'main-song-link',
-      'run-through-link'
+      'run-through-link',
+      'Custom column value'
     ]
   }
 ]
