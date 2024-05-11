@@ -1,11 +1,11 @@
 import { Request, Response } from 'express'
-import { getDbDoc, getValues } from '../db/helpers'
-import { onSlackInstall } from './config/installation'
-import { OAuthResponse } from './types'
-import { SlackClient } from './client'
-import { initialIntroText, initialBlocks } from './blocks/messages'
-import { joinChannel } from './utils'
-import db from '../db/db'
+import { getDbDoc, getValues } from '../../db/helpers'
+import { onSlackInstall } from '../installation/installation'
+import { OAuthResponse } from '../types'
+import { SlackClient } from '../client'
+import { initialIntroText, initialBlocks } from '../blocks/messages'
+import { joinChannel } from '../utils'
+import { db } from '../../db'
 
 const { SLACK_CLIENT_ID, SLACK_CLIENT_SECRET, SLACK_APP_ID } = process.env
 // With thanks to Dennis Alund https://medium.com/evenbit/building-a-slack-app-with-firebase-as-a-backend-151c1c98641d

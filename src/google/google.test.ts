@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { testRehearsalDateString, testTeamId } from '../test/testData'
 import {
   getNextSongs,

@@ -1,0 +1,1 @@
+export { handleInteractions } from './handler'

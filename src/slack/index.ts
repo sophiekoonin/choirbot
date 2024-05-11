@@ -1,7 +1,7 @@
 import { postRehearsalReminder } from '../rehearsals/rehearsals'
-import { handleInteractions } from './config/interactions'
-import { oauth_redirect, oauth_error, oauth_success } from './oauth'
-import { verifyRequestSignature } from './auth'
+import { handleInteractions } from './interactions'
+import { oauth_redirect, oauth_error, oauth_success } from './auth/oauth'
+import { verifyRequestSignature } from './auth/auth'
 import { handleEvents } from './events'
 
 export {

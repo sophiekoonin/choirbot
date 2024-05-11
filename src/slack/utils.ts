@@ -1,6 +1,7 @@
 import { ListUsersResult, ReactionResult, UserId } from './types'
 import { SlackClient } from './client'
 import { getDbDoc, getValue } from '../db'
+import { ModalView, View } from '@slack/web-api'
 
 export async function getSlackUserIds(
   teamId: string,
@@ -55,4 +56,21 @@ export function getUserReactionsForEmoji({
   return (
     reactions.find((group) => group.name === emoji)['users'] || []
   ).filter((user) => user !== botId)
+}
+
+export function openModalView(
+  view: ModalView,
+  token: string,
+  teamId: string,
+  trigger_id: string
+) {
+  SlackClient.views
+    .open({
+      view,
+      token,
+      trigger_id
+    })
+    .catch((err) =>
+      console.error(`Error showing view ${view.title?.text} for ${teamId}`, err)
+    )
 }

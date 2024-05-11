@@ -1,14 +1,7 @@
 import { BlockTypes } from '../constants'
-import { TeamId, SubmissionValues } from '../types'
-import { updateDbValue } from '../../db/helpers'
+import { SubmissionValues } from '../types'
 
-export async function processConfigSubmission({
-  values,
-  teamId
-}: {
-  values: SubmissionValues
-  teamId: TeamId
-}) {
+export function getConfigSubmissionValues(values: SubmissionValues) {
   const valuesToUpdate = Object.keys(values).reduce((acc, curr) => {
     const item = values[curr][curr]
     if (item == null) return
@@ -29,6 +22,5 @@ export async function processConfigSubmission({
         return acc
     }
   }, {})
-
-  await updateDbValue('teams', teamId, valuesToUpdate)
+  return valuesToUpdate
 }

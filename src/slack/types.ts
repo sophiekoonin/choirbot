@@ -138,8 +138,8 @@ export interface SubmissionValue {
   [action_id: string]: {
     type: string
     value?: string
-    selected_options?: [Option]
-    selected_users?: [UserId]
+    selected_options?: Option[]
+    selected_users?: UserId[]
   }
 }
 

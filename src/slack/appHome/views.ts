@@ -1,11 +1,10 @@
-import { View } from '@slack/types'
 import { Actions, Blocks } from '../constants'
 import { getValues, getDbDoc } from '../../db/helpers'
 import { TeamId, UserId } from '../types'
-import { getAttendancePostBlocks } from '../../attendance/attendance'
 import { AttendanceBlockSelectors } from '../blocks/config'
-import { Option } from '@slack/web-api'
+import { Option, ModalView } from '@slack/web-api'
 import { getReportBlocks } from '../reports/reports'
+import { getAttendancePostBlocks } from '../../attendance/helpers'
 
 const exampleSongData = {
   mainSong: 'Example Song',
@@ -17,10 +16,7 @@ const exampleSongData = {
   customColumnValue: 'Custom column value'
 }
 
-export async function setIgnoredUsersView(
-  teamId: TeamId,
-  token: string
-): Promise<View> {
+export async function setIgnoredUsersView(teamId: TeamId): Promise<ModalView> {
   const ignoredUsers: UserId[] = (await getDbDoc('teams', teamId)).get(
     'ignored_users'
   )
@@ -70,7 +66,7 @@ export async function setIgnoredUsersView(
   }
 }
 
-export const setSheetIdView: View = {
+export const setSheetIdView: ModalView = {
   type: 'modal',
   title: {
     type: 'plain_text',
@@ -123,7 +119,10 @@ export const setSheetIdView: View = {
   }
 }
 
-export async function reportView(teamId: TeamId, token: string): Promise<View> {
+export async function reportView(
+  teamId: TeamId,
+  token: string
+): Promise<ModalView> {
   const reportBlocks = await getReportBlocks(teamId, token)
   return {
     type: 'modal',
@@ -137,7 +136,7 @@ export async function reportView(teamId: TeamId, token: string): Promise<View> {
 
 export async function chooseAttendancePostBlocks(
   teamId: TeamId
-): Promise<View> {
+): Promise<ModalView> {
   const { attendance_blocks: currentBlocks, intro_text: introText } =
     await getValues('teams', teamId, ['attendance_blocks', 'intro_text'])
   const initialOptions = (currentBlocks as string[])

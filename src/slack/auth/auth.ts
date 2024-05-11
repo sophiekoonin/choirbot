@@ -1,9 +1,9 @@
 import crypto from 'crypto'
 import timingSafeCompare from 'tsscmp'
 
-import { VerificationHeaders } from './types'
+import { VerificationHeaders } from '../types'
 import { Response, NextFunction } from 'express'
-import { Request } from '../types'
+import { Request } from '../../types'
 
 /**
  * Method to verify signature of requests - COURTESY OF SLACK SDK
