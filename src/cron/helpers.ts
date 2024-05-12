@@ -5,13 +5,13 @@ export async function getActiveTeamsWithRehearsalOnDate(
   extraWhereBool?: string
 ) {
   const day = date.getDay().toString()
-  const query = db
+  let query = db
     .collection('teams')
     .where('rehearsal_day', '==', day)
     .where('active', '==', true)
 
   if (extraWhereBool) {
-    query.where(extraWhereBool, '==', true)
+    query = query.where(extraWhereBool, '==', true)
   }
 
   const teams = await getQueryResults(query)

@@ -66,7 +66,7 @@ export async function runFacilitatorRoulette(
     thread_ts: ts,
     channel,
     reply_broadcast: true,
-    text: `:8ball: Today's randomly-chosen faciliator is <@${facilitatorUserId}>!`
+    text: `:8ball: Nobody volunteered to facilitate today, so I'm shaking the magic 8 ball. Today's randomly-chosen facilitator is <@${facilitatorUserId}>!`
   })
 
   return

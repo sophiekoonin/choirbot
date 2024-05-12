@@ -59,6 +59,7 @@ export async function handleInteractions(
           })
           break
         case Actions.YES_NO_REMINDERS:
+        case Actions.FACILITATOR_ROULETTE:
           updateDbValue('teams', team.id, {
             [action_id]: action.selected_option.value === 'true'
           })

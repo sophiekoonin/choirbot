@@ -86,7 +86,7 @@ describe('facilitator roulette', () => {
     expect(SlackClient.chat.postMessage).toHaveBeenCalledWith({
       channel: 'test-channel',
       reply_broadcast: true,
-      text: `:8ball: Today's randomly-chosen faciliator is <@${testUser2}>!`,
+      text: `:8ball: Nobody volunteered to facilitate today, so I'm shaking the magic 8 ball. Today's randomly-chosen facilitator is <@${testUser2}>!`,
       thread_ts: '1654709611.420969',
       token: 'test-token'
     })
