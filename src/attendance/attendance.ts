@@ -121,7 +121,10 @@ export const postAttendanceMessage = async ({
       ts: postMsgRsp.ts,
       channel: channel,
       attending: [],
-      notAttending: []
+      notAttending: [],
+      roles: {
+        facilitor: null
+      }
     })
   } catch (err) {
     console.error(err)

@@ -1,4 +1,4 @@
-import { AttendancePostSections } from '../constants'
+import { AttendancePostSections, Emoji } from '../constants'
 import { PlainTextOption } from '@slack/types'
 
 export const AttendanceBlockSelectors: PlainTextOption[] = [
@@ -6,7 +6,7 @@ export const AttendanceBlockSelectors: PlainTextOption[] = [
     text: {
       type: 'plain_text',
       emoji: true,
-      text: 'Volunteer to facilitate with 🙌'
+      text: `Volunteer to facilitate with :${Emoji.Facilitator}:`
     },
     value: AttendancePostSections.FACILITATOR
   },
@@ -29,7 +29,7 @@ export const AttendanceBlockSelectors: PlainTextOption[] = [
     text: {
       type: 'plain_text',
       emoji: true,
-      text: 'Volunteer for warmup with 🎵'
+      text: `Volunteer for warmup with :${Emoji.GeneralWarmup}:`
     },
     value: AttendancePostSections.GENERAL_WARMUP
   },
@@ -37,7 +37,7 @@ export const AttendanceBlockSelectors: PlainTextOption[] = [
     text: {
       type: 'plain_text',
       emoji: true,
-      text: 'Volunteer for musical warmup with 🎵'
+      text: `Volunteer for musical warmup with :${Emoji.MusicalWarmup}:`
     },
     value: AttendancePostSections.MUSICAL_WARMUP
   },
@@ -45,7 +45,7 @@ export const AttendanceBlockSelectors: PlainTextOption[] = [
     text: {
       type: 'plain_text',
       emoji: true,
-      text: 'Volunteer for physical warmup with 💪'
+      text: `Volunteer for physical warmup with :${Emoji.PhysicalWarmup}:`
     },
     value: AttendancePostSections.PHYSICAL_WARMUP
   },
@@ -73,7 +73,7 @@ export const AttendanceBlockSelectors: PlainTextOption[] = [
   {
     text: {
       type: 'plain_text',
-      text: 'React with 👍👎 if attending/not attending',
+      text: `React with :${Emoji.Attending}::${Emoji.NotAttending}: if attending/not attending`,
       emoji: true
     },
     value: AttendancePostSections.ATTENDANCE_EMOJI

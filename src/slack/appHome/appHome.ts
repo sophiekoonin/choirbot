@@ -24,15 +24,18 @@ async function updateView(team: TeamId): Promise<View> {
     active,
     rehearsal_day: rehearsalDay,
     rehearsal_reminders: remindersEnabled,
+    facilitator_roulette = false,
     channel,
     google_sheet_id: sheetId
   } = await getValues('teams', team, [
     'active',
     'rehearsal_day',
     'rehearsal_reminders',
+    'facilitator_roulette',
     'channel',
     'google_sheet_id'
   ])
+  const facilitatorRouletteEnabled = facilitator_roulette as boolean
   const blocks = [
     {
       type: 'section',
@@ -198,6 +201,40 @@ async function updateView(team: TeamId): Promise<View> {
           text: {
             type: 'plain_text',
             text: remindersEnabled ? 'Enabled' : 'Disabled'
+          }
+        },
+        options: [
+          {
+            value: 'true',
+            text: {
+              type: 'plain_text',
+              text: 'Enabled'
+            }
+          },
+          {
+            value: 'false',
+            text: {
+              type: 'plain_text',
+              text: 'Disabled'
+            }
+          }
+        ]
+      }
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: ':8ball: *Facilitator magic 8 ball* (Pick a random facilitator if nobody volunteered at 5pm on rehearsal day)'
+      },
+      accessory: {
+        type: 'radio_buttons',
+        action_id: Actions.FACILITATOR_ROULETTE,
+        initial_option: {
+          value: facilitatorRouletteEnabled.toString(),
+          text: {
+            type: 'plain_text',
+            text: facilitatorRouletteEnabled ? 'Enabled' : 'Disabled'
           }
         },
         options: [

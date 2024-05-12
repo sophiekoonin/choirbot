@@ -10,8 +10,9 @@ import {
   handleEvents
 } from './slack'
 
-import { checkForJobsToday } from './cron'
+import { checkForJobsToday } from './cron/cron'
 import { Request } from './types'
+import { runFacilitatorRouletteCronJob } from './cron/roulette'
 
 const app: express.Application = express()
 app.use(bodyParser.json())
@@ -35,6 +36,7 @@ app.post('/events', handleEvents)
 app.get('/oauth_success', oauth_success)
 app.get('/oauth_error', oauth_error)
 app.get('/cron', checkForJobsToday)
+app.get('/roulette', runFacilitatorRouletteCronJob)
 
 const PORT: number = parseInt(process.env.PORT) || 6060
 app.listen(PORT, () => {

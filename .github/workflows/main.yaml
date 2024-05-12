@@ -17,7 +17,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
+      - id: 'test'
+        name: 'Run unit tests'
+        run: npm install && npm run test
       - id: 'auth'
         name: 'Authenticate with Google Cloud'
         uses: 'google-github-actions/auth@v1'
@@ -38,5 +40,5 @@ jobs:
             SLACK_SIGNING_SECRET=${{ secrets.SLACK_SIGNING_SECRET }}
             SLACK_APP_ID=${{ vars.SLACK_APP_ID }}
 
-      - name: Test
+      - name: Test live deployment
         run: curl "${{ steps.deploy.outputs.url }}"
