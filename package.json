@@ -57,9 +57,6 @@
   "jest": {
     "silent": false,
     "collectCoverage": false,
-    "setupFilesAfterEnv": [
-      "./jest.setup.js"
-    ],
     "modulePathIgnorePatterns": [
       "<rootDir>/dist"
     ]
