@@ -33,7 +33,7 @@ export async function hasUserFacilitatedInLastFourWeeks(
   teamId: string,
   userId: string
 ) {
-  const recentAttendancePosts = await getAttendancePosts(teamId, 4)
+  const recentAttendancePosts = await getAttendancePosts(teamId, 5) // includes this week
   if (recentAttendancePosts == null || recentAttendancePosts.length === 0) {
     return false
   }

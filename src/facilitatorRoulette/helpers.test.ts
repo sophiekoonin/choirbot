@@ -32,7 +32,8 @@ describe('facilitator roulette helpers', () => {
         { ...testAttendancePost, roles: { facilitator: testUserId } },
         { ...testAttendancePost2, roles: { facilitator: testUser3 } },
         { ...testAttendancePost3, roles: { facilitator: testUser4 } },
-        { ...testAttendancePost4, roles: { facilitator: testUser2 } }
+        { ...testAttendancePost4, roles: { facilitator: testUser2 } },
+        { ...testAttendancePost4, roles: { facilitator: 'blah' } }
       ]
     })
     test(`Returns a random-ish user who hasn't faciliated recently`, async () => {
@@ -76,7 +77,8 @@ describe('facilitator roulette helpers', () => {
           { ...testAttendancePost, roles: { facilitator: testUserId } },
           { ...testAttendancePost2, roles: { facilitator: testUser3 } },
           { ...testAttendancePost3, roles: { facilitator: testUser4 } },
-          { ...testAttendancePost4, roles: { facilitator: testUser2 } }
+          { ...testAttendancePost4, roles: { facilitator: testUser2 } },
+          { ...testAttendancePost4, roles: { facilitator: 'blah' } }
         ]
       })
 
@@ -94,7 +96,8 @@ describe('facilitator roulette helpers', () => {
           { ...testAttendancePost, roles: { facilitator: 'someOtherUser' } },
           { ...testAttendancePost2, roles: { facilitator: testUser3 } },
           { ...testAttendancePost3, roles: { facilitator: testUser4 } },
-          { ...testAttendancePost4, roles: { facilitator: testUser2 } }
+          { ...testAttendancePost4, roles: { facilitator: testUser2 } },
+          { ...testAttendancePost4, roles: { facilitator: 'blah' } }
         ]
       })
 
@@ -104,7 +107,7 @@ describe('facilitator roulette helpers', () => {
       )
       expect(result).toBe(false)
     })
-    test(`Ignores attendance posts that don't have roles`, async () => {
+    test(`Ignores attendance posts that don't have roles or if there aren't 5 posts`, async () => {
       // @ts-expect-error mock
       db.setMockDbContents({
         attendance: [
