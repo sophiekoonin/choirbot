@@ -1,8 +1,21 @@
-import { testAttendancePost, testTeamId } from '../test/testData'
-import { getAttendancePostBlocks, getAttendancePosts } from './helpers'
+import {
+  testAttendancePost,
+  testTeamId,
+  testTimestamp,
+  testUser3,
+  testUser4,
+  testUserId
+} from '../test/testData'
+import {
+  getAttendancePostBlocks,
+  getAttendancePosts,
+  getReactionsForPost
+} from './helpers'
 import { db } from '../db/db'
 import { mockLimit } from 'firestore-jest-mock/mocks/firestore'
+import { SlackClient } from '../slack/client'
 jest.mock('../db/db')
+jest.mock('../slack/client')
 
 const testTimestamp2 = '13535234.5353567'
 const testTimestamp3 = '13533443.5353568'
@@ -97,5 +110,33 @@ describe('attendance helpers', () => {
         }
       }
     ])
+  })
+
+  test('getReactionsForPost gets reactions for a post', async () => {
+    const reactions = [
+      {
+        users: [testUserId],
+        name: 'raised_hands'
+      },
+      {
+        users: [testUser3, testUser4],
+        name: '-1'
+      }
+    ]
+    // @ts-expect-error mock
+    SlackClient.reactions.get.mockResolvedValue({
+      channel: 'test-channel',
+      ok: true,
+      message: {
+        reactions
+      }
+    })
+
+    const result = await getReactionsForPost(
+      'test-token',
+      'test-channel',
+      testTimestamp
+    )
+    expect(result).toEqual(reactions)
   })
 })

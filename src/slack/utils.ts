@@ -51,11 +51,14 @@ export function getUserReactionsForEmoji({
 }: {
   reactions: ReactionResult[]
   emoji: string
-  botId: UserId
+  botId?: UserId
 }): UserId[] {
-  return (
-    reactions.find((group) => group.name === emoji)['users'] || []
-  ).filter((user) => user !== botId)
+  const result =
+    reactions.find((group) => group.name === emoji)?.['users'] || []
+  if (botId != null && result != null) {
+    return result.filter((userId) => userId !== botId)
+  }
+  return result
 }
 
 export function openModalView(

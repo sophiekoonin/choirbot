@@ -26,7 +26,7 @@ export const testRehearsalDateString = '06/05/2024'
 export const testTimestamp = '1654709611.420969'
 
 export const testAttendancePost = {
-  id: testTimestamp,
+  id: testRehearsalDateString,
   attending: [testUserId, testUser2, testUser3],
   not_attending: [testUser4],
   created_at: 1654709612,

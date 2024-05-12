@@ -132,7 +132,7 @@ describe('Attendance reports', () => {
 
       const blocks = await getReportBlocks(testTeamId, 'test-token')
       expect(blocks).toHaveLength(1)
-      expect(blocks[0].text.text).toContain('No data to show')
+      expect(blocks[0].text?.text).toContain('No data to show')
     })
 
     test('copes with less than 4 weeks of data', async () => {
