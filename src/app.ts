@@ -10,7 +10,7 @@ import {
   handleEvents
 } from './slack'
 
-import { checkForJobsToday } from './cron'
+import { checkForJobsToday } from './cron/cron'
 import { Request } from './types'
 
 const app: express.Application = express()

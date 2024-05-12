@@ -1,11 +1,12 @@
-import * as utils from './utils'
+import * as utils from '../utils'
 import { format, addDays } from 'date-fns'
-import { postAttendanceMessage, processAttendanceForTeam } from './attendance'
-import { postRehearsalReminder } from './rehearsals/rehearsals'
+import { postAttendanceMessage, processAttendanceForTeam } from '../attendance'
+import { postRehearsalReminder } from '../rehearsals/rehearsals'
 import { Request, Response } from 'express'
-import { SlackClient } from './slack/client'
-import { getQueryResults } from './db/helpers'
-import { db } from './db/db'
+import { SlackClient } from '../slack/client'
+import { getQueryResults } from '../db/helpers'
+import { db } from '../db/db'
+import { getActiveTeamsWithRehearsalOnDate } from './helpers'
 
 export const checkForJobsToday = async (req: Request, res: Response) => {
   // Prevent illegitimate cron requests
@@ -25,18 +26,20 @@ export const checkForJobsToday = async (req: Request, res: Response) => {
   return res.sendStatus(200)
 }
 
+async function checkFacilitatorRoulette(date: Date) {
+  const dateISO = format(date, 'yyyy-MM-dd')
+  const isBankHol = await utils.isBankHoliday(dateISO)
+  if (isBankHol) return
+
+  const teams = await getActiveTeamsWithRehearsalOnDate(date)
+}
+
 async function checkForAttendancePostJobs(date: Date) {
   const dateISO = format(date, 'yyyy-MM-dd')
   const isBankHol = await utils.isBankHoliday(dateISO)
   if (isBankHol) return
 
-  const today = date.getDay().toString()
-  const todayQuery = db
-    .collection('teams')
-    .where('rehearsal_day', '==', today)
-    .where('active', '==', true)
-  const teams = await getQueryResults(todayQuery)
-  if (teams.length === 0) return
+  const teams = await getActiveTeamsWithRehearsalOnDate(date)
 
   teams.forEach(async (team) => {
     const {
@@ -69,20 +72,17 @@ async function checkForAttendancePostJobs(date: Date) {
 
 async function checkForRehearsalReminderJobs(date: Date) {
   const rehearsalDay = addDays(date, 4)
-  const rehearsalDayNumber = rehearsalDay.getDay().toString()
   const dateString = format(rehearsalDay, 'dd/MM/yyyy')
   const isBankHoliday = await utils.isBankHoliday(
     format(rehearsalDay, 'yyyy-MM-dd')
   )
   const dayOfWeek = format(rehearsalDay, 'eeee')
 
-  const todayQuery = db
-    .collection('teams')
-    .where('rehearsal_day', '==', rehearsalDayNumber)
-    .where('rehearsal_reminders', '==', 'true')
-    .where('active', '==', true)
-  const teams = await getQueryResults(todayQuery)
-  if (teams.length === 0) return
+  const teams = await getActiveTeamsWithRehearsalOnDate(
+    rehearsalDay,
+    'rehearsal_reminders'
+  )
+
   teams.forEach(async (team) => {
     const { id, access_token: token, channel_id: channel } = team
     if (channel === '' || channel == null) return
