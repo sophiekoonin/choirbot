@@ -1,10 +1,8 @@
-let postMessageOk = true
-let reactionsGetOk = true
 export const SlackClient = {
   chat: {
     postMessage: jest.fn(() => {
       return {
-        ok: postMessageOk,
+        ok: true,
         ts: 'returnTimestamp'
       }
     }),
@@ -17,7 +15,7 @@ export const SlackClient = {
     add: jest.fn(),
     get: jest.fn(() => {
       return {
-        ok: reactionsGetOk,
+        ok: true,
         message: {
           reactions: [
             {
@@ -48,11 +46,5 @@ export const SlackClient = {
     v2: {
       access: jest.fn()
     }
-  },
-  setPostMessageOk(ok: boolean) {
-    postMessageOk = ok
-  },
-  setReactionsGetOk(ok: boolean) {
-    reactionsGetOk = ok
   }
 }

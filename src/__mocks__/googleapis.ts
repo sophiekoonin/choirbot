@@ -29,14 +29,11 @@ export const google = {
         })
       }
     }
-  }))
+  })),
+  setMockBatchGetReturnValue: (value: typeof mockBatchGetReturnValue) => {
+    mockBatchGetReturnValue = value
+  }
 }
 
-const _setMockBatchGetReturnValue = (value: typeof mockBatchGetReturnValue) => {
-  mockBatchGetReturnValue = value
-}
-
-// @ts-expect-error mock type
-google.setMockBatchGetReturnValue = _setMockBatchGetReturnValue
 googleapis.google = google
 export default googleapis
