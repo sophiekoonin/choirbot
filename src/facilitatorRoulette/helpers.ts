@@ -1,8 +1,15 @@
 import { getAttendancePosts } from '../attendance'
 
-export async function pickRandomAttendee(_attendees: string[], teamId: string) {
+export async function pickRandomAttendee(
+  _attendees: string[],
+  teamId: string,
+  musicalWarmUpVolunteer: string | null,
+  physicalWarmUpVolunteer: string | null
+) {
   const previousFacilitators = []
-  let attendees = _attendees
+  let attendees = _attendees.filter(
+    (a) => a !== musicalWarmUpVolunteer && a !== physicalWarmUpVolunteer
+  )
 
   while (attendees.length > 0) {
     const randomAttendee =

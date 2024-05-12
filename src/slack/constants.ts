@@ -66,3 +66,12 @@ export const AttendancePostSections = {
   FACILITATOR: 'facilitator',
   LOCKING_UP: 'locking_up'
 }
+
+export enum Emoji {
+  PhysicalWarmup = 'muscle',
+  GeneralWarmup = 'musical_note',
+  MusicalWarmup = 'musical_note',
+  Facilitator = 'raised_hands',
+  Attending = '+1',
+  NotAttending = '-1'
+}

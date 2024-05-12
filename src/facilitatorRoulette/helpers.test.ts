@@ -37,13 +37,34 @@ describe('facilitator roulette helpers', () => {
     })
     test(`Returns a random-ish user who hasn't faciliated recently`, async () => {
       const testAttendees = [testUserId, testUser2, 'User2', 'User3', 'User4']
-      const result = await pickRandomAttendee(testAttendees, testTeamId)
+      const result = await pickRandomAttendee(
+        testAttendees,
+        testTeamId,
+        null,
+        null
+      )
       expect(result).toEqual('User2')
+    })
+
+    test(`Returns a random-ish user who hasn't volunteered for a warmup`, async () => {
+      const testAttendees = [testUserId, testUser2, 'UserPickMe']
+      const result = await pickRandomAttendee(
+        testAttendees,
+        testTeamId,
+        testUserId,
+        testUser2
+      )
+      expect(result).toEqual('UserPickMe')
     })
 
     test(`Returns null if all attendees have facilitated recently`, async () => {
       const testAttendees = [testUserId, testUser2, testUser3, testUser4]
-      const result = await pickRandomAttendee(testAttendees, testTeamId)
+      const result = await pickRandomAttendee(
+        testAttendees,
+        testTeamId,
+        null,
+        null
+      )
       expect(result).toBe(null)
     })
   })

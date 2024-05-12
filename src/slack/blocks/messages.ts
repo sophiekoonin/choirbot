@@ -1,5 +1,5 @@
 import { SectionBlock, HeaderBlock } from '@slack/types'
-import { AttendancePostSections } from '../constants'
+import { AttendancePostSections, Emoji } from '../constants'
 
 function getSongLink(songName: string, songLink: string): string {
   if (songLink == null || songLink === '') {
@@ -54,7 +54,7 @@ export const musicalWarmupBlock: SectionBlock = {
   block_id: AttendancePostSections.MUSICAL_WARMUP,
   text: {
     type: 'mrkdwn',
-    text: 'If you want to lead musical warmup, respond with :musical_note:.'
+    text: `If you want to lead musical warmup, respond with :${Emoji.MusicalWarmup}:.`
   }
 }
 export const genericWarmupBlock: SectionBlock = {
@@ -62,7 +62,7 @@ export const genericWarmupBlock: SectionBlock = {
   block_id: AttendancePostSections.GENERAL_WARMUP,
   text: {
     type: 'mrkdwn',
-    text: 'If you want to lead warmup, respond with :musical_note:.'
+    text: `If you want to lead warmup, respond with :${Emoji.GeneralWarmup}:.`
   }
 }
 
@@ -142,7 +142,7 @@ export const physicalWarmupBlock: SectionBlock = {
   block_id: AttendancePostSections.PHYSICAL_WARMUP,
   text: {
     type: 'mrkdwn',
-    text: 'To volunteer for physical warmup, respond with :muscle:.'
+    text: `To volunteer for physical warmup, respond with :${Emoji.PhysicalWarmup}:.`
   }
 }
 
@@ -151,7 +151,7 @@ export const facilitatorBlock: SectionBlock = {
   block_id: AttendancePostSections.FACILITATOR,
   text: {
     type: 'mrkdwn',
-    text: 'Facilitator please respond with :raised_hands:!'
+    text: `Facilitator please volunteer with :${Emoji.Facilitator}:!`
   }
 }
 

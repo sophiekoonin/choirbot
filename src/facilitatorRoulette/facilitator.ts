@@ -1,6 +1,7 @@
 import { getMostRecentAttendancePost, getReactionsForPost } from '../attendance'
 import { updateDbValue } from '../db'
 import { SlackClient } from '../slack/client'
+import { Emoji } from '../slack/constants'
 import { getUserReactionsForEmoji } from '../slack/utils'
 import { pickRandomAttendee } from './helpers'
 
@@ -21,23 +22,40 @@ export async function runFacilitatorRoulette(
   // First, has anyone already volunteered?
   const facilitatorReactions = getUserReactionsForEmoji({
     reactions,
-    emoji: 'raised_hands'
+    emoji: Emoji.Facilitator
   })
   if (facilitatorReactions.length > 0) {
     facilitatorUserId = facilitatorReactions[0]
   } else {
     // Otherwise, choose one of the people attending to facilitate
-    // Ensure they haven't facilitated in the last 4 weeks to be a bit fairer
+    // We ensure they haven't facilitated in the last 4 weeks to be a bit fairer
+    // and make sure they didn't volunteer for any other roles.
     // If they have, choose another person
+    const musicalWarmUpVolunteer =
+      getUserReactionsForEmoji({
+        reactions,
+        emoji: Emoji.GeneralWarmup
+      })[0] || null
+    const physicalWarmUpVolunteer =
+      getUserReactionsForEmoji({
+        reactions,
+        emoji: Emoji.PhysicalWarmup
+      })[0] || null
+
     const attendees = getUserReactionsForEmoji({
       reactions,
-      emoji: '+1',
+      emoji: Emoji.Attending,
       botId
     })
     if (attendees.length === 0) {
       return
     }
-    facilitatorUserId = await pickRandomAttendee(attendees, teamId)
+    facilitatorUserId = await pickRandomAttendee(
+      attendees,
+      teamId,
+      musicalWarmUpVolunteer,
+      physicalWarmUpVolunteer
+    )
     shouldPostMessage = true
   }
 
