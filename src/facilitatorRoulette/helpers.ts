@@ -5,7 +5,6 @@ export async function pickRandomAttendee(_attendees: string[], teamId: string) {
   let attendees = _attendees
 
   while (attendees.length > 0) {
-    console.log(attendees)
     const randomAttendee =
       attendees[Math.floor(Math.random() * attendees.length)]
     const hasRecentlyFacilitated = await hasUserFacilitatedInLastFourWeeks(

@@ -1,7 +1,8 @@
 import { getMostRecentAttendancePost, getReactionsForPost } from '../attendance'
 import { updateDbValue } from '../db'
+import { SlackClient } from '../slack/client'
 import { getUserReactionsForEmoji } from '../slack/utils'
-import { getVolunteerFacilitator } from './helpers'
+import { pickRandomAttendee } from './helpers'
 
 export async function runFacilitatorRoulette(
   teamId: string,
@@ -16,7 +17,7 @@ export async function runFacilitatorRoulette(
   }
   const ts = post.get('ts')
   const reactions = await getReactionsForPost(token, channel, ts)
-
+  let shouldPostMessage = false
   // First, has anyone already volunteered?
   const facilitatorReactions = getUserReactionsForEmoji({
     reactions,
@@ -36,11 +37,37 @@ export async function runFacilitatorRoulette(
     if (attendees.length === 0) {
       return
     }
+    facilitatorUserId = await pickRandomAttendee(attendees, teamId)
+    shouldPostMessage = true
+  }
+
+  if (facilitatorUserId == null) {
+    SlackClient.chat.postMessage({
+      token,
+      thread_ts: ts,
+      channel,
+      reply_broadcast: true,
+      text: ":raised_hands::warning: I tried to pick a facilitator for today's rehearsal but I wasn't able to. Please can someone volunteer?"
+    })
+    return
   }
 
   // Persist the user ID of our facilitator so we can track who's facilitated
   await updateDbValue(`attendance-${teamId}`, post.id, {
     roles: { facilitator: facilitatorUserId }
   })
+
+  if (!shouldPostMessage) {
+    return
+  }
+
+  SlackClient.chat.postMessage({
+    token,
+    thread_ts: ts,
+    channel,
+    reply_broadcast: true,
+    text: `:8ball: Today's randomly-chosen faciliator is <@${facilitatorUserId}>!`
+  })
+
   return
 }
