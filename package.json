@@ -4,14 +4,14 @@
   "description": "",
   "main": "app.js",
   "engines": {
-    "node": "18"
+    "node": "20"
   },
   "scripts": {
     "deploy": "gcloud app deploy --quiet app.yaml cron.yaml",
     "gcp-build": "tsc -p .",
     "build:watch": "tsc --watch -p .",
-    "start": "NODE_ENV=prod node --experimental-specifier-resolution=node dist/app.js",
-    "dev": "nodemon --experimental-specifier-resolution=node -r dotenv/config dist/app.js",
+    "start": "NODE_ENV=prod node --import=extensionless/register dist/app.js",
+    "dev": "nodemon --import=extensionless/register -r dotenv/config dist/app.js",
     "test": "jest"
   },
   "type": "module",
@@ -23,6 +23,7 @@
     "date-fns": "2.30.0",
     "dotenv": "16.3.1",
     "express": "4.19.2",
+    "extensionless": "1.9.7",
     "google-auth-library": "9.9.0",
     "googleapis": "129.0.0",
     "tsscmp": "1.0.6",
