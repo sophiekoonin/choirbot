@@ -24,6 +24,9 @@ export const testUser4 = 'U01A1B2C6'
 export const testRehearsalDate = new Date('2024-05-06') // this is a Monday
 export const testRehearsalDateString = '06/05/2024'
 export const testTimestamp = '1654709611.420969'
+export const testTimestamp2 = '13535234.5353567'
+export const testTimestamp3 = '13533443.5353568'
+export const testTimestamp4 = '135333535.5353569'
 
 export const testAttendancePost = {
   id: testRehearsalDateString,
@@ -75,4 +78,30 @@ export function recordWithoutId(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { id, ...rest } = obj
   return rest
+}
+
+export const testAttendancePost2: typeof testAttendancePost = {
+  id: '06/05/2024',
+  attending: [],
+  not_attending: [],
+  created_at: 165470924,
+  rehearsal_date: '06/05/2024',
+  ts: testTimestamp2
+}
+export const testAttendancePost3: typeof testAttendancePost = {
+  id: '19/05/2024',
+  attending: [],
+  not_attending: [],
+  created_at: 165470924,
+  rehearsal_date: '19/05/2024',
+  ts: testTimestamp3
+}
+
+export const testAttendancePost4: typeof testAttendancePost = {
+  id: '26/05/2024',
+  attending: [],
+  not_attending: [],
+  created_at: 165470924,
+  rehearsal_date: '26/05/2024',
+  ts: testTimestamp4
 }

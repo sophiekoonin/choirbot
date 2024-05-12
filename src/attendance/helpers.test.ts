@@ -1,5 +1,7 @@
 import {
   testAttendancePost,
+  testAttendancePost2,
+  testAttendancePost3,
   testTeamId,
   testTimestamp,
   testUser3,
@@ -17,25 +19,7 @@ import { SlackClient } from '../slack/client'
 jest.mock('../db/db')
 jest.mock('../slack/client')
 
-const testTimestamp2 = '13535234.5353567'
-const testTimestamp3 = '13533443.5353568'
 const testAttendancePost1 = testAttendancePost
-const testAttendancePost2: typeof testAttendancePost = {
-  id: testTimestamp2,
-  attending: [],
-  not_attending: [],
-  created_at: 165470924,
-  rehearsal_date: '06/05/2024',
-  ts: testTimestamp2
-}
-const testAttendancePost3: typeof testAttendancePost = {
-  id: testTimestamp3,
-  attending: [],
-  not_attending: [],
-  created_at: 165470924,
-  rehearsal_date: '19/05/2024',
-  ts: testTimestamp3
-}
 
 describe('attendance helpers', () => {
   describe('getAttendancePosts', () => {
