@@ -7,7 +7,6 @@ import { SlackClient } from '../slack/client'
 import { getQueryResults } from '../db/helpers'
 import { db } from '../db/db'
 import { getActiveTeamsWithRehearsalOnDate } from './helpers'
-import { runFacilitatorRoulette } from '../facilitatorRoulette'
 
 export const checkForJobsToday = async (req: Request, res: Response) => {
   // Prevent illegitimate cron requests
@@ -25,29 +24,6 @@ export const checkForJobsToday = async (req: Request, res: Response) => {
   await checkForRehearsalReminderJobs(date)
 
   return res.sendStatus(200)
-}
-
-export async function checkFacilitatorRoulette(date: Date) {
-  const dateISO = format(date, 'yyyy-MM-dd')
-  const isBankHol = await utils.isBankHoliday(dateISO)
-  if (isBankHol) return
-
-  const teams = await getActiveTeamsWithRehearsalOnDate(
-    date,
-    'facilitator_roulette'
-  )
-  console.log(teams)
-  teams.forEach(async (team) => {
-    const { id, access_token: token, channel_id: channel, bot_user_id } = team
-    if (channel === '' || channel == null) return
-
-    return await runFacilitatorRoulette(
-      id,
-      token as string,
-      channel as string,
-      bot_user_id as string
-    )
-  })
 }
 
 async function checkForAttendancePostJobs(date: Date) {
