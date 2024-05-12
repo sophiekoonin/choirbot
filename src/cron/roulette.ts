@@ -21,7 +21,6 @@ export async function runFacilitatorRouletteCronJob(
     date,
     'facilitator_roulette'
   )
-  console.log(teams)
   teams.forEach(async (team) => {
     const { id, access_token: token, channel_id: channel, bot_user_id } = team
     if (channel === '' || channel == null) return
