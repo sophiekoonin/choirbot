@@ -1,27 +1,26 @@
-import {
-  getAttendancePosts,
-  getMostRecentAttendancePost,
-  getReactionsForPost
-} from '../attendance'
-import { getUserReactionsForEmoji } from '../slack/utils'
+import { getAttendancePosts } from '../attendance'
 
-export async function getVolunteerFacilitator(
-  teamId: string,
-  token: string,
-  channel: string
-) {
-  const post = await getMostRecentAttendancePost(teamId)
-  if (!post) {
-    return
+export async function pickRandomAttendee(_attendees: string[], teamId: string) {
+  const previousFacilitators = []
+  let attendees = _attendees
+
+  while (attendees.length > 0) {
+    console.log(attendees)
+    const randomAttendee =
+      attendees[Math.floor(Math.random() * attendees.length)]
+    const hasRecentlyFacilitated = await hasUserFacilitatedInLastFourWeeks(
+      teamId,
+      randomAttendee
+    )
+    if (hasRecentlyFacilitated) {
+      previousFacilitators.push(randomAttendee)
+      attendees = attendees.filter((attendee) => attendee !== randomAttendee)
+    } else {
+      return randomAttendee
+    }
   }
-  const ts = post.get('ts')
-  const reactions = await getReactionsForPost(token, channel, ts)
-  const facilitator = getUserReactionsForEmoji({
-    reactions,
-    emoji: 'raised_hands'
-  })
-  if (facilitator.length === 0) return null
-  return facilitator[0]
+
+  return null
 }
 
 export async function hasUserFacilitatedInLastFourWeeks(
