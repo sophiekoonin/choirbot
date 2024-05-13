@@ -15,13 +15,17 @@ export const checkForJobsToday = async (req: Request, res: Response) => {
   }
   const date = new Date()
 
-  // Process attendance on Sundays
-  if (date.getDay() === 0) {
-    await processAttendance()
+  try {
+    // Process attendance on Sundays
+    if (date.getDay() === 0) {
+      await processAttendance()
+    }
+    await checkForRehearsalReminderJobs(date)
+    await checkForAttendancePostJobs(date)
+  } catch (err) {
+    console.error(err)
+    return res.sendStatus(500)
   }
-
-  await checkForAttendancePostJobs(date)
-  await checkForRehearsalReminderJobs(date)
 
   return res.sendStatus(200)
 }
