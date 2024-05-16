@@ -10,7 +10,7 @@ import {
   handleEvents
 } from './slack'
 
-import { checkForJobsToday } from './cron/cron'
+import { checkForJobsToday, testCronHandler } from './cron/cron'
 import { Request } from './types'
 import { runFacilitatorRouletteCronJob } from './cron/roulette'
 
@@ -26,10 +26,10 @@ app.use(
   })
 )
 
-app.get('/', (req: express.Request, res: express.Response) => {
+app.get('/', (_: express.Request, res: express.Response) => {
   res.send('Hello world! SHEbot v2.1')
 })
-
+app.get('/cron-test', testCronHandler)
 app.post('/interactions', verifyRequestSignature, handleInteractions)
 app.get('/oauth_redirect', oauth_redirect)
 app.post('/events', handleEvents)

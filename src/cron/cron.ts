@@ -8,7 +8,7 @@ import { getQueryResults } from '../db/helpers'
 import { db } from '../db/db'
 import { getActiveTeamsWithRehearsalOnDate } from './helpers'
 
-export const checkForJobsToday = async (req: Request, res: Response) => {
+export const checkForJobsToday = async (_: Request, res: Response) => {
   // // Prevent illegitimate cron requests
   // if (!req.headers['x-appengine-cron']) {
   //   return res.sendStatus(400)
@@ -29,7 +29,7 @@ export const checkForJobsToday = async (req: Request, res: Response) => {
   return res.sendStatus(200)
 }
 
-async function testCronHandler(req: Request, res: Response) {
+export async function testCronHandler(_: Request, res: Response) {
   const date = new Date()
   try {
     await checkForRehearsalReminderJobs(date, true)
