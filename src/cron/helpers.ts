@@ -16,9 +16,10 @@ export async function getActiveTeamsWithRehearsalOnDate(
 
   try {
     const teams = await getQueryResults(query)
+    if (teams.length === 0) return []
+    return teams
   } catch (error) {
     console.error(error)
   }
-  if (teams.length === 0) return []
-  return teams
+  return []
 }
