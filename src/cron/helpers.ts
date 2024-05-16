@@ -16,10 +16,13 @@ export async function getActiveTeamsWithRehearsalOnDate(
 
   try {
     const teams = await getQueryResults(query)
-    console.log('Found no teams with rehearsal on this day.')
-    if (teams.length === 0) return []
+    if (teams.length === 0) {
+      console.log('Found no teams with rehearsal on day', day)
+      return []
+    }
     console.log(
-      'Found teams with rehearsal on this day:',
+      'Found teams with rehearsal on day:',
+      day,
       teams.map((t) => t.id)
     )
     return teams
