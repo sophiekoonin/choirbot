@@ -9,12 +9,11 @@ import { db } from '../db/db'
 import { getActiveTeamsWithRehearsalOnDate } from './helpers'
 
 export const checkForJobsToday = async (req: Request, res: Response) => {
-  // Prevent illegitimate cron requests
-  if (!req.headers['x-appengine-cron']) {
-    return res.sendStatus(400)
-  }
+  // // Prevent illegitimate cron requests
+  // if (!req.headers['x-appengine-cron']) {
+  //   return res.sendStatus(400)
+  // }
   const date = new Date()
-
   try {
     // Process attendance on Sundays
     if (date.getDay() === 0) {
@@ -30,7 +29,19 @@ export const checkForJobsToday = async (req: Request, res: Response) => {
   return res.sendStatus(200)
 }
 
-async function checkForAttendancePostJobs(date: Date) {
+async function testCronHandler(req: Request, res: Response) {
+  const date = new Date()
+  try {
+    await checkForRehearsalReminderJobs(date, true)
+    await checkForAttendancePostJobs(date, true)
+  } catch (err) {
+    console.error(err)
+    return res.sendStatus(500)
+  }
+
+  return res.sendStatus(200)
+}
+async function checkForAttendancePostJobs(date: Date, dryRun?: boolean) {
   const dateISO = format(date, 'yyyy-MM-dd')
   const isBankHol = await utils.isBankHoliday(dateISO)
   if (isBankHol) return
@@ -46,6 +57,11 @@ async function checkForAttendancePostJobs(date: Date) {
       attendance_blocks: blocks,
       intro_text: introText
     } = team
+
+    if (dryRun) {
+      console.log('Attendance process team id', id)
+      return
+    }
     if (channel === '' || channel == null) {
       SlackClient.chat.postMessage({
         token: token as string,
@@ -66,7 +82,7 @@ async function checkForAttendancePostJobs(date: Date) {
   })
 }
 
-async function checkForRehearsalReminderJobs(date: Date) {
+async function checkForRehearsalReminderJobs(date: Date, dryRun?: boolean) {
   const rehearsalDay = addDays(date, 4)
   const dateString = format(rehearsalDay, 'dd/MM/yyyy')
   const isBankHoliday = await utils.isBankHoliday(
@@ -81,7 +97,8 @@ async function checkForRehearsalReminderJobs(date: Date) {
 
   teams.forEach(async (team) => {
     const { id, access_token: token, channel_id: channel } = team
-    if (channel === '' || channel == null) return
+    console.log('Team', id)
+    if (channel === '' || channel == null || dryRun) return
     return await postRehearsalReminder({
       token: token as string,
       teamId: id,
