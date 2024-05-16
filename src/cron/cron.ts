@@ -59,9 +59,9 @@ async function checkForAttendancePostJobs(date: Date, dryRun?: boolean) {
     } = team
 
     if (dryRun) {
-      console.log('Attendance process team id', id)
       return
     }
+
     if (channel === '' || channel == null) {
       SlackClient.chat.postMessage({
         token: token as string,
@@ -88,7 +88,7 @@ async function checkForRehearsalReminderJobs(date: Date, dryRun?: boolean) {
   const isBankHoliday = await utils.isBankHoliday(
     format(rehearsalDay, 'yyyy-MM-dd')
   )
-  console.log('Is bank holiday?', isBankHoliday)
+
   const dayOfWeek = format(rehearsalDay, 'eeee')
 
   const teams = await getActiveTeamsWithRehearsalOnDate(
@@ -98,7 +98,6 @@ async function checkForRehearsalReminderJobs(date: Date, dryRun?: boolean) {
 
   teams.forEach(async (team) => {
     const { id, access_token: token, channel_id: channel } = team
-    console.log('Team', id)
     if (channel === '' || channel == null || dryRun) return
     return await postRehearsalReminder({
       token: token as string,
