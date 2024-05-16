@@ -88,6 +88,7 @@ async function checkForRehearsalReminderJobs(date: Date, dryRun?: boolean) {
   const isBankHoliday = await utils.isBankHoliday(
     format(rehearsalDay, 'yyyy-MM-dd')
   )
+  console.log('Is bank holiday?', isBankHoliday)
   const dayOfWeek = format(rehearsalDay, 'eeee')
 
   const teams = await getActiveTeamsWithRehearsalOnDate(
