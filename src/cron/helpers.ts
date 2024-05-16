@@ -14,7 +14,11 @@ export async function getActiveTeamsWithRehearsalOnDate(
     query = query.where(extraWhereBool, '==', true)
   }
 
-  const teams = await getQueryResults(query)
+  try {
+    const teams = await getQueryResults(query)
+  } catch (error) {
+    console.error(error)
+  }
   if (teams.length === 0) return []
   return teams
 }
