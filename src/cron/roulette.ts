@@ -8,7 +8,7 @@ export async function runFacilitatorRouletteCronJob(
   req: Request,
   res: Response
 ) {
-  Prevent illegitimate cron requests
+  // Prevent illegitimate cron requests
   if (!req.headers['X-Appengine-Cron']) {
     console.error('No header found, blocking request')
     return res.sendStatus(400)
