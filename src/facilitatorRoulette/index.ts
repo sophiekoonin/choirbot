@@ -1,1 +1,1 @@
-export { runFacilitatorRoulette } from './facilitator'
+export { runFacilitatorRoulette, rerollFacilitator } from './facilitator'

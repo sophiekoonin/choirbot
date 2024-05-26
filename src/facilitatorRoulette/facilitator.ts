@@ -1,7 +1,8 @@
+import { format } from 'date-fns'
 import { getMostRecentAttendancePost, getReactionsForPost } from '../attendance'
 import { updateDbValue } from '../db'
 import { SlackClient } from '../slack/client'
-import { Emoji } from '../slack/constants'
+import { Actions, Emoji } from '../slack/constants'
 import { getUserReactionsForEmoji } from '../slack/utils'
 import { pickRandomAttendee } from './helpers'
 
@@ -9,11 +10,13 @@ export async function runFacilitatorRoulette(
   teamId: string,
   token: string,
   channel: string,
-  botId: string
+  botId: string,
+  rehearsalTimingsLink: string
 ): Promise<void> {
   let facilitatorUserId: string | null = null
   const post = await getMostRecentAttendancePost(teamId)
   if (!post) {
+    console.log('No post found, exiting')
     return
   }
   const ts = post.get('ts')
@@ -48,6 +51,7 @@ export async function runFacilitatorRoulette(
       botId
     })
     if (attendees.length === 0) {
+      console.log('no attendees')
       return
     }
     facilitatorUserId = await pickRandomAttendee(
@@ -76,16 +80,69 @@ export async function runFacilitatorRoulette(
   })
 
   if (!shouldPostMessage) {
+    console.log('nothing to do')
     return
   }
 
-  SlackClient.chat.postMessage({
+  const blocks = [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `:8ball: Nobody volunteered to facilitate today, so we're shaking the magic 8 ball. Today's randomly-chosen facilitator is <@${facilitatorUserId}>!\n\n:clock: <${rehearsalTimingsLink}|Rehearsal timings>`
+      }
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `If you can't facilitate today, please tap "Decline".`
+      },
+      accessory: {
+        type: 'button',
+        text: {
+          type: 'plain_text',
+          text: 'Decline',
+          emoji: true
+        },
+        value: 'decline_facilitator',
+        action_id: Actions.DECLINE_FACILITATOR
+      }
+    }
+  ]
+
+  await SlackClient.chat.postMessage({
     token,
     thread_ts: ts,
     channel,
     reply_broadcast: true,
-    text: `:8ball: Nobody volunteered to facilitate today, so I'm shaking the magic 8 ball. Today's randomly-chosen facilitator is <@${facilitatorUserId}>!`
+    blocks,
+    unfurl_links: false,
+    unfurl_media: false,
+    text: `:8ball: <@${facilitatorUserId}> is facilitating today's rehearsal! :8ball:`
   })
 
   return
+}
+
+export async function rerollFacilitator(
+  teamId: string,
+  token: string,
+  channel: string,
+  botId: string,
+  rehearsalTimingsLink: string
+): Promise<void> {
+  const date = format(new Date(), 'yyyy-MM-dd')
+  // Persist the user ID of our facilitator so we can track who's facilitated
+  await updateDbValue(`attendance-${teamId}`, date, {
+    roles: { facilitator: null }
+  })
+
+  return runFacilitatorRoulette(
+    teamId,
+    token,
+    channel,
+    botId,
+    rehearsalTimingsLink
+  )
 }

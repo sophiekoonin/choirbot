@@ -15,7 +15,8 @@ export const Actions = {
   SET_IGNORED_USERS: 'ignored_users',
   SET_CHANNEL: 'set_channel',
   DISABLE_CHOIRBOT: 'disable_choirbot',
-  ENABLE_CHOIRBOT: 'enable_choirbot'
+  ENABLE_CHOIRBOT: 'enable_choirbot',
+  DECLINE_FACILITATOR: 'decline_facilitator'
 }
 
 export const Interactions = {
@@ -24,23 +25,6 @@ export const Interactions = {
 export const ActionTypes = {
   STATIC_SELECT: 'static_select',
   BUTTON: 'button'
-}
-
-export const Blocks = {
-  INTRO_TEXT: 'intro_text',
-  ATTENDANCE_BLOCKS: 'attendance_blocks'
-}
-
-export const EventTypes = {
-  APP_HOME_OPENED: 'app_home_opened',
-  URL_VERIFICATION: 'url_verification',
-  APP_UNINSTALLED: 'app_uninstalled'
-}
-
-export const BlockTypes = {
-  PLAIN_TEXT_INPUT: 'plain_text_input',
-  MULTI_STATIC_SELECT: 'multi_static_select',
-  MULTI_USERS_SELECT: 'multi_users_select'
 }
 
 export const DaysOfWeek: { [key: string]: string } = {

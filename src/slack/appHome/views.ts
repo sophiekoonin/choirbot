@@ -1,10 +1,11 @@
-import { Actions, Blocks } from '../constants'
+import { Actions } from '../constants'
 import { getValues, getDbDoc } from '../../db/helpers'
 import { TeamId, UserId } from '../types'
 import { AttendanceBlockSelectors } from '../blocks/config'
 import { Option, ModalView } from '@slack/web-api'
 import { getReportBlocks } from '../reports/reports'
 import { getAttendancePostBlocks } from '../../attendance/helpers'
+import { Blocks } from '../blocks/constants'
 
 const exampleSongData = {
   mainSong: 'Example Song',

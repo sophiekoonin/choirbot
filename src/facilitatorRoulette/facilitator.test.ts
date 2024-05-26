@@ -48,7 +48,8 @@ describe('facilitator roulette', () => {
       testTeamId,
       'test-token',
       'test-channel',
-      'test-bot-id'
+      'test-bot-id',
+      'https://rehearsal-timings-link'
     )
     expect(mockUpdate).toHaveBeenCalledWith({
       roles: { facilitator: testUserId }
@@ -79,7 +80,8 @@ describe('facilitator roulette', () => {
       testTeamId,
       'test-token',
       'test-channel',
-      testBotId
+      testBotId,
+      'https://rehearsal-timings-link'
     )
     expect(mockUpdate).toHaveBeenCalledWith({
       roles: { facilitator: testUser2 }
@@ -87,7 +89,7 @@ describe('facilitator roulette', () => {
     expect(SlackClient.chat.postMessage).toHaveBeenCalledWith({
       channel: 'test-channel',
       reply_broadcast: true,
-      text: `:8ball: Nobody volunteered to facilitate today, so I'm shaking the magic 8 ball. Today's randomly-chosen facilitator is <@${testUser2}>!`,
+      text: `:8ball: Nobody volunteered to facilitate today, so I'm shaking the magic 8 ball. Today's randomly-chosen facilitator is <@${testUser2}>!\n<https://rehearsal-timings-link|Rehearsal timings>\nIf you can't facilitate today, please react to this message with :-1:.`,
       thread_ts: '1654709611.420969',
       token: 'test-token'
     })
@@ -121,7 +123,8 @@ describe('facilitator roulette', () => {
       testTeamId,
       'test-token',
       'test-channel',
-      testBotId
+      testBotId,
+      'https://rehearsal-timings-link'
     )
     expect(mockUpdate).not.toHaveBeenCalled()
     expect(SlackClient.chat.postMessage).toHaveBeenCalledWith({
@@ -170,7 +173,8 @@ describe('facilitator roulette', () => {
       testTeamId,
       'test-token',
       'test-channel',
-      testBotId
+      testBotId,
+      'https://rehearsal-timings-link'
     )
     expect(mockUpdate).toHaveBeenCalledWith({
       roles: { facilitator: testUser4 }

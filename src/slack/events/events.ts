@@ -1,8 +1,8 @@
 import { Response } from 'express'
-import { Request } from '../types'
+import { Request } from '../../types'
+import { showAppHome } from '../appHome'
+import { onUninstall } from '../installation/uninstall'
 import { EventTypes } from './constants'
-import { showAppHome } from './appHome'
-import { onUninstall } from './installation/uninstall'
 
 export async function handleEvents(req: Request, res: Response) {
   const { team_id: team, api_app_id, event } = req.body

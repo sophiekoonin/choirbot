@@ -5,6 +5,7 @@ import { getConfigSubmissionValues } from './helpers'
 import { Actions, Interactions } from '../constants'
 import { getValue, updateDbValue } from '../../db'
 import {
+  handleFacilitatorDeclined,
   postManually,
   setChannel,
   showGoogleSheetModal,
@@ -21,7 +22,12 @@ export async function handleInteractions(
   res: Response
 ): Promise<void> {
   const payload: InboundInteraction = JSON.parse(req.body.payload)
-  const { actions, team, trigger_id, view, type, user } = payload
+  if (process.env.DEBUG) {
+    console.log('Received interaction', JSON.stringify(payload, null, 3))
+  }
+  const { actions, team, trigger_id, view, type, user, message, channel } =
+    payload
+  const { root } = message || {}
   const token = await getValue('teams', team.id, 'access_token')
   res.send()
   if (view != null && type === Interactions.VIEW_SUBMISSION) {
@@ -89,6 +95,14 @@ export async function handleInteractions(
         case Actions.SHOW_IGNORE_MODAL:
           await showIgnoredUsersDialog(token, team.id, trigger_id)
           break
+        case Actions.DECLINE_FACILITATOR:
+          await handleFacilitatorDeclined(
+            team.id,
+            token,
+            channel.id,
+            root?.user,
+            root?.ts
+          )
         default:
           break
       }

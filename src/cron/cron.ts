@@ -8,11 +8,12 @@ import { getQueryResults } from '../db/helpers'
 import { db } from '../db/db'
 import { getActiveTeamsWithRehearsalOnDate } from './helpers'
 
-export const checkForJobsToday = async (_: Request, res: Response) => {
-  // // Prevent illegitimate cron requests
-  // if (!req.headers['x-appengine-cron']) {
-  //   return res.sendStatus(400)
-  // }
+export const checkForJobsToday = async (req: Request, res: Response) => {
+  // Prevent illegitimate cron requests
+  if (!req.headers['X-Appengine-Cron']) {
+    console.error('No header found, blocking request')
+    return res.sendStatus(400)
+  }
   const date = new Date()
   try {
     // Process attendance on Sundays

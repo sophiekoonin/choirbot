@@ -193,9 +193,20 @@ export interface InboundInteraction {
     type: string
     view_id: string
   }
+  channel: {
+    id: string
+    name: string
+  }
   trigger_id: string
   view: ViewSubmissionDetails | null
   actions?: [ActionSubmission]
+  message?: {
+    thread_ts: string
+    root: {
+      ts: string
+      user: string
+    }
+  }
 }
 
 export interface ReportArgs {

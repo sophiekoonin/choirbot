@@ -1,4 +1,4 @@
-import { BlockTypes } from '../constants'
+import { BlockTypes } from '../blocks/constants'
 import { SubmissionValues } from '../types'
 
 export function getConfigSubmissionValues(values: SubmissionValues) {

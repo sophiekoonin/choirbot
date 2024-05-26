@@ -15,7 +15,8 @@ export const testTeamData = {
   intro_text: 'Hello world',
   team_name: 'test',
   rehearsal_reminders: true,
-  active: true
+  active: true,
+  rehearsal_timings_link: 'https://example.com'
 }
 
 export const testUser2 = 'U01A1B2C4'

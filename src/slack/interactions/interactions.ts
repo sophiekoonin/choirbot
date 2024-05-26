@@ -17,6 +17,7 @@ import {
   setIgnoredUsersView,
   setSheetIdView
 } from '../appHome/views'
+import { rerollFacilitator } from '../../facilitatorRoulette'
 
 export async function postToResponseUrl(
   responseUrl: string,
@@ -137,4 +138,27 @@ export async function showGoogleSheetModal(
   trigger_id: string
 ) {
   openModalView(setSheetIdView, token, teamId, trigger_id)
+}
+
+export async function handleFacilitatorDeclined(
+  teamId: string,
+  token: string,
+  channel: string,
+  botId: string,
+  timestamp: string
+) {
+  if (botId == null || timestamp == null) {
+    return
+  }
+  const { rehearsal_timings_link } = await db.getValues('teams', teamId, [
+    'rehearsal_timings_link'
+  ])
+  await rerollFacilitator(
+    teamId,
+    token,
+    channel,
+    botId,
+    rehearsal_timings_link as string,
+    timestamp
+  )
 }
