@@ -5,6 +5,7 @@ import { SlackClient } from '../slack/client'
 import { Actions, Emoji } from '../slack/constants'
 import { getUserReactionsForEmoji } from '../slack/utils'
 import { pickRandomAttendee } from './helpers'
+import { SectionBlock } from '@slack/web-api'
 
 export async function runFacilitatorRoulette(
   teamId: string,
@@ -84,12 +85,12 @@ export async function runFacilitatorRoulette(
     return
   }
 
-  const blocks = [
+  const blocks: SectionBlock[] = [
     {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `:8ball: Nobody volunteered to facilitate today, so we're shaking the magic 8 ball. Today's randomly-chosen facilitator is <@${facilitatorUserId}>!\n\n:clock: <${rehearsalTimingsLink}|Rehearsal timings>`
+        text: `:8ball: Nobody volunteered to facilitate today, so we're shaking the magic 8 ball. Today's randomly-chosen facilitator is <@${facilitatorUserId}>!\n\n⌚️ <${rehearsalTimingsLink}|Rehearsal timings>`
       }
     },
     {
