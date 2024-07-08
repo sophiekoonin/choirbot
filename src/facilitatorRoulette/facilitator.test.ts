@@ -89,9 +89,38 @@ describe('facilitator roulette', () => {
     expect(SlackClient.chat.postMessage).toHaveBeenCalledWith({
       channel: 'test-channel',
       reply_broadcast: true,
-      text: `:8ball: Nobody volunteered to facilitate today, so I'm shaking the magic 8 ball. Today's randomly-chosen facilitator is <@${testUser2}>!\n<https://rehearsal-timings-link|Rehearsal timings>\nIf you can't facilitate today, please react to this message with :-1:.`,
+      // text: `:8ball: Nobody volunteered to facilitate today, so I'm shaking the magic 8 ball. Today's randomly-chosen facilitator is <@${testUser2}>!\n<https://rehearsal-timings-link|Rehearsal timings>\nIf you can't facilitate today, please react to this message with :-1:.`,
+      blocks: [
+        {
+          text: {
+            text: `:8ball: Nobody volunteered to facilitate today, so we're shaking the magic 8 ball. Today's randomly-chosen facilitator is <@U01A1B2C4>!\n\n⌚️ <https://rehearsal-timings-link|Rehearsal timings>`,
+            type: 'mrkdwn'
+          },
+          type: 'section'
+        },
+        {
+          accessory: {
+            action_id: 'decline_facilitator',
+            text: {
+              emoji: true,
+              text: 'Decline',
+              type: 'plain_text'
+            },
+            type: 'button',
+            value: 'decline_facilitator'
+          },
+          text: {
+            text: 'If you can\'t facilitate today, please tap "Decline".',
+            type: 'mrkdwn'
+          },
+          type: 'section'
+        }
+      ],
+      text: ":8ball: <@U01A1B2C4> is facilitating today's rehearsal! :8ball:",
       thread_ts: '1654709611.420969',
-      token: 'test-token'
+      token: 'test-token',
+      unfurl_links: false,
+      unfurl_media: false
     })
   })
   test(`Doesn't choose the same person to facilitate within a 4 week period`, async () => {
