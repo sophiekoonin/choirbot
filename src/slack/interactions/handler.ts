@@ -3,7 +3,7 @@ import { Request, Response } from 'express'
 import { InboundInteraction } from '../types'
 import { getConfigSubmissionValues } from './helpers'
 import { Actions, Interactions } from '../constants'
-import { getValue, updateDbValue } from '../../db'
+import { getValue, getValues, updateDbValue } from '../../db'
 import {
   handleFacilitatorDeclined,
   postManually,
@@ -27,14 +27,22 @@ export async function handleInteractions(
   }
   const { actions, team, trigger_id, view, type, user, message, channel } =
     payload
+  let channelId = channel?.id
   const { root } = message || {}
-  const token = await getValue('teams', team.id, 'access_token')
+  const { access_token, channel_id } = await getValues('teams', team.id, [
+    'access_token',
+    'channel_id'
+  ])
   res.send()
   if (view != null && type === Interactions.VIEW_SUBMISSION) {
     const valuesToUpdate = getConfigSubmissionValues(view.state.values)
     await updateDbValue('teams', team.id, valuesToUpdate)
   }
 
+  const token = access_token as string
+  if (channel == null) {
+    channelId = channel_id as string
+  }
   if (actions != null) {
     const action = actions[0]
     const { action_id } = action
@@ -100,7 +108,7 @@ export async function handleInteractions(
           await handleFacilitatorDeclined(
             team.id,
             token,
-            channel.id,
+            channelId,
             root?.user,
             root?.ts
           )
