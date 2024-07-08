@@ -411,42 +411,42 @@ async function updateView(team: TeamId): Promise<View> {
         }
       }
     },
-    facilitatorRouletteEnabled
-      ? {
-          type: 'section',
-          text: {
-            type: 'mrkdwn',
-            text: '*Shake facilitator magic 8 ball*'
-          },
-          accessory: {
-            type: 'button',
-            action_id: Actions.RUN_FACILITATOR_ROULETTE,
-            text: {
-              type: 'plain_text',
-              text: 'Shake',
-              emoji: true
-            },
-            confirm: {
-              title: {
-                type: 'plain_text',
-                text: 'Randomly select a facilitator'
-              },
-              text: {
-                type: 'plain_text',
-                text: 'Are you sure you want to randomly select a facilitator and tag them?'
-              },
-              confirm: {
-                type: 'plain_text',
-                text: 'Shake the 8 ball'
-              },
-              deny: {
-                type: 'plain_text',
-                text: 'Cancel'
-              }
-            }
-          }
-        }
-      : null,
+    // facilitatorRouletteEnabled
+    //   ? {
+    //       type: 'section',
+    //       text: {
+    //         type: 'mrkdwn',
+    //         text: '*Shake facilitator magic 8 ball*'
+    //       },
+    //       accessory: {
+    //         type: 'button',
+    //         action_id: Actions.RUN_FACILITATOR_ROULETTE,
+    //         text: {
+    //           type: 'plain_text',
+    //           text: 'Shake',
+    //           emoji: true
+    //         },
+    //         confirm: {
+    //           title: {
+    //             type: 'plain_text',
+    //             text: 'Randomly select a facilitator'
+    //           },
+    //           text: {
+    //             type: 'plain_text',
+    //             text: 'Are you sure you want to randomly select a facilitator and tag them?'
+    //           },
+    //           confirm: {
+    //             type: 'plain_text',
+    //             text: 'Shake the 8 ball'
+    //           },
+    //           deny: {
+    //             type: 'plain_text',
+    //             text: 'Cancel'
+    //           }
+    //         }
+    //       }
+    //     }
+    //   : null,
     {
       type: 'divider'
     },
