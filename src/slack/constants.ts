@@ -16,8 +16,7 @@ export const Actions = {
   SET_CHANNEL: 'set_channel',
   DISABLE_CHOIRBOT: 'disable_choirbot',
   ENABLE_CHOIRBOT: 'enable_choirbot',
-  DECLINE_FACILITATOR: 'decline_facilitator',
-  RUN_FACILITATOR_ROULETTE: 'run_facilitator_roulette'
+  DECLINE_FACILITATOR: 'decline_facilitator'
 }
 
 export const Interactions = {

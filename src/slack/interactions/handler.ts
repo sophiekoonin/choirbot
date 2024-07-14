@@ -104,7 +104,6 @@ export async function handleInteractions(
           await showIgnoredUsersDialog(token, team.id, trigger_id)
           break
         case Actions.DECLINE_FACILITATOR:
-        case Actions.RUN_FACILITATOR_ROULETTE:
           await handleFacilitatorDeclined(
             team.id,
             token,
