@@ -11,7 +11,9 @@ import { getActiveTeamsWithRehearsalOnDate } from './helpers'
 export const checkForJobsToday = async (req: Request, res: Response) => {
   // Prevent illegitimate cron requests
   if (!req.headers['X-Appengine-Cron']) {
-    console.error('No header found, blocking request')
+    console.error('No header found, blocking request', {
+      headers: Object.keys(req.headers)
+    })
     return res.sendStatus(400)
   }
   const date = new Date()
