@@ -22,7 +22,7 @@
     "@slack/web-api": "6.12.0",
     "date-fns": "2.30.0",
     "dotenv": "16.3.1",
-    "express": "4.19.2",
+    "express": "4.21.2",
     "extensionless": "1.9.7",
     "google-auth-library": "9.9.0",
     "googleapis": "129.0.0",
