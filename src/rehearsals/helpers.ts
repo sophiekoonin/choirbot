@@ -7,6 +7,7 @@ import {
 import { SongData } from '../google/types'
 import { format, nextDay, Day } from 'date-fns'
 import { isBankHoliday } from '../utils'
+import { getRowNumberForDate } from '../google/google'
 
 export function getRehearsalMusicBlocks(
   { mainSong, mainSongLink, runThrough, runThroughLink, notes }: SongData,

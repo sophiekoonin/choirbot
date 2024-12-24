@@ -145,7 +145,8 @@ export async function handleFacilitatorDeclined(
   token: string,
   channel: string,
   botId: string,
-  timestamp: string
+  timestamp: string,
+  userId: string
 ) {
   if (botId == null || timestamp == null) {
     return
@@ -158,6 +159,7 @@ export async function handleFacilitatorDeclined(
     token,
     channel,
     botId,
-    rehearsal_timings_link as string
+    rehearsal_timings_link as string,
+    userId
   )
 }

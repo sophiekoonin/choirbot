@@ -17,11 +17,13 @@ import { runFacilitatorRoulette } from './facilitator'
 import { db } from '../db/db'
 import { Emoji } from '../slack/constants'
 jest.mock('../slack/client')
+jest.mock('googleapis')
 jest.mock('../db/db')
 
 describe('facilitator roulette', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    jest.useFakeTimers().setSystemTime(new Date('2024-05-06')) // Monday
   })
   mockRandomForEach([0.1, 0.2, 0.3, 0.6])
 
@@ -163,6 +165,20 @@ describe('facilitator roulette', () => {
       thread_ts: '1654709611.420969',
       token: 'test-token'
     })
+  })
+
+  test(`Doesn't post if there isn't a rehearsal today`, async () => {
+    jest.useFakeTimers().setSystemTime(new Date('2024-01-01'))
+
+    await runFacilitatorRoulette(
+      testTeamId,
+      'test-token',
+      'test-channel',
+      testBotId,
+      'https://rehearsal-timings-link'
+    )
+    expect(mockUpdate).not.toHaveBeenCalled()
+    expect(SlackClient.chat.postMessage).not.toHaveBeenCalled()
   })
 
   test(`Doesn't choose a warmup volunteer`, async () => {

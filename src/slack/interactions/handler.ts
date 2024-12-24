@@ -109,7 +109,8 @@ export async function handleInteractions(
             token,
             channelId,
             root?.user,
-            root?.ts
+            root?.ts,
+            user.id
           )
         default:
           break

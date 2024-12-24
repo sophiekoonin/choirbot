@@ -4,6 +4,7 @@ import { Request, Response } from 'express'
 import * as dbHelpers from '../db/helpers'
 import { SongData, GoogleAuth } from './types'
 import { TeamId } from '../slack/types'
+import { format } from 'date-fns'
 
 const sheets: sheets_v4.Sheets = google.sheets('v4')
 
@@ -120,4 +121,19 @@ export async function testGoogleIntegration(req: Request, res: Response) {
     console.error(err)
     res.status(500).send(err)
   }
+}
+
+export async function isThereARehearsalToday(teamId: string) {
+  const today = new Date()
+  const auth = await google.auth.getClient({
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS
+  })
+  const row = await getRowNumberForDate(
+    auth,
+    teamId,
+    format(today, 'dd/MM/yyyy')
+  )
+  if (row < 0) return false
+  return true
 }

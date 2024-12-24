@@ -6,23 +6,32 @@ import { Actions, Emoji } from '../slack/constants'
 import { getUserReactionsForEmoji } from '../slack/utils'
 import { pickRandomAttendee } from './helpers'
 import { SectionBlock } from '@slack/web-api'
+import { isThereARehearsalToday } from '../google/google'
 
 export async function runFacilitatorRoulette(
   teamId: string,
   token: string,
   channel: string,
   botId: string,
-  rehearsalTimingsLink: string
+  rehearsalTimingsLink: string,
+  prevFacilitator?: string
 ): Promise<void> {
   let facilitatorUserId: string | null = null
+  const hasRehearsal = await isThereARehearsalToday(teamId)
+  if (!hasRehearsal) {
+    console.info('No rehearsal today, exiting')
+    return
+  }
+
   const post = await getMostRecentAttendancePost(teamId)
   if (!post) {
-    console.log('No post found, exiting')
+    console.info('No post found, exiting')
     return
   }
   const ts = post.get('ts')
   const reactions = await getReactionsForPost(token, channel, ts)
   let shouldPostMessage = false
+
   // First, has anyone already volunteered?
   const facilitatorReactions = getUserReactionsForEmoji({
     reactions,
@@ -50,11 +59,12 @@ export async function runFacilitatorRoulette(
       reactions,
       emoji: Emoji.Attending,
       botId
-    })
+    }).filter((userId) => (prevFacilitator ? userId !== prevFacilitator : true))
     if (attendees.length === 0) {
       console.log('no attendees')
       return
     }
+
     facilitatorUserId = await pickRandomAttendee(
       attendees,
       teamId,
@@ -131,10 +141,12 @@ export async function rerollFacilitator(
   token: string,
   channel: string,
   botId: string,
-  rehearsalTimingsLink: string
+  rehearsalTimingsLink: string,
+  actorId: string // the person who chose to decline
 ): Promise<void> {
   const date = format(new Date(), 'yyyy-MM-dd')
-  // Persist the user ID of our facilitator so we can track who's facilitated
+
+  // Reset the facilitator role for today
   await updateDbValue(`attendance-${teamId}`, date, {
     roles: { facilitator: null }
   })
@@ -144,6 +156,7 @@ export async function rerollFacilitator(
     token,
     channel,
     botId,
-    rehearsalTimingsLink
+    rehearsalTimingsLink,
+    actorId
   )
 }
