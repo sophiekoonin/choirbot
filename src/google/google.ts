@@ -107,7 +107,7 @@ export async function putGoogleCredentials(req: Request, res: Response) {
   }
 }
 
-export async function testGoogleIntegration(req: Request, res: Response) {
+export async function testGoogleIntegration(_: Request, res: Response) {
   try {
     const sheetId = process.env.TEST_SHEET_ID
     const auth = await google.auth.getClient({
@@ -129,9 +129,11 @@ export async function isThereARehearsalToday(teamId: string) {
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS
   })
+  const sheetId = await dbHelpers.getValue('teams', teamId, 'google_sheet_id')
+
   const row = await getRowNumberForDate(
     auth,
-    teamId,
+    sheetId,
     format(today, 'dd/MM/yyyy')
   )
   if (row < 0) return false
