@@ -8,6 +8,19 @@ import { pickRandomAttendee } from './helpers'
 import { SectionBlock } from '@slack/web-api'
 import { isThereARehearsalToday } from '../google/google'
 
+function introBlock(
+  facilitatorUserId: string,
+  rehearsalTimingsLink: string
+): SectionBlock {
+  return {
+    type: 'section',
+    text: {
+      type: 'mrkdwn',
+      text: `:8ball: Nobody volunteered to facilitate today, so we're shaking the magic 8 ball. Today's randomly-chosen facilitator is <@${facilitatorUserId}>!\n\n⌚️ <${rehearsalTimingsLink}|Rehearsal timings>`
+    }
+  }
+}
+
 export async function runFacilitatorRoulette(
   teamId: string,
   token: string,
@@ -96,13 +109,7 @@ export async function runFacilitatorRoulette(
   }
 
   const blocks: SectionBlock[] = [
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `:8ball: Nobody volunteered to facilitate today, so we're shaking the magic 8 ball. Today's randomly-chosen facilitator is <@${facilitatorUserId}>!\n\n⌚️ <${rehearsalTimingsLink}|Rehearsal timings>`
-      }
-    },
+    introBlock(facilitatorUserId, rehearsalTimingsLink),
     {
       type: 'section',
       text: {
@@ -142,13 +149,31 @@ export async function rerollFacilitator(
   channel: string,
   botId: string,
   rehearsalTimingsLink: string,
-  actorId: string // the person who chose to decline
+  actorId: string, // the person who chose to decline
+  postTs: string
 ): Promise<void> {
   const date = format(new Date(), 'yyyy-MM-dd')
 
   // Reset the facilitator role for today
   await updateDbValue(`attendance-${teamId}`, date, {
     roles: { facilitator: null }
+  })
+
+  // Overwrite the existing post
+  await SlackClient.chat.update({
+    token,
+    ts: postTs,
+    channel,
+    blocks: [
+      introBlock(actorId, rehearsalTimingsLink),
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `_Nominated person declined_`
+        }
+      }
+    ]
   })
 
   return runFacilitatorRoulette(

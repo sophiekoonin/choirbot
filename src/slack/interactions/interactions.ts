@@ -160,6 +160,7 @@ export async function handleFacilitatorDeclined(
     channel,
     botId,
     rehearsal_timings_link as string,
-    userId
+    userId,
+    timestamp
   )
 }
