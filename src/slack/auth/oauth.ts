@@ -27,8 +27,8 @@ export const oauth_redirect = async function (
     : (req.query.code as string)
 
   const result = await SlackClient.oauth.v2.access({
-    client_id: SLACK_CLIENT_ID,
-    client_secret: SLACK_CLIENT_SECRET,
+    client_id: SLACK_CLIENT_ID || '',
+    client_secret: SLACK_CLIENT_SECRET || '',
     code
   })
 

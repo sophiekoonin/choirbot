@@ -26,7 +26,7 @@ export async function postRehearsalReminder({
     let text = `:wave: Here's the plan for ${dayOfWeek}'s rehearsal!`
     let destination = channel
     const isNextWeek = ['Monday', 'Tuesday', 'Wednesday'].includes(dayOfWeek)
-    let blocks: Block[]
+    let blocks: Block[] | undefined
 
     if (isBankHoliday) {
       text = `<!channel> It's a bank holiday next ${dayOfWeek}, so no rehearsal! Have a lovely day off!`
@@ -47,7 +47,7 @@ export async function postRehearsalReminder({
             notes: '<!channel> ' + nextWeekSongs.notes,
             showEmoji: false
           })
-        ]
+        ].filter((block) => block != null) as Block[]
       } else if (nextWeekSongs.mainSong.match(/no rehearsal/gi)) {
         text = `Reminder: there's no rehearsal ${
           isNextWeek ? 'next' : 'this'
@@ -65,7 +65,9 @@ export async function postRehearsalReminder({
                 `We're not meeting ${isNextWeek ? 'next' : 'this'} week.`),
             showEmoji: false
           })
-        ]
+        ].filter(
+          (block): block is NonNullable<typeof block> => block != null
+        ) as Block[]
       } else {
         blocks = getRehearsalMusicBlocks(nextWeekSongs, dayOfWeek).filter(
           (block) => block != null
@@ -118,10 +120,10 @@ export const updateRehearsalMessage = async ({
     token
   })
   // Conversations are in reverse-chron order, so we look through for the first one by the bot
-  const rehearsalMessage = conversationHistory.messages.find(
+  const rehearsalMessage = conversationHistory.messages?.find(
     (message) =>
       message.app_id === process.env.SLACK_APP_ID &&
-      message.text.includes(`Here's the plan for ${dayOfWeek}'s rehearsal!`)
+      message.text?.includes(`Here's the plan for ${dayOfWeek}'s rehearsal!`)
   )
 
   if (rehearsalMessage == null) {

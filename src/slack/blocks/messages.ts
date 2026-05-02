@@ -90,7 +90,7 @@ export function runThroughBlock({
   runThrough: string
   runThroughLink: string
 }): SectionBlock | null {
-  if (runThrough == null || runThrough === '') return
+  if (runThrough == null || runThrough === '') return null
   return {
     type: 'section',
     block_id: AttendancePostSections.RUN_THROUGH,

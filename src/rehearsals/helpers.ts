@@ -19,8 +19,8 @@ export function getRehearsalMusicBlocks(
         type: 'mrkdwn',
         text: `<!channel> Here's the plan for ${dayOfWeek}'s rehearsal!`
       }
-    },
-    notesBlock({ notes }),
+    } as SectionBlock,
+    notesBlock({ notes })!,
     mainSongBlock({ mainSong, mainSongLink }),
     runThroughBlock({ runThrough, runThroughLink }),
     {
@@ -29,8 +29,8 @@ export function getRehearsalMusicBlocks(
         type: 'mrkdwn',
         text: ':musical_note: Please give the recordings a listen before rehearsal.'
       }
-    }
-  ]
+    } as SectionBlock
+  ].filter((block) => block != null)
 }
 
 export async function getRehearsalDateFromToday(rehearsalDay: string) {

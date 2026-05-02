@@ -35,6 +35,7 @@ export const updateAttendanceMessage = async ({
     return
   }
   const team = await getDocData('teams', teamId)
+  if (team == null) return
 
   if (songs == null) {
     const userId = team.user_id

@@ -2,7 +2,7 @@ import { Actions } from '../constants'
 import { getValues, getDbDoc } from '../../db/helpers'
 import { TeamId, UserId } from '../types'
 import { AttendanceBlockSelectors } from '../blocks/config'
-import { Option, ModalView } from '@slack/web-api'
+import { Option, ModalView, PlainTextOption } from '@slack/web-api'
 import { getReportBlocks } from '../reports/reports'
 import { getAttendancePostBlocks } from '../../attendance/helpers'
 import { Blocks } from '../blocks/constants'
@@ -144,7 +144,7 @@ export async function chooseAttendancePostBlocks(
     .map((block: string) =>
       AttendanceBlockSelectors.find((b) => b.value === block)
     )
-    .filter((block: Option) => block != null)
+    .filter((block): block is PlainTextOption => block != null)
 
   return {
     type: 'modal',

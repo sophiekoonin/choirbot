@@ -39,7 +39,7 @@ export async function joinChannel(
     await SlackClient.chat.postMessage({
       token,
       channel: user_id,
-      text: `Couldn't join the channel #${channel} - got the following error: ${err.message}`
+      text: `Couldn't join the channel #${channel} - got the following error: ${(err as Error).message}`
     })
   }
 }

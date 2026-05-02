@@ -58,8 +58,9 @@ export const getValues = async (
     throw new Error(`Doc not found for ${docName}`)
   } else {
     const data = doc.data()
+
     return keys
-      .map((key) => ({ [key]: data[key] }))
+      .map((key) => ({ [key]: data![key] }))
       .reduce((acc, curr) => {
         return { ...acc, ...curr }
       }, {})

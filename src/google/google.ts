@@ -20,13 +20,13 @@ export async function getRowNumberForDate(
   }
   try {
     const response = await sheets.spreadsheets.values.get(request)
-    const values = [...response.data.values].flat()
+    const values = [...(response.data.values ?? [])].flat()
     const rowNumber = values.indexOf(dateString)
     // 1-indexed
     return rowNumber < 0 ? rowNumber : rowNumber + 1
   } catch (err) {
     console.error(`Error getting row number: ${err}`)
-    throw new Error(err)
+    throw err instanceof Error ? err : new Error(String(err))
   }
 }
 
@@ -53,9 +53,9 @@ export async function getSongDetailsFromSheet(
       ranges: ['B1:I1', `B${rowNumber}:I${rowNumber}`]
     })
     const { valueRanges } = response.data
-    const headers = valueRanges.find((v) => v.range.match(/B1:I1/gi))
-    const thisWeekData = valueRanges.find((v) => v.range !== headers.range)
-    const customColumnHeader = headers.values.flat()[5]
+    const headers = valueRanges!.find((v) => v.range?.match(/B1:I1/gi))
+    const thisWeekData = valueRanges!.find((v) => v.range !== headers!.range)
+    const customColumnHeader = headers!.values!.flat()[5]
     const [
       mainSong,
       runThrough,
@@ -63,7 +63,7 @@ export async function getSongDetailsFromSheet(
       mainSongLink,
       runThroughLink,
       customColumnValue
-    ] = thisWeekData.values.flat()
+    ] = thisWeekData!.values!.flat()
     return {
       mainSong,
       mainSongLink,
@@ -77,7 +77,7 @@ export async function getSongDetailsFromSheet(
     console.error(
       `The API returned an error when trying to get song details: ${err}`
     )
-    throw new Error(err)
+    throw err instanceof Error ? err : new Error(String(err))
   }
 }
 
@@ -115,7 +115,7 @@ export async function testGoogleIntegration(_: Request, res: Response) {
       keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS
     })
     const testDate = '18/03/2019'
-    const rowNumber = await getRowNumberForDate(auth, sheetId, testDate)
+    const rowNumber = await getRowNumberForDate(auth, sheetId!, testDate)
     res.status(200).send(`Row number is ${rowNumber}`)
   } catch (err) {
     console.error(err)
