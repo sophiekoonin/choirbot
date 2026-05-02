@@ -18,8 +18,8 @@ export function verifyRequestSignature(
   req: Request,
   res: Response,
   next: NextFunction
-): Response {
-  const signingSecret = process.env.SLACK_SIGNING_SECRET
+): Response | void {
+  const signingSecret = process.env.SLACK_SIGNING_SECRET!
   const requestHeaders = req.headers as VerificationHeaders
   // Request signature
   const signature = requestHeaders['x-slack-signature']
@@ -38,7 +38,7 @@ export function verifyRequestSignature(
   }
   const hmac = crypto.createHmac('sha256', signingSecret)
   const [version, hash] = signature.split('=')
-  hmac.update(`${version}:${ts}:${req.text}`)
+  hmac.update(`${version}:${ts}:${req.text ?? ''}`)
 
   if (!timingSafeCompare(hash, hmac.digest('hex'))) {
     return res.status(200).send({

@@ -91,7 +91,7 @@ export async function setChannel(
   token: string,
   teamId: string
 ) {
-  const id = action.selected_channels[0]
+  const id = action.selected_channels![0]
   const channelInfo = (await SlackClient.conversations.info({
     token,
     channel: id

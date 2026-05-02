@@ -3,8 +3,8 @@
     "target": "es2017",
     "noImplicitAny": true,
     "sourceMap": true,
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "module": "es2022",
+    "moduleResolution": "bundler",
     "outDir": "dist",
     "rootDir": ".",
     "esModuleInterop": true,
@@ -12,14 +12,16 @@
       "es2019",
       "dom"
     ],
+    "types": [
+      "node",
+      "jest"
+    ]
   },
   "include": [
     "src/**/*"
   ],
   "exclude": [
     "node_modules",
-    "**/__mocks__/*",
-    "**/*.test.ts",
     "dist/**/*"
   ]
 }

@@ -8,8 +8,8 @@
   },
   "scripts": {
     "deploy": "gcloud app deploy --quiet app.yaml cron.yaml",
-    "gcp-build": "tsc -p .",
-    "build:watch": "tsc --watch -p .",
+    "gcp-build": "tsc -p tsconfig.build.json",
+    "build:watch": "tsc --watch -p tsconfig.build.json",
     "start": "NODE_ENV=prod node --import=extensionless/register dist/app.js",
     "dev": "nodemon --import=extensionless/register -r dotenv/config dist/app.js",
     "test": "jest"

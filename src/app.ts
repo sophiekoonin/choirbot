@@ -30,7 +30,11 @@ app.get('/', (_: express.Request, res: express.Response) => {
   res.send('Hello world! SHEbot v2.1')
 })
 app.get('/cron-test', testCronHandler)
-app.post('/interactions', verifyRequestSignature, handleInteractions)
+app.post(
+  '/interactions',
+  verifyRequestSignature as express.RequestHandler,
+  handleInteractions as express.RequestHandler
+)
 app.get('/oauth_redirect', oauth_redirect)
 app.post('/events', handleEvents)
 app.get('/oauth_success', oauth_success)
