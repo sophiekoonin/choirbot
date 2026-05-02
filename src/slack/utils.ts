@@ -49,12 +49,12 @@ export function getUserReactionsForEmoji({
   emoji,
   botId
 }: {
-  reactions: ReactionResult[]
+  reactions: ReactionResult[] | undefined
   emoji: string
   botId?: UserId
 }): UserId[] {
   const result =
-    reactions.find((group) => group.name === emoji)?.['users'] || []
+    (reactions || []).find((group) => group.name === emoji)?.['users'] || []
   if (botId != null && result != null) {
     return result.filter((userId) => userId !== botId)
   }

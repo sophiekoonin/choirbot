@@ -11,7 +11,7 @@ export function getConfigSubmissionValues(values: SubmissionValues) {
       case BlockTypes.MULTI_STATIC_SELECT:
         return {
           ...acc,
-          [curr]: item.selected_options.map((option) => option.value)
+          [curr]: item.selected_options?.map((option) => option.value)
         }
       case BlockTypes.MULTI_USERS_SELECT:
         return {

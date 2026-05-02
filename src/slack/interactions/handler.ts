@@ -27,13 +27,13 @@ export async function handleInteractions(
   }
   const { actions, team, trigger_id, view, type, user, message, channel } =
     payload
+  res.send()
   let channelId = channel?.id
   const { root } = message || {}
   const { access_token, channel_id } = await getValues('teams', team.id, [
     'access_token',
     'channel_id'
   ])
-  res.send()
   if (view != null && type === Interactions.VIEW_SUBMISSION) {
     const valuesToUpdate = getConfigSubmissionValues(view.state.values)
     await updateDbValue('teams', team.id, valuesToUpdate)
@@ -69,13 +69,13 @@ export async function handleInteractions(
           break
         case Actions.SELECT_REHEARSAL_DAY:
           updateDbValue('teams', team.id, {
-            [action_id]: action.selected_option.value
+            [action_id]: action.selected_option?.value
           })
           break
         case Actions.YES_NO_REMINDERS:
         case Actions.FACILITATOR_ROULETTE:
           updateDbValue('teams', team.id, {
-            [action_id]: action.selected_option.value === 'true'
+            [action_id]: action.selected_option?.value === 'true'
           })
           break
         case Actions.DISABLE_CHOIRBOT:
@@ -108,10 +108,11 @@ export async function handleInteractions(
             team.id,
             token,
             channelId,
-            root?.user,
-            root?.ts,
+            root?.user || '',
+            root?.ts || '',
             user.id
           )
+          break
         default:
           break
       }

@@ -38,7 +38,7 @@ app.get('/oauth_error', oauth_error)
 app.get('/cron', checkForJobsToday)
 app.get('/roulette', runFacilitatorRouletteCronJob)
 
-const PORT: number = parseInt(process.env.PORT) || 6060
+const PORT: number = parseInt(process.env.PORT!) || 6060
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`)
   console.log('Press Ctrl+C to quit.')
