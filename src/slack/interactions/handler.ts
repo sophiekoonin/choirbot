@@ -27,7 +27,7 @@ export async function handleInteractions(
   }
   const { actions, team, trigger_id, view, type, user, message, channel } =
     payload
-  res.send()
+  res.sendStatus(200)
   let channelId = channel?.id
   const { root } = message || {}
   const { access_token, channel_id } = await getValues('teams', team.id, [

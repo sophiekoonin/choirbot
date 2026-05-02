@@ -7,7 +7,7 @@ jest.mock('../client')
 
 describe('Slack interactions handler', () => {
   const response = {
-    send: jest.fn()
+    sendStatus: jest.fn()
   }
   beforeEach(() => {
     jest.clearAllMocks()
