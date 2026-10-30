@@ -1,10 +1,4 @@
-import {
-  JWT,
-  Compute,
-  UserRefreshClient,
-  Impersonated,
-  BaseExternalAccountClient
-} from 'google-auth-library'
+import { google } from 'googleapis'
 export interface SongData {
   mainSong: string
   mainSongLink: string
@@ -15,9 +9,4 @@ export interface SongData {
   customColumnValue: string
 }
 
-export type GoogleAuth =
-  | JWT
-  | Compute
-  | UserRefreshClient
-  | BaseExternalAccountClient
-  | Impersonated
+export type GoogleAuth = Awaited<ReturnType<typeof google.auth.getClient>>
